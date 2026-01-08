@@ -118,7 +118,6 @@
     <header class="theme-bg text-white shadow-lg no-print transition-colors duration-300">
         <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3 w-full md:w-auto">
-                <!-- Alterado para RFM conforme solicitado -->
                 <div class="flex items-center justify-center w-12 h-12 bg-white/20 rounded-lg border-2 border-white/30 backdrop-blur-sm">
                     <span class="text-xl font-black tracking-tighter">RFM</span>
                 </div>
@@ -171,7 +170,6 @@
                 
                 <!-- Cor -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <!-- Texto alterado conforme solicitado -->
                     <h3 class="text-xs font-bold text-slate-500 uppercase mb-3">Personalizar Cor</h3>
                     <div class="grid grid-cols-5 gap-3">
                         <!-- Linha 1 -->
@@ -187,19 +185,6 @@
                         <button onclick="setTheme('teal')" class="w-8 h-8 rounded-full bg-teal-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Turquesa"></button>
                         <button onclick="setTheme('lime')" class="w-8 h-8 rounded-full bg-lime-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Limão"></button>
                         <button onclick="setTheme('fuchsia')" class="w-8 h-8 rounded-full bg-fuchsia-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Fúcsia"></button>
-                    </div>
-                </div>
-
-                <!-- Nova Refeição -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700">
-                        <i class="fa-solid fa-calendar-plus theme-text"></i> Criar Refeição Extra
-                    </h2>
-                    <div class="flex gap-2">
-                        <input type="text" id="new-meal-name" placeholder="Ex: Pré-Treino..." class="flex-1 p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm">
-                        <button onclick="addNewMeal()" class="bg-slate-800 text-white px-4 rounded-lg hover:bg-slate-700 transition">
-                            <i class="fa-solid fa-plus"></i>
-                        </button>
                     </div>
                 </div>
 
@@ -265,6 +250,19 @@
                     </div>
                 </div>
 
+                <!-- Nova Refeição (MOVIDO PARA BAIXO) -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700">
+                        <i class="fa-solid fa-calendar-plus theme-text"></i> Criar Refeição Extra
+                    </h2>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-meal-name" placeholder="Ex: Pré-Treino..." class="flex-1 p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm">
+                        <button onclick="addNewMeal()" class="bg-slate-800 text-white px-4 rounded-lg hover:bg-slate-700 transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Adicionar Novos Alimentos -->
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                     <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700 cursor-pointer" onclick="toggleCustomForm()">
@@ -273,6 +271,12 @@
                     </h2>
                     
                     <div id="custom-food-form" class="hidden space-y-3 pt-2 border-t border-slate-100">
+                        <!-- MENSAGEM DE AVISO ATUALIZADA -->
+                        <div class="bg-amber-50 p-3 rounded-lg text-xs text-amber-800 mb-2 border border-amber-100 leading-relaxed">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i> 
+                            <strong>Atenção:</strong> Os alimentos adicionados ficarão salvos <u>apenas neste navegador</u>. Se você limpar o cache ou usar outro navegador, eles desaparecerão.
+                        </div>
+                        
                         <input type="text" id="new-name" placeholder="Nome do Alimento" class="w-full p-2 text-sm border rounded">
                         
                         <!-- Novo campo de Porção Base -->
@@ -303,8 +307,14 @@
                             </div>
                         </div>
                         <button onclick="createCustomFood()" class="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 py-2 rounded-lg text-sm font-semibold transition border border-blue-200 mt-2">
-                            Salvar no Banco
+                            Salvar no Banco (Permanente)
                         </button>
+                        
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                             <button onclick="clearCustomFoods()" class="text-xs text-red-400 hover:text-red-600 underline w-full text-center">
+                                Limpar alimentos personalizados salvos
+                             </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -622,6 +632,9 @@
         };
 
         function init() {
+            // -- NOVO: Carregar alimentos personalizados salvos --
+            loadCustomFoodsFromStorage();
+
             const dateInput = document.getElementById('diet-date');
             if(dateInput) {
                 dateInput.valueAsDate = new Date();
@@ -719,7 +732,9 @@
             sortedFoods.forEach(food => {
                 const option = document.createElement('option');
                 option.value = food.id;
-                option.text = `${food.name} (${food.cal}kcal/100g)`;
+                // Marcador visual para alimentos personalizados
+                const marker = food.isCustom ? '★ ' : '';
+                option.text = `${marker}${food.name} (${food.cal.toFixed(0)}kcal/100g)`;
                 select.appendChild(option);
             });
             
@@ -989,6 +1004,45 @@
             }
         }
 
+        // ============================================
+        // === NOVAS FUNÇÕES PARA PERSISTÊNCIA ===
+        // ============================================
+
+        function loadCustomFoodsFromStorage() {
+            const stored = localStorage.getItem('dietCustomFoods');
+            if (stored) {
+                try {
+                    const customFoods = JSON.parse(stored);
+                    if (Array.isArray(customFoods)) {
+                        // Adiciona ao banco de dados principal
+                        foodDatabase = [...foodDatabase, ...customFoods];
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar alimentos personalizados", e);
+                }
+            }
+        }
+
+        function saveCustomFoodToStorage(foodItem) {
+            // Recupera lista existente ou cria nova
+            let stored = localStorage.getItem('dietCustomFoods');
+            let customList = stored ? JSON.parse(stored) : [];
+            
+            // Adiciona novo item
+            customList.push(foodItem);
+            
+            // Salva de volta
+            localStorage.setItem('dietCustomFoods', JSON.stringify(customList));
+        }
+
+        function clearCustomFoods() {
+            if(confirm("Isso apagará todos os alimentos que você criou manualmente do histórico deste navegador. Confirmar?")) {
+                localStorage.removeItem('dietCustomFoods');
+                showToast("Alimentos personalizados limpos. Recarregue a página.", "neutral");
+                setTimeout(() => location.reload(), 1500);
+            }
+        }
+
         function createCustomFood() {
             const name = document.getElementById('new-name').value;
             // Novo: Pega a porção base do usuário
@@ -1001,20 +1055,24 @@
             if (isNaN(cal)) { showToast("Preencha as calorias!", "error"); return; }
 
             // Fator de conversão para normalizar para 100g
-            // Ex: Se usuário põe 30g e 24g de prot. 
-            // Fator = 100 / 30 = 3.333
-            // Prot armazenada = 24 * 3.333 = 80g (que é o correto para 100g)
             const factor = 100 / serving;
 
             const newId = Date.now(); 
-            foodDatabase.push({
+            const newFood = {
                 id: newId,
-                name: name, // Nome puro, o sistema de cálculo se encarrega
+                name: name, 
                 cal: cal * factor,
                 carb: (parseFloat(document.getElementById('new-carb').value) || 0) * factor,
                 prot: (parseFloat(document.getElementById('new-prot').value) || 0) * factor,
-                fat: (parseFloat(document.getElementById('new-fat').value) || 0) * factor
-            });
+                fat: (parseFloat(document.getElementById('new-fat').value) || 0) * factor,
+                isCustom: true // Marcador para saber que é personalizado
+            };
+
+            // Adiciona à lista em tempo real
+            foodDatabase.push(newFood);
+            
+            // --- NOVO: SALVA NO NAVEGADOR ---
+            saveCustomFoodToStorage(newFood);
             
             // Limpa form e busca
             document.getElementById('search-food').value = '';
@@ -1030,7 +1088,7 @@
             document.getElementById('select-food').value = newId;
             
             toggleCustomForm();
-            showToast("Alimento criado com sucesso!");
+            showToast("Alimento criado e salvo!");
         }
 
         function toggleCustomForm() {
