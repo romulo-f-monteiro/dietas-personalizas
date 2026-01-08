@@ -44,6 +44,16 @@
                 size: auto;
             }
 
+            /* --- CORREÇÃO DE FLICKERING/PISCAR --- */
+            * {
+                animation: none !important;
+                transition: none !important;
+                backdrop-filter: none !important; /* Remove efeito de vidro pesado */
+                -webkit-backdrop-filter: none !important;
+                box-shadow: none !important; /* Remove sombras pesadas */
+                text-shadow: none !important;
+            }
+
             body { 
                 background-color: white; 
                 margin: 0; 
@@ -54,6 +64,7 @@
             
             .no-print { display: none !important; }
             .print-only { display: block !important; }
+            #toast { display: none !important; } /* Garante que o toast suma */
 
             .container, #document-area {
                 max-width: 100% !important;
