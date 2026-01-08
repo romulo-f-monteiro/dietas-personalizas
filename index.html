@@ -30,6 +30,13 @@
         .theme-border { border-color: var(--border-color) !important; }
         .theme-ring:focus { --tw-ring-color: var(--primary); }
 
+        /* Remove setas do input number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
         /* --- CONFIGURAÇÃO DE IMPRESSÃO (NATIVO) --- */
         @media print {
             @page {
@@ -65,6 +72,15 @@
             }
 
             ::-webkit-scrollbar { display: none; }
+            
+            /* Remove input styling on print */
+            .qty-input {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                text-align: center;
+                width: auto !important;
+            }
         }
 
         .editable-div {
@@ -109,6 +125,20 @@
             outline: 2px solid var(--primary-light);
             text-decoration: none;
             border-radius: 4px;
+        }
+
+        .qty-input {
+            width: 50px;
+            text-align: center;
+            background-color: transparent;
+            border-bottom: 1px dashed #cbd5e1;
+            transition: all 0.2s;
+        }
+        .qty-input:focus {
+            outline: none;
+            background-color: white;
+            border-bottom: 2px solid var(--primary);
+            font-weight: bold;
         }
     </style>
 </head>
@@ -230,6 +260,12 @@
                                 </div>
                                 <input type="text" id="search-food" onkeyup="filterFoods()" placeholder="Buscar alimento (ex: arroz, frango)..." class="w-full p-2 pl-10 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm">
                             </div>
+                            
+                            <!-- DICA VISUAL PARA CLICAR NA LISTA -->
+                            <div id="search-hint" class="hidden bg-blue-50 text-blue-600 text-xs p-2 rounded mb-2 flex items-center gap-2 border border-blue-100 animate-pulse">
+                                <i class="fa-solid fa-arrow-down"></i> Selecione o alimento na lista abaixo:
+                            </div>
+
                             <!-- Select Filtrável -->
                             <select id="select-food" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none custom-scroll text-sm">
                                 <!-- JS Populates -->
@@ -250,7 +286,7 @@
                     </div>
                 </div>
 
-                <!-- Nova Refeição (MOVIDO PARA BAIXO) -->
+                <!-- Nova Refeição -->
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                     <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700">
                         <i class="fa-solid fa-calendar-plus theme-text"></i> Criar Refeição Extra
@@ -271,7 +307,7 @@
                     </h2>
                     
                     <div id="custom-food-form" class="hidden space-y-3 pt-2 border-t border-slate-100">
-                        <!-- MENSAGEM DE AVISO ATUALIZADA -->
+                        <!-- MENSAGEM DE AVISO -->
                         <div class="bg-amber-50 p-3 rounded-lg text-xs text-amber-800 mb-2 border border-amber-100 leading-relaxed">
                             <i class="fa-solid fa-triangle-exclamation mr-1"></i> 
                             <strong>Atenção:</strong> Os alimentos adicionados ficarão salvos <u>apenas neste navegador</u>. Se você limpar o cache ou usar outro navegador, eles desaparecerão.
@@ -744,7 +780,16 @@
 
         function filterFoods() {
             const searchInput = document.getElementById('search-food');
-            renderFoodSelect(searchInput.value);
+            const term = searchInput.value;
+            renderFoodSelect(term);
+            
+            // LÓGICA DO HINT VISUAL
+            const hint = document.getElementById('search-hint');
+            if (term.length > 0) {
+                hint.classList.remove('hidden');
+            } else {
+                hint.classList.add('hidden');
+            }
         }
 
         // --- FUNÇÃO PARA ATUALIZAR NOME DO ALIMENTO ---
@@ -754,6 +799,43 @@
                 // Atualiza o nome apenas na instância local da dieta
                 meal.foods[foodIndex].name = newName.trim();
                 showToast("Nome do alimento atualizado", "neutral");
+            }
+        }
+        
+        // --- FUNÇÃO PARA ATUALIZAR QUANTIDADE DO ALIMENTO NA TABELA ---
+        function updateFoodQty(mealId, foodIndex, newQtyVal) {
+            const meal = dietMeals.find(m => m.id === mealId);
+            if (meal && meal.foods[foodIndex]) {
+                const qty = parseFloat(newQtyVal);
+                if (isNaN(qty) || qty <= 0) return;
+
+                const food = meal.foods[foodIndex];
+                const factor = qty / 100;
+                
+                // Recalcula tudo com base na quantidade nova
+                food.qty = qty;
+                food.totalCal = food.cal * factor;
+                food.totalCarb = food.carb * factor;
+                food.totalProt = food.prot * factor;
+                food.totalFat = food.fat * factor;
+                
+                renderDiet(); // Redesenha para atualizar totais
+                showToast("Quantidade atualizada", "neutral");
+            }
+        }
+        
+        // --- FUNÇÃO PARA MOVER ALIMENTO NA LISTA ---
+        function moveFood(mealId, foodIndex, direction) {
+            const meal = dietMeals.find(m => m.id === mealId);
+            if (!meal) return;
+            
+            const newIndex = foodIndex + direction;
+            
+            // Verifica limites
+            if (newIndex >= 0 && newIndex < meal.foods.length) {
+                // Troca de posição
+                [meal.foods[foodIndex], meal.foods[newIndex]] = [meal.foods[newIndex], meal.foods[foodIndex]];
+                renderDiet();
             }
         }
 
@@ -801,29 +883,49 @@
                             `;
                         }
                         contentHtml += `<table class="w-full text-left text-sm">
-                                    <tbody class="divide-y divide-slate-100">
-                                        ${groups[opt].map((food) => {
-                                            const originalIndex = meal.foods.indexOf(food);
-                                            return `
-                                            <tr class="hover:bg-slate-50 transition group">
-                                                <td class="p-3 text-slate-700 font-medium pl-4 w-1/2 transition"
-                                                    contenteditable="true"
-                                                    onblur="updateFoodName(${meal.id}, ${originalIndex}, this.innerText)"
-                                                    onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
-                                                    title="Clique para editar o nome"
-                                                >${food.name}</td>
-                                                <td class="p-3 text-center text-slate-600 bg-slate-50/50 text-xs">${food.qty}g</td>
-                                                <td class="p-3 text-center font-bold text-slate-700 text-xs">${food.totalCal.toFixed(0)} kcal</td>
-                                                <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell">C:${food.totalCarb.toFixed(0)} P:${food.totalProt.toFixed(0)} G:${food.totalFat.toFixed(0)}</td>
-                                                <td class="p-3 text-center no-print w-10">
-                                                    <button onclick="removeFood(${meal.id}, ${originalIndex})" class="text-slate-300 hover:text-red-500 transition" data-html2canvas-ignore="true">
-                                                        <i class="fa-solid fa-times"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            `}).join('')}
-                                    </tbody>
-                                </table>`;
+                                            <tbody class="divide-y divide-slate-100">
+                                                ${groups[opt].map((food) => {
+                                                    const originalIndex = meal.foods.indexOf(food);
+                                                    return `
+                                                    <tr class="hover:bg-slate-50 transition group">
+                                                        <td class="p-3 text-slate-700 font-medium pl-4 w-1/2 transition"
+                                                            contenteditable="true"
+                                                            onblur="updateFoodName(${meal.id}, ${originalIndex}, this.innerText)"
+                                                            onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+                                                            title="Clique para editar o nome"
+                                                        >${food.name}</td>
+                                                        
+                                                        <td class="p-3 text-center text-slate-600 bg-slate-50/50 text-xs">
+                                                            <div class="flex items-center justify-center gap-1">
+                                                                <input type="number" 
+                                                                    class="qty-input" 
+                                                                    value="${food.qty}" 
+                                                                    onchange="updateFoodQty(${meal.id}, ${originalIndex}, this.value)"
+                                                                    onkeydown="if(event.key==='Enter'){this.blur();}"
+                                                                > g
+                                                            </div>
+                                                        </td>
+                                                        
+                                                        <td class="p-3 text-center font-bold text-slate-700 text-xs">${food.totalCal.toFixed(0)} kcal</td>
+                                                        <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell">C:${food.totalCarb.toFixed(0)} P:${food.totalProt.toFixed(0)} G:${food.totalFat.toFixed(0)}</td>
+                                                        <td class="p-3 text-center no-print w-24">
+                                                            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                                                                
+                                                                <!-- Botões de mover -->
+                                                                <div class="flex flex-col text-[8px] text-slate-400">
+                                                                    <button onclick="moveFood(${meal.id}, ${originalIndex}, -1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-up"></i></button>
+                                                                    <button onclick="moveFood(${meal.id}, ${originalIndex}, 1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-down"></i></button>
+                                                                </div>
+
+                                                                <button onclick="removeFood(${meal.id}, ${originalIndex})" class="text-slate-300 hover:text-red-500 transition ml-1" title="Remover item" data-html2canvas-ignore="true">
+                                                                    <i class="fa-solid fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    `}).join('')}
+                                            </tbody>
+                                        </table>`;
                     }
                 });
 
@@ -839,7 +941,7 @@
                         <div class="meal-header theme-bg-light p-4 border-b theme-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             
                             <div class="flex items-center gap-3 flex-1 w-full sm:w-auto">
-                                <!-- Controles de Ordem -->
+                                <!-- Controles de Ordem da Refeição -->
                                 <div class="flex flex-col gap-1 no-print">
                                     <button onclick="moveMeal(${index}, -1)" class="text-[10px] leading-none px-1 py-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 ${index === 0 ? 'invisible' : ''}" title="Mover para cima">
                                         <i class="fa-solid fa-chevron-up"></i>
@@ -850,7 +952,7 @@
                                 </div>
 
                                 <h3 class="font-bold text-slate-700 flex items-center gap-2 flex-1 cursor-text hover:bg-white/50 px-2 py-1 rounded border border-transparent hover:border-slate-200 transition"
-                                    contenteditable="true"
+                                    contenteditable="true" 
                                     onblur="updateMealTitle(${meal.id}, this.innerText)"
                                     onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
                                     title="Clique para editar o nome da refeição">
@@ -932,6 +1034,8 @@
                 
                 // Limpar busca para facilitar proxima inserção
                 document.getElementById('search-food').value = '';
+                // Esconder Hint
+                document.getElementById('search-hint').classList.add('hidden');
                 renderFoodSelect();
             }
         }
