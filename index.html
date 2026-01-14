@@ -655,12 +655,12 @@
 
         // Refeições Pré-definidas
         let dietMeals = [
-            { id: 1, title: "Café da Manhã (Desjejum)", foods: [] },
-            { id: 2, title: "Lanche da Manhã (Colação)", foods: [] },
-            { id: 3, title: "Almoço", foods: [] },
-            { id: 4, title: "Lanche da Tarde", foods: [] },
-            { id: 5, title: "Jantar", foods: [] },
-            { id: 6, title: "Ceia", foods: [] }
+            { id: 1, title: "Café da Manhã (Desjejum)", foods: [], observation: "" },
+            { id: 2, title: "Lanche da Manhã (Colação)", foods: [], observation: "" },
+            { id: 3, title: "Almoço", foods: [], observation: "" },
+            { id: 4, title: "Lanche da Tarde", foods: [], observation: "" },
+            { id: 5, title: "Jantar", foods: [], observation: "" },
+            { id: 6, title: "Ceia", foods: [], observation: "" }
         ];
 
         let currentTheme = 'emerald';
@@ -699,7 +699,7 @@
             const name = nameInput.value.trim();
             if(!name) { showToast("Digite o nome da refeição", "error"); return; }
             const newId = Date.now();
-            dietMeals.push({ id: newId, title: name, foods: [] });
+            dietMeals.push({ id: newId, title: name, foods: [], observation: "" });
             nameInput.value = '';
             renderMealSelect();
             renderDiet();
@@ -735,6 +735,14 @@
                 meal.title = newName.trim();
                 renderMealSelect(); // Sync dropdown
                 showToast("Nome da refeição atualizado", "neutral");
+            }
+        }
+
+        function updateMealObservation(id, text) {
+            const meal = dietMeals.find(m => m.id === id);
+            if(meal) {
+                meal.observation = text;
+                showToast("Observação salva", "neutral");
             }
         }
 
@@ -894,55 +902,68 @@
                             `;
                         }
                         contentHtml += `<table class="w-full text-left text-sm">
-                                            <tbody class="divide-y divide-slate-100">
-                                                ${groups[opt].map((food) => {
-                                                    const originalIndex = meal.foods.indexOf(food);
-                                                    return `
-                                                    <tr class="hover:bg-slate-50 transition group">
-                                                        <td class="p-3 text-slate-700 font-medium pl-4 w-1/2 transition"
-                                                            contenteditable="true"
-                                                            onblur="updateFoodName(${meal.id}, ${originalIndex}, this.innerText)"
-                                                            onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
-                                                            title="Clique para editar o nome"
-                                                        >${food.name}</td>
-                                                        
-                                                        <td class="p-3 text-center text-slate-600 bg-slate-50/50 text-xs">
-                                                            <div class="flex items-center justify-center gap-1">
-                                                                <input type="number" 
-                                                                    class="qty-input" 
-                                                                    value="${food.qty}" 
-                                                                    onchange="updateFoodQty(${meal.id}, ${originalIndex}, this.value)"
-                                                                    onkeydown="if(event.key==='Enter'){this.blur();}"
-                                                                > g
-                                                            </div>
-                                                        </td>
-                                                        
-                                                        <td class="p-3 text-center font-bold text-slate-700 text-xs">${food.totalCal.toFixed(0)} kcal</td>
-                                                        <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell">C:${food.totalCarb.toFixed(0)} P:${food.totalProt.toFixed(0)} G:${food.totalFat.toFixed(0)}</td>
-                                                        <td class="p-3 text-center no-print w-24">
-                                                            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                                                                
-                                                                <!-- Botões de mover -->
-                                                                <div class="flex flex-col text-[8px] text-slate-400">
-                                                                    <button onclick="moveFood(${meal.id}, ${originalIndex}, -1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-up"></i></button>
-                                                                    <button onclick="moveFood(${meal.id}, ${originalIndex}, 1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-down"></i></button>
+                                                <tbody class="divide-y divide-slate-100">
+                                                    ${groups[opt].map((food) => {
+                                                        const originalIndex = meal.foods.indexOf(food);
+                                                        return `
+                                                        <tr class="hover:bg-slate-50 transition group">
+                                                            <td class="p-3 text-slate-700 font-medium pl-4 w-1/2 transition"
+                                                                contenteditable="true"
+                                                                onblur="updateFoodName(${meal.id}, ${originalIndex}, this.innerText)"
+                                                                onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+                                                                title="Clique para editar o nome"
+                                                            >${food.name}</td>
+                                                            
+                                                            <td class="p-3 text-center text-slate-600 bg-slate-50/50 text-xs">
+                                                                <div class="flex items-center justify-center gap-1">
+                                                                    <input type="number" 
+                                                                        class="qty-input" 
+                                                                        value="${food.qty}" 
+                                                                        onchange="updateFoodQty(${meal.id}, ${originalIndex}, this.value)"
+                                                                        onkeydown="if(event.key==='Enter'){this.blur();}"
+                                                                    > g
                                                                 </div>
+                                                            </td>
+                                                            
+                                                            <td class="p-3 text-center font-bold text-slate-700 text-xs">${food.totalCal.toFixed(0)} kcal</td>
+                                                            <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell">C:${food.totalCarb.toFixed(0)} P:${food.totalProt.toFixed(0)} G:${food.totalFat.toFixed(0)}</td>
+                                                            <td class="p-3 text-center no-print w-24">
+                                                                <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                                                                    
+                                                                    <!-- Botões de mover -->
+                                                                    <div class="flex flex-col text-[8px] text-slate-400">
+                                                                        <button onclick="moveFood(${meal.id}, ${originalIndex}, -1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-up"></i></button>
+                                                                        <button onclick="moveFood(${meal.id}, ${originalIndex}, 1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-down"></i></button>
+                                                                    </div>
 
-                                                                <button onclick="removeFood(${meal.id}, ${originalIndex})" class="text-slate-300 hover:text-red-500 transition ml-1" title="Remover item" data-html2canvas-ignore="true">
-                                                                    <i class="fa-solid fa-times"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    `}).join('')}
-                                            </tbody>
-                                        </table>`;
+                                                                    <button onclick="removeFood(${meal.id}, ${originalIndex})" class="text-slate-300 hover:text-red-500 transition ml-1" title="Remover item" data-html2canvas-ignore="true">
+                                                                        <i class="fa-solid fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        `}).join('')}
+                                                </tbody>
+                                            </table>`;
                     }
                 });
 
                 if (meal.foods.length === 0) {
                     contentHtml = `<div class="p-6 text-center text-slate-400 text-sm italic no-print">Nenhum alimento adicionado.</div>`;
                 }
+
+                // --- OBSERVAÇÃO ---
+                const observationHtml = `
+                    <div class="px-4 pb-4 pt-2 border-t border-slate-100">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                            <i class="fa-regular fa-comment-dots"></i> Observações
+                        </div>
+                        <div class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm text-slate-600 min-h-[40px] focus:bg-white focus:ring-1 focus:ring-slate-300 outline-none transition"
+                             contenteditable="true"
+                             placeholder="Ex: Beber copo d'água antes..."
+                             onblur="updateMealObservation(${meal.id}, this.innerText)">${meal.observation || ''}</div>
+                    </div>
+                `;
 
                 const mealHtml = `
                     <div class="card bg-white rounded-xl shadow-sm theme-border border overflow-hidden break-inside-avoid relative group">
@@ -979,6 +1000,7 @@
                             </div>
                         </div>
                         <div class="p-0">${contentHtml}</div>
+                        ${observationHtml}
                     </div>
                 `;
                 container.innerHTML += mealHtml;
