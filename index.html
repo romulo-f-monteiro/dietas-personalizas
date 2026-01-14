@@ -736,6 +736,26 @@
             }
         }
 
+        function duplicateMeal(id) {
+            const index = dietMeals.findIndex(m => m.id === id);
+            if (index === -1) return;
+
+            // Cria uma cópia profunda do objeto para evitar referências compartilhadas
+            const originalMeal = dietMeals[index];
+            const newMeal = JSON.parse(JSON.stringify(originalMeal));
+            
+            // Atribui novo ID e atualiza o título
+            newMeal.id = Date.now();
+            newMeal.title = `${originalMeal.title} (Cópia)`;
+
+            // Insere logo após a refeição original
+            dietMeals.splice(index + 1, 0, newMeal);
+
+            renderDiet();
+            renderMealSelect();
+            showToast("Refeição duplicada com sucesso!");
+        }
+
         function moveMeal(index, direction) {
             if (direction === -1 && index > 0) {
                 // Swap with previous
@@ -1010,9 +1030,17 @@
 
                 const mealHtml = `
                     <div class="card bg-white rounded-xl shadow-sm theme-border border overflow-hidden break-inside-avoid relative group">
-                        <button onclick="deleteMeal(${meal.id})" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 no-print opacity-0 group-hover:opacity-100 transition z-10" title="Apagar Refeição" data-html2canvas-ignore="true">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                        
+                        <!-- BOTÕES DE AÇÃO: EXCLUIR E DUPLICAR -->
+                        <div class="absolute top-4 right-4 flex gap-2 no-print opacity-0 group-hover:opacity-100 transition z-10" data-html2canvas-ignore="true">
+                            <button onclick="duplicateMeal(${meal.id})" class="text-slate-300 hover:text-blue-500 transition" title="Duplicar Refeição">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                            <button onclick="deleteMeal(${meal.id})" class="text-slate-300 hover:text-red-500 transition" title="Apagar Refeição">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+
                         <div class="meal-header theme-bg-light p-4 border-b theme-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             
                             <div class="flex items-center gap-3 flex-1 w-full sm:w-auto">
