@@ -9,8 +9,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- REMOVIDO: jQuery e jQuery Mask (Desnecessários e pesados) -->
-
     <style>
         :root {
             --primary: #059669;
@@ -94,7 +92,6 @@
                 page-break-inside: avoid; 
                 border: 1px solid #ddd;
                 box-shadow: none !important;
-                /* background: white !important; <--- REMOVIDO PARA CORRIGIR O FUNDO ESCURO DO RESUMO */
             }
             
             /* Remove estilos de input na impressão para parecer texto puro */
@@ -230,18 +227,135 @@
             <!-- COLUNA DA ESQUERDA: Controles (Oculto no PDF) -->
             <div class="lg:col-span-4 space-y-6 no-print">
                 
+                <!-- === NOVA CALCULADORA DO PROFISSIONAL === -->
+                <div class="bg-slate-800 text-white p-5 rounded-xl shadow-lg border border-slate-700 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10">
+                        <i class="fa-solid fa-calculator text-6xl"></i>
+                    </div>
+                    
+                    <!-- EMOJI REMOVIDO -->
+                    <h2 class="font-bold text-lg mb-4 flex items-center gap-2 relative z-10">
+                        Área do Nutricionista
+                    </h2>
+
+                    <!-- Inputs Antropométricos -->
+                    <div class="space-y-3 relative z-10 text-sm">
+                        <div class="flex gap-2 bg-slate-700/50 p-1 rounded-lg">
+                            <label class="flex-1 text-center cursor-pointer">
+                                <input type="radio" name="calc-sex" value="m" checked class="peer sr-only" onchange="calculateEnergy()">
+                                <div class="py-1.5 rounded peer-checked:bg-blue-600 peer-checked:text-white text-slate-400 transition text-xs font-bold">Homem</div>
+                            </label>
+                            <label class="flex-1 text-center cursor-pointer">
+                                <input type="radio" name="calc-sex" value="f" class="peer sr-only" onchange="calculateEnergy()">
+                                <div class="py-1.5 rounded peer-checked:bg-pink-600 peer-checked:text-white text-slate-400 transition text-xs font-bold">Mulher</div>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 uppercase">Peso (kg)</label>
+                                <input type="number" id="calc-weight" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy()">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 uppercase">Altura (cm)</label>
+                                <input type="number" id="calc-height" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy()">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 uppercase">Idade</label>
+                                <input type="number" id="calc-age" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-slate-400 uppercase">Fórmula TMB</label>
+                            <select id="calc-formula" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="toggleBodyFatInput(); calculateEnergy();">
+                                <option value="mifflin" selected>Mifflin-St Jeor (Padrão)</option>
+                                <option value="harris">Harris-Benedict</option>
+                                <option value="tinsley_p">Tinsley (P) - Ativos</option>
+                                <option value="tinsley_mlg">Tinsley (MLG)</option>
+                                <option value="cunningham">Cunningham (MLG)</option>
+                            </select>
+                        </div>
+
+                        <!-- Campo % Gordura (Escondido por padrão) -->
+                        <div id="bf-container" class="hidden">
+                            <label class="text-[10px] text-slate-400 uppercase">% Gordura (BF)</label>
+                            <input type="number" id="calc-bf" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="Ex: 15" onkeyup="calculateEnergy()">
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-slate-400 uppercase">Nível de Atividade</label>
+                            <select id="calc-activity" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="calculateEnergy()">
+                                <option value="1.2">Sedentário (Pouco ou nenhum - FA 1 - 1,39)</option>
+                                <option value="1.375">Leve (1-3 dias/sem - FA 1,4 - 1,59)</option>
+                                <option value="1.55" selected>Moderado (3-5 dias/sem - FA 1,6 - 1,89)</option>
+                                <option value="1.725">Intenso (6-7 dias/sem - FA 1,9 - 2,49)</option>
+                                <option value="1.9">Muito Intenso (Atleta - FA > 2,5)</option>
+                            </select>
+                        </div>
+
+                        <!-- Resultados Calculados -->
+                        <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-700">
+                            <div class="text-center">
+                                <div class="text-[10px] text-slate-400">IMC</div>
+                                <div id="res-bmi" class="font-bold text-emerald-400 text-lg">--</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-[10px] text-slate-400">Basal (TMB)</div>
+                                <div id="res-bmr" class="font-bold text-white text-sm">--</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-[10px] text-slate-400">Total (GET)</div>
+                                <div id="res-tdee" class="font-bold text-white text-sm">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Painel de Metas e Comparação -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="font-bold text-sm mb-3 flex items-center gap-2 text-slate-700 uppercase tracking-wide">
+                        <i class="fa-solid fa-bullseye text-blue-500"></i> Metas da Dieta
+                    </h2>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500">Meta Calórica (Kcal)</label>
+                            <input type="number" id="target-cal" class="w-full border border-slate-300 rounded p-2 text-center font-bold text-slate-700 focus:ring-2 focus:ring-blue-200 outline-none" value="2000" onkeyup="renderDiet()">
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <div class="flex justify-between text-[10px] text-slate-400 uppercase font-bold mb-1">
+                                <span>Carbo %</span>
+                                <span>Prot %</span>
+                                <span>Gord %</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="number" id="target-carb-pct" class="w-full p-1 text-center border rounded text-xs" value="50" onkeyup="renderDiet()">
+                                <input type="number" id="target-prot-pct" class="w-full p-1 text-center border rounded text-xs" value="30" onkeyup="renderDiet()">
+                                <input type="number" id="target-fat-pct" class="w-full p-1 text-center border rounded text-xs" value="20" onkeyup="renderDiet()">
+                            </div>
+                            <div class="text-[10px] text-center mt-1 text-slate-400">
+                                Total: <span id="total-pct-display">100</span>%
+                            </div>
+                        </div>
+
+                        <!-- Comparativo Rápido -->
+                        <div id="comparison-widget" class="text-xs space-y-1 pt-2 border-t border-slate-100">
+                            <!-- Preenchido via JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Cor -->
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                     <h3 class="text-xs font-bold text-slate-500 uppercase mb-3">Personalizar Cor</h3>
                     <div class="grid grid-cols-5 gap-3">
-                        <!-- Linha 1 -->
                         <button onclick="setTheme('emerald')" class="w-8 h-8 rounded-full bg-emerald-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Esmeralda"></button>
                         <button onclick="setTheme('blue')" class="w-8 h-8 rounded-full bg-blue-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Azul"></button>
                         <button onclick="setTheme('indigo')" class="w-8 h-8 rounded-full bg-indigo-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Índigo"></button>
                         <button onclick="setTheme('rose')" class="w-8 h-8 rounded-full bg-rose-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Rosa"></button>
                         <button onclick="setTheme('amber')" class="w-8 h-8 rounded-full bg-amber-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Âmbar/Laranja"></button>
-                        
-                        <!-- Linha 2 -->
                         <button onclick="setTheme('purple')" class="w-8 h-8 rounded-full bg-purple-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Roxo"></button>
                         <button onclick="setTheme('cyan')" class="w-8 h-8 rounded-full bg-cyan-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Ciano"></button>
                         <button onclick="setTheme('teal')" class="w-8 h-8 rounded-full bg-teal-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Turquesa"></button>
@@ -713,6 +827,93 @@
             renderDiet();
         }
 
+        function toggleBodyFatInput() {
+            const formula = document.getElementById('calc-formula').value;
+            const bfContainer = document.getElementById('bf-container');
+            
+            if(formula === 'tinsley_mlg' || formula === 'cunningham') {
+                bfContainer.classList.remove('hidden');
+            } else {
+                bfContainer.classList.add('hidden');
+            }
+        }
+
+        // --- CÁLCULOS NUTRICIONAIS ---
+        function calculateEnergy() {
+            const weight = parseFloat(document.getElementById('calc-weight').value) || 0;
+            const height = parseFloat(document.getElementById('calc-height').value) || 0;
+            const age = parseFloat(document.getElementById('calc-age').value) || 0;
+            const bf = parseFloat(document.getElementById('calc-bf').value) || 0;
+            const activity = parseFloat(document.getElementById('calc-activity').value) || 1.2;
+            const sex = document.querySelector('input[name="calc-sex"]:checked').value;
+            const formula = document.getElementById('calc-formula').value;
+
+            // IMC
+            if(weight > 0 && height > 0) {
+                const bmi = weight / ((height/100) * (height/100));
+                document.getElementById('res-bmi').innerText = bmi.toFixed(1);
+            } else {
+                document.getElementById('res-bmi').innerText = '--';
+            }
+
+            if(weight > 0) {
+                let bmr = 0;
+
+                // --- FÓRMULAS ---
+                if (formula === 'mifflin') {
+                    // Mifflin-St Jeor
+                    if(height > 0 && age > 0) {
+                        if(sex === 'm') {
+                            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+                        } else {
+                            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+                        }
+                    }
+                } 
+                else if (formula === 'harris') {
+                    // Harris-Benedict
+                    if(height > 0 && age > 0) {
+                        if(sex === 'm') {
+                            bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+                        } else {
+                            bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+                        }
+                    }
+                }
+                else if (formula === 'tinsley_p') {
+                    // Tinsley (P) - Ativos
+                    bmr = (22 * weight) + 500;
+                }
+                else if (formula === 'tinsley_mlg') {
+                    // Tinsley (MLG)
+                    // MLG = Peso * (1 - (BF/100))
+                    if (bf > 0) {
+                        const mlg = weight * (1 - (bf/100));
+                        bmr = (25 * mlg) + 370;
+                    }
+                }
+                else if (formula === 'cunningham') {
+                    // Cunningham (MLG)
+                    if (bf > 0) {
+                        const mlg = weight * (1 - (bf/100));
+                        bmr = (22 * mlg) + 500;
+                    }
+                }
+
+                if (bmr > 0) {
+                    const tdee = bmr * activity;
+                    document.getElementById('res-bmr').innerText = bmr.toFixed(0) + ' kcal';
+                    document.getElementById('res-tdee').innerText = tdee.toFixed(0) + ' kcal';
+                } else {
+                    document.getElementById('res-bmr').innerText = '--';
+                    document.getElementById('res-tdee').innerText = '--';
+                }
+            } else {
+                document.getElementById('res-bmr').innerText = '--';
+                document.getElementById('res-tdee').innerText = '--';
+            }
+        }
+
         // --- GESTÃO DE REFEIÇÕES ---
 
         function addNewMeal() {
@@ -1076,6 +1277,63 @@
                 `;
                 container.innerHTML += mealHtml;
             });
+
+            // --- ATUALIZAÇÃO DO WIDGET DE COMPARAÇÃO ---
+            // Recalcula totais para o widget lateral
+            const targetCal = parseFloat(document.getElementById('target-cal').value) || 2000;
+            const pctC = parseFloat(document.getElementById('target-carb-pct').value) || 50;
+            const pctP = parseFloat(document.getElementById('target-prot-pct').value) || 30;
+            const pctF = parseFloat(document.getElementById('target-fat-pct').value) || 20;
+            
+            // Update total percentage display
+            const totalPct = pctC + pctP + pctF;
+            const totalPctEl = document.getElementById('total-pct-display');
+            if(totalPctEl) {
+                totalPctEl.innerText = totalPct;
+                totalPctEl.style.color = totalPct !== 100 ? 'red' : 'inherit';
+            }
+
+            // Target Grams
+            const targetGramsC = (targetCal * (pctC / 100)) / 4;
+            const targetGramsP = (targetCal * (pctP / 100)) / 4;
+            const targetGramsF = (targetCal * (pctF / 100)) / 9;
+
+            // Differences
+            const diffCal = dailyTotal.cal - targetCal;
+            const diffC = dailyTotal.carb - targetGramsC;
+            const diffP = dailyTotal.prot - targetGramsP;
+            const diffF = dailyTotal.fat - targetGramsF;
+
+            // Render Widget
+            const widget = document.getElementById('comparison-widget');
+            if(widget) {
+                widget.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Calorias:</span>
+                        <span class="font-bold ${diffCal > 100 ? 'text-red-500' : (diffCal < -100 ? 'text-yellow-500' : 'text-green-500')}">
+                            ${dailyTotal.cal.toFixed(0)} / ${targetCal.toFixed(0)} (${diffCal > 0 ? '+' : ''}${diffCal.toFixed(0)})
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-blue-500">Carbo:</span>
+                        <span class="font-medium text-slate-600">
+                            ${dailyTotal.carb.toFixed(0)}g / ${targetGramsC.toFixed(0)}g
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-emerald-500">Prot:</span>
+                        <span class="font-medium text-slate-600">
+                            ${dailyTotal.prot.toFixed(0)}g / ${targetGramsP.toFixed(0)}g
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-yellow-500">Gord:</span>
+                        <span class="font-medium text-slate-600">
+                            ${dailyTotal.fat.toFixed(0)}g / ${targetGramsF.toFixed(0)}g
+                        </span>
+                    </div>
+                `;
+            }
 
             // --- ADICIONAR CARD DE RESUMO TOTAL ---
             const totalHtml = `
