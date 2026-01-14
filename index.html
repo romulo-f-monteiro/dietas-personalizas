@@ -83,12 +83,35 @@
 
             table { width: 100% !important; table-layout: fixed !important; }
             
-            /* Ajuste de colunas na impressão */
-            .col-name { width: 38% !important; }
-            /* Aumentei para 20% para garantir que não sobreponha a próxima */
-            .col-qty { width: 20% !important; text-align: center !important; } 
-            .col-cal { width: 15% !important; text-align: center !important; }
-            .col-macro { width: 27% !important; text-align: center !important; }
+            /* --- ALTERAÇÕES DE LARGURA DE COLUNA (PEDIDO DO USUÁRIO) --- */
+            
+            /* Nome: Aumentado para 55% para permitir texto longo em uma linha */
+            .col-name { width: 55% !important; }
+            
+            /* Quantidade: Compactado e sem quebra de linha */
+            .col-qty { 
+                width: 12% !important; 
+                text-align: center !important; 
+                white-space: nowrap !important; /* Impede quebra (ex: 100 g) */
+            } 
+            
+            /* Calorias: Compactado e sem quebra */
+            .col-cal { 
+                width: 9% !important; 
+                text-align: center !important; 
+                white-space: nowrap !important; 
+            }
+            
+            /* Macros: Compactado, sem quebra e fonte menor */
+            .col-macro { 
+                width: 8% !important; /* 3 colunas de 8% = 24% */
+                text-align: center !important;
+                white-space: nowrap !important;
+                font-size: 9px !important; /* Fonte menor para caber */
+            }
+            
+            /* Soma Total: 55 + 12 + 9 + 24 = 100% */
+            
             .col-actions { display: none !important; width: 0 !important; }
 
             .card, .break-inside-avoid { 
@@ -1222,7 +1245,7 @@
                                                     title="Clique para editar o nome"
                                                 >${food.name}</td>
                                                 
-                                                <td class="p-3 text-slate-600 bg-slate-50/50 text-xs col-qty">
+                                                <td class="p-3 text-slate-600 bg-slate-50/50 text-xs col-qty whitespace-nowrap">
                                                     <div class="flex items-center justify-start gap-1 qty-wrapper">
                                                         <input type="number" 
                                                             class="qty-input" 
@@ -1233,10 +1256,10 @@
                                                     </div>
                                                 </td>
                                                 
-                                                <td class="p-3 text-center font-bold text-slate-700 text-xs col-cal">${food.totalCal.toFixed(0)} kcal</td>
-                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro">C: ${food.totalCarb.toFixed(0)}</td>
-                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro">P: ${food.totalProt.toFixed(0)}</td>
-                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro">G: ${food.totalFat.toFixed(0)}</td>
+                                                <td class="p-3 text-center font-bold text-slate-700 text-xs col-cal whitespace-nowrap">${food.totalCal.toFixed(0)} kcal</td>
+                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro whitespace-nowrap">C: ${food.totalCarb.toFixed(0)}</td>
+                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro whitespace-nowrap">P: ${food.totalProt.toFixed(0)}</td>
+                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro whitespace-nowrap">G: ${food.totalFat.toFixed(0)}</td>
                                                 
                                                 <td class="p-3 text-center no-print w-24 col-actions">
                                                     <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
