@@ -85,11 +85,12 @@
 
             table { width: 100% !important; table-layout: fixed; }
             
-            /* Ajuste de colunas na impressão para alinhamento */
-            .col-name { width: 45% !important; }
-            .col-qty { width: 15% !important; white-space: nowrap !important; }
-            .col-cal { width: 15% !important; }
-            .col-macros { width: 25% !important; display: table-cell !important; }
+            /* Ajuste de colunas na impressão para alinhamento e evitar sobreposição */
+            .col-name { width: 40% !important; }
+            /* Aumentei a largura da coluna de quantidade e forcei alinhamento */
+            .col-qty { width: 18% !important; white-space: nowrap !important; text-align: center !important; }
+            .col-cal { width: 15% !important; text-align: center !important; }
+            .col-macros { width: 27% !important; display: table-cell !important; font-size: 9px !important; } /* Macros menores para caber "Carbo" */
             .col-actions { display: none !important; }
 
             .card, .break-inside-avoid { 
@@ -105,16 +106,16 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                gap: 0 !important; /* Remove espaço */
+                gap: 0 !important;
             }
             .qty-input {
                 border: none !important;
                 background: transparent !important;
                 padding: 0 !important;
-                text-align: right !important; /* Alinha numero a direita */
+                text-align: right !important;
                 width: auto !important;
                 font-weight: normal !important;
-                margin-right: 2px !important; /* Pequeno ajuste visual */
+                margin-right: 2px !important;
             }
             .unit-text {
                 text-align: left !important;
@@ -280,7 +281,6 @@
 
                         <div>
                             <label class="text-[10px] text-slate-400 uppercase">Fórmula TMB</label>
-                            <!-- ID dos valores ajustados para lógica JS -->
                             <select id="calc-formula" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="toggleBodyFatInput(); calculateEnergy();">
                                 <option value="mifflin" selected>Mifflin-St Jeor (Padrão)</option>
                                 <option value="harris">Harris-Benedict</option>
@@ -1147,6 +1147,27 @@
 
             let dailyTotal = { cal: 0, carb: 0, prot: 0, fat: 0 };
 
+            // === 1. PREPARAR METAS (CÁLCULO) ===
+            const targetCal = parseFloat(document.getElementById('target-cal').value) || 2000;
+            const pctC = parseFloat(document.getElementById('target-carb-pct').value) || 50;
+            const pctP = parseFloat(document.getElementById('target-prot-pct').value) || 30;
+            const pctF = parseFloat(document.getElementById('target-fat-pct').value) || 20;
+            
+            // Update total percentage display
+            const totalPct = pctC + pctP + pctF;
+            const totalPctEl = document.getElementById('total-pct-display');
+            if(totalPctEl) {
+                totalPctEl.innerText = totalPct;
+                totalPctEl.style.color = totalPct !== 100 ? 'red' : 'inherit';
+            }
+
+            // Target Grams
+            const targetGramsC = (targetCal * (pctC / 100)) / 4;
+            const targetGramsP = (targetCal * (pctP / 100)) / 4;
+            const targetGramsF = (targetCal * (pctF / 100)) / 9;
+
+
+            // === 2. RENDERIZAR REFEIÇÕES ===
             dietMeals.forEach((meal, index) => {
                 let mCal = 0, mCarb = 0, mProt = 0, mFat = 0;
                 meal.foods.forEach(f => {
@@ -1207,7 +1228,7 @@
                                                             </td>
                                                             
                                                             <td class="p-3 text-center font-bold text-slate-700 text-xs col-cal">${food.totalCal.toFixed(0)} kcal</td>
-                                                            <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell col-macros">C:${food.totalCarb.toFixed(0)} P:${food.totalProt.toFixed(0)} G:${food.totalFat.toFixed(0)}</td>
+                                                            <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell col-macros">Carbo:${food.totalCarb.toFixed(0)} Prot:${food.totalProt.toFixed(0)} Gord:${food.totalFat.toFixed(0)}</td>
                                                             <td class="p-3 text-center no-print w-24 col-actions">
                                                                 <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
                                                                     
@@ -1288,9 +1309,9 @@
 
                             <div class="flex flex-wrap gap-3 text-xs font-semibold">
                                 <div class="theme-text bg-white px-3 py-1 rounded-full border theme-border shadow-sm">~${mCal.toFixed(0)} kcal</div>
-                                <div class="text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">C: ${mCarb.toFixed(0)}g</div>
-                                <div class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">P: ${mProt.toFixed(0)}g</div>
-                                <div class="text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">G: ${mFat.toFixed(0)}g</div>
+                                <div class="text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">Carbo: ${mCarb.toFixed(0)}g</div>
+                                <div class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">Prot: ${mProt.toFixed(0)}g</div>
+                                <div class="text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">Gord: ${mFat.toFixed(0)}g</div>
                             </div>
                         </div>
                         <div class="p-0">${contentHtml}</div>
@@ -1300,7 +1321,7 @@
                 container.innerHTML += mealHtml;
             });
 
-            // --- ADICIONAR CARD DE RESUMO TOTAL ---
+            // === 3. ADICIONAR CARD DE RESUMO TOTAL (CONSUMIDO) ===
             const totalHtml = `
                 <div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 overflow-hidden break-inside-avoid mt-6">
                     <div class="p-4 border-b border-slate-700 flex justify-between items-center">
@@ -1309,7 +1330,6 @@
                         </h3>
                         <span class="text-xs text-slate-400 font-normal">(Soma das Opções A)</span>
                     </div>
-                    <!-- print:grid-cols-4 forçado para impressão correta em linha -->
                     <div class="p-6 grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 gap-6 text-center">
                         <div>
                             <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calorias</div>
@@ -1331,6 +1351,76 @@
                 </div>
             `;
             container.innerHTML += totalHtml;
+
+            // === 4. NOVO CARD DE METAS (VISÍVEL PARA PACIENTE/IMPRESSÃO) ===
+            const goalsHtml = `
+                <div class="card bg-white rounded-xl shadow-sm border theme-border overflow-hidden break-inside-avoid mt-4">
+                    <div class="p-3 border-b theme-border theme-bg-light flex justify-between items-center">
+                        <h3 class="font-bold text-sm flex items-center gap-2 text-slate-700 uppercase tracking-wide">
+                            <i class="fa-solid fa-flag-checkered theme-text"></i> Metas Prescritas
+                        </h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Kcal</div>
+                            <div class="text-xl font-bold text-slate-700">${targetCal.toFixed(0)}</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Carbo</div>
+                            <div class="text-lg font-bold text-blue-600">${targetGramsC.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctC}%)</span></div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Prot</div>
+                            <div class="text-lg font-bold text-emerald-600">${targetGramsP.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctP}%)</span></div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Gord</div>
+                            <div class="text-lg font-bold text-yellow-600">${targetGramsF.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctF}%)</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += goalsHtml;
+
+            // === 5. ATUALIZAR SIDEBAR (COMPARATIVO) ===
+            const diffCal = dailyTotal.cal - targetCal;
+            const diffC = dailyTotal.carb - targetGramsC;
+            const diffP = dailyTotal.prot - targetGramsP;
+            const diffF = dailyTotal.fat - targetGramsF;
+
+            const widget = document.getElementById('comparison-widget');
+            if(widget) {
+                widget.innerHTML = `
+                    <div class="flex justify-between items-center text-[11px] font-bold text-slate-500 mb-2 border-b border-slate-100 pb-1">
+                        <span>Metas Calculadas:</span>
+                        <span>(Consumido / Meta)</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Calorias:</span>
+                        <span class="font-bold ${diffCal > 100 ? 'text-red-500' : (diffCal < -100 ? 'text-yellow-500' : 'text-green-500')}">
+                            ${dailyTotal.cal.toFixed(0)} / ${targetCal.toFixed(0)}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-blue-500">Carbo:</span>
+                        <span class="font-medium text-slate-600">
+                            ${dailyTotal.carb.toFixed(0)}g / ${targetGramsC.toFixed(0)}g
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-emerald-500">Prot:</span>
+                        <span class="font-medium text-slate-600">
+                            ${dailyTotal.prot.toFixed(0)}g / ${targetGramsP.toFixed(0)}g
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-yellow-500">Gord:</span>
+                        <span class="font-medium text-slate-600">
+                            ${dailyTotal.fat.toFixed(0)}g / ${targetGramsF.toFixed(0)}g
+                        </span>
+                    </div>
+                `;
+            }
         }
 
         function addToPlan() {
