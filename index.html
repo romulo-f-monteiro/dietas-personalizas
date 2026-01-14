@@ -281,6 +281,7 @@
 
                         <div>
                             <label class="text-[10px] text-slate-400 uppercase">Fórmula TMB</label>
+                            <!-- ID dos valores ajustados para lógica JS -->
                             <select id="calc-formula" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="toggleBodyFatInput(); calculateEnergy();">
                                 <option value="mifflin" selected>Mifflin-St Jeor (Padrão)</option>
                                 <option value="harris">Harris-Benedict</option>
@@ -523,7 +524,7 @@
                 <!-- Metas -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mt-8 break-inside-avoid">
                     <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-lg">
-                        <i class="fa-solid fa-bullseye theme-text"></i> Metas e Orientações
+                        <i class="fa-solid fa-bullseye theme-text"></i> Orientações e Recomendações
                     </h3>
                     <div id="goals-area" class="editable-div w-full p-2 bg-transparent text-slate-700 leading-relaxed" contenteditable="true" placeholder="Clique aqui para digitar as metas e orientações..."></div>
                 </div>
@@ -812,6 +813,8 @@
         ];
 
         let currentTheme = 'emerald';
+        let showGoals = true; // Global state for goals card visibility
+
         const themes = {
             emerald: { primary: '#059669', hover: '#047857', light: '#ecfdf5', text: '#065f46', border: '#d1fae5' },
             blue: { primary: '#2563eb', hover: '#1d4ed8', light: '#eff6ff', text: '#1e40af', border: '#dbeafe' },
@@ -977,6 +980,12 @@
             renderDiet();
             renderMealSelect();
             showToast("Refeição duplicada com sucesso!");
+        }
+
+        function removeGoals() {
+            showGoals = false;
+            renderDiet();
+            showToast("Metas diárias ocultadas!", "neutral");
         }
 
         function moveMeal(index, direction) {
@@ -1228,7 +1237,7 @@
                                                             </td>
                                                             
                                                             <td class="p-3 text-center font-bold text-slate-700 text-xs col-cal">${food.totalCal.toFixed(0)} kcal</td>
-                                                            <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell col-macros">C:${food.totalCarb.toFixed(0)} P:${food.totalProt.toFixed(0)} G:${food.totalFat.toFixed(0)}</td>
+                                                            <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell col-macros">Carbo:${food.totalCarb.toFixed(0)} Prot:${food.totalProt.toFixed(0)} Gord:${food.totalFat.toFixed(0)}</td>
                                                             <td class="p-3 text-center no-print w-24 col-actions">
                                                                 <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
                                                                     
@@ -1309,9 +1318,9 @@
 
                             <div class="flex flex-wrap gap-3 text-xs font-semibold">
                                 <div class="theme-text bg-white px-3 py-1 rounded-full border theme-border shadow-sm">~${mCal.toFixed(0)} kcal</div>
-                                <div class="text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">Carbo: ${mCarb.toFixed(0)}g</div>
-                                <div class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">Prot: ${mProt.toFixed(0)}g</div>
-                                <div class="text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">Gord: ${mFat.toFixed(0)}g</div>
+                                <div class="text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">C: ${mCarb.toFixed(0)}g</div>
+                                <div class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">P: ${mProt.toFixed(0)}g</div>
+                                <div class="text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">G: ${mFat.toFixed(0)}g</div>
                             </div>
                         </div>
                         <div class="p-0">${contentHtml}</div>
@@ -1326,7 +1335,7 @@
                 <div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 overflow-hidden break-inside-avoid mt-6">
                     <div class="p-4 border-b border-slate-700 flex justify-between items-center">
                         <h3 class="font-bold text-lg flex items-center gap-2">
-                            <i class="fa-solid fa-chart-pie text-emerald-400"></i> Resumo Total Diário
+                            <i class="fa-solid fa-chart-pie text-emerald-400"></i> Ingestão Diária
                         </h3>
                         <span class="text-xs text-slate-400 font-normal">(Soma das Opções A)</span>
                     </div>
@@ -1353,34 +1362,41 @@
             container.innerHTML += totalHtml;
 
             // === 4. NOVO CARD DE METAS (VISÍVEL PARA PACIENTE/IMPRESSÃO) ===
-            const goalsHtml = `
-                <div class="card bg-white rounded-xl shadow-sm border theme-border overflow-hidden break-inside-avoid mt-4">
-                    <div class="p-3 border-b theme-border theme-bg-light flex justify-between items-center">
-                        <h3 class="font-bold text-sm flex items-center gap-2 text-slate-700 uppercase tracking-wide">
-                            <i class="fa-solid fa-flag-checkered theme-text"></i> Metas Prescritas
-                        </h3>
+            if (showGoals) {
+                const goalsHtml = `
+                    <div class="card bg-white rounded-xl shadow-sm border theme-border overflow-hidden break-inside-avoid mt-4 relative group">
+                         <!-- BOTÃO EXCLUIR -->
+                        <button onclick="removeGoals()" class="absolute top-3 right-3 text-slate-300 hover:text-red-500 transition no-print opacity-0 group-hover:opacity-100" title="Ocultar Metas">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+
+                        <div class="p-3 border-b theme-border theme-bg-light flex justify-between items-center">
+                            <h3 class="font-bold text-sm flex items-center gap-2 text-slate-700 uppercase tracking-wide">
+                                <i class="fa-solid fa-flag-checkered theme-text"></i> Metas Diárias
+                            </h3>
+                        </div>
+                        <div class="p-4 grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 gap-4 text-center">
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Kcal</div>
+                                <div class="text-xl font-bold text-slate-700">${targetCal.toFixed(0)}</div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Carbo</div>
+                                <div class="text-lg font-bold text-blue-600">${targetGramsC.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctC}%)</span></div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Prot</div>
+                                <div class="text-lg font-bold text-emerald-600">${targetGramsP.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctP}%)</span></div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Gord</div>
+                                <div class="text-lg font-bold text-yellow-600">${targetGramsF.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctF}%)</span></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-4 grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 gap-4 text-center">
-                        <div>
-                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Kcal</div>
-                            <div class="text-xl font-bold text-slate-700">${targetCal.toFixed(0)}</div>
-                        </div>
-                        <div>
-                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Carbo</div>
-                            <div class="text-lg font-bold text-blue-600">${targetGramsC.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctC}%)</span></div>
-                        </div>
-                        <div>
-                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Prot</div>
-                            <div class="text-lg font-bold text-emerald-600">${targetGramsP.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctP}%)</span></div>
-                        </div>
-                        <div>
-                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Gord</div>
-                            <div class="text-lg font-bold text-yellow-600">${targetGramsF.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctF}%)</span></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.innerHTML += goalsHtml;
+                `;
+                container.innerHTML += goalsHtml;
+            }
 
             // === 5. ATUALIZAR SIDEBAR (COMPARATIVO) ===
             const diffCal = dailyTotal.cal - targetCal;
