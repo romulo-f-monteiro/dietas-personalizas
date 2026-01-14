@@ -83,34 +83,40 @@
 
             table { width: 100% !important; table-layout: fixed !important; }
             
-            /* --- ALTERAÇÕES DE LARGURA DE COLUNA (PEDIDO DO USUÁRIO) --- */
+            /* --- ALTERAÇÕES DE LARGURA DE COLUNA --- */
             
-            /* Nome: Aumentado para 55% para permitir texto longo em uma linha */
+            /* Nome: 55% */
             .col-name { width: 55% !important; }
             
-            /* Quantidade: Compactado e sem quebra de linha */
+            /* CORREÇÃO: Quantidade Centralizada e Contida */
             .col-qty { 
                 width: 12% !important; 
                 text-align: center !important; 
-                white-space: nowrap !important; /* Impede quebra (ex: 100 g) */
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                padding: 0 !important; /* Remove padding extra para ganhar espaço */
             } 
             
-            /* Calorias: Compactado e sem quebra */
+            /* FORÇA O ALINHAMENTO CENTRAL DO FLEX NA IMPRESSÃO */
+            .col-qty .qty-wrapper {
+                justify-content: center !important;
+                width: 100% !important;
+            }
+            
+            /* Calorias */
             .col-cal { 
                 width: 9% !important; 
                 text-align: center !important; 
                 white-space: nowrap !important; 
             }
             
-            /* Macros: Compactado, sem quebra e fonte menor */
+            /* Macros */
             .col-macro { 
-                width: 8% !important; /* 3 colunas de 8% = 24% */
+                width: 8% !important; 
                 text-align: center !important;
                 white-space: nowrap !important;
-                font-size: 9px !important; /* Fonte menor para caber */
+                font-size: 9px !important; 
             }
-            
-            /* Soma Total: 55 + 12 + 9 + 24 = 100% */
             
             .col-actions { display: none !important; width: 0 !important; }
 
@@ -121,15 +127,16 @@
                 box-shadow: none !important;
             }
             
-            /* Input limpo na impressão */
+            /* CORREÇÃO: Input limpo e contido na impressão */
             .qty-input {
                 border: none !important;
                 background: transparent !important;
                 padding: 0 !important;
                 text-align: right !important;
                 width: auto !important;
+                max-width: 40px !important; /* Impede que o input cresça demais */
                 font-weight: normal !important;
-                margin-right: 4px !important;
+                margin-right: 2px !important;
             }
 
             .meal-header {
