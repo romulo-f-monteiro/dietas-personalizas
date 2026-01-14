@@ -43,6 +43,10 @@
                 backdrop-filter: none !important;
                 background-color: rgba(255, 255, 255, 0.9) !important;
             }
+            /* Em mobile, permite scroll horizontal na tabela se necessário */
+            .table-container {
+                overflow-x: auto;
+            }
         }
 
         /* --- CONFIGURAÇÃO DE IMPRESSÃO (NATIVO) --- */
@@ -83,15 +87,15 @@
                 overflow: visible !important;
             }
 
-            table { width: 100% !important; table-layout: fixed; }
+            /* Forçar layout fixo para alinhamento perfeito */
+            table { width: 100% !important; table-layout: fixed !important; }
             
-            /* Ajuste de colunas na impressão para alinhamento e evitar sobreposição */
-            .col-name { width: 40% !important; }
-            /* Aumentei a largura da coluna de quantidade e forcei alinhamento */
-            .col-qty { width: 18% !important; white-space: nowrap !important; text-align: center !important; }
-            .col-cal { width: 15% !important; text-align: center !important; }
-            .col-macros { width: 27% !important; display: table-cell !important; font-size: 9px !important; } /* Macros menores para caber "Carbo" */
-            .col-actions { display: none !important; }
+            /* Larguras de Colunas Específicas para Impressão */
+            .col-name { width: 35% !important; }
+            .col-qty { width: 12% !important; text-align: left !important; padding-left: 0 !important; }
+            .col-cal { width: 13% !important; text-align: center !important; }
+            .col-macro { width: 13% !important; text-align: center !important; }
+            .col-actions { display: none !important; width: 0 !important; }
 
             .card, .break-inside-avoid { 
                 break-inside: avoid; 
@@ -100,14 +104,7 @@
                 box-shadow: none !important;
             }
             
-            /* --- CORREÇÃO 100g --- */
-            .qty-wrapper {
-                white-space: nowrap !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                gap: 0 !important;
-            }
+            /* Input limpo na impressão */
             .qty-input {
                 border: none !important;
                 background: transparent !important;
@@ -115,15 +112,18 @@
                 text-align: right !important;
                 width: auto !important;
                 font-weight: normal !important;
-                margin-right: 2px !important;
-            }
-            .unit-text {
-                text-align: left !important;
             }
 
             .meal-header {
                 background-color: #f8fafc !important;
                 border-bottom: 1px solid #e2e8f0 !important;
+            }
+            
+            /* Garante que o cabeçalho de totais tenha fundo cinza claro na impressão */
+            thead tr.totals-row {
+                background-color: #f1f5f9 !important;
+                font-weight: bold !important;
+                color: #334155 !important;
             }
         }
 
@@ -171,7 +171,7 @@
         }
 
         .qty-input {
-            width: 50px;
+            width: 45px;
             text-align: center;
             background-color: transparent;
             border-bottom: 1px dashed #cbd5e1;
@@ -281,7 +281,6 @@
 
                         <div>
                             <label class="text-[10px] text-slate-400 uppercase">Fórmula TMB</label>
-                            <!-- ID dos valores ajustados para lógica JS -->
                             <select id="calc-formula" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="toggleBodyFatInput(); calculateEnergy();">
                                 <option value="mifflin" selected>Mifflin-St Jeor (Padrão)</option>
                                 <option value="harris">Harris-Benedict</option>
@@ -1212,50 +1211,67 @@
                                 </div>
                             `;
                         }
-                        contentHtml += `<table class="w-full text-left text-sm">
-                                                <tbody class="divide-y divide-slate-100">
-                                                    ${groups[opt].map((food) => {
-                                                        const originalIndex = meal.foods.indexOf(food);
-                                                        return `
-                                                        <tr class="hover:bg-slate-50 transition group">
-                                                            <td class="p-3 text-slate-700 font-medium pl-4 w-1/2 transition col-name"
-                                                                contenteditable="true"
-                                                                onblur="updateFoodName(${meal.id}, ${originalIndex}, this.innerText)"
-                                                                onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
-                                                                title="Clique para editar o nome"
-                                                            >${food.name}</td>
-                                                            
-                                                            <td class="p-3 text-center text-slate-600 bg-slate-50/50 text-xs col-qty">
-                                                                <div class="flex items-center justify-center gap-1 qty-wrapper">
-                                                                    <input type="number" 
-                                                                        class="qty-input" 
-                                                                        value="${food.qty}" 
-                                                                        onchange="updateFoodQty(${meal.id}, ${originalIndex}, this.value)"
-                                                                        onkeydown="if(event.key==='Enter'){this.blur();}"
-                                                                    > <span class="unit-text">g</span>
-                                                                </div>
-                                                            </td>
-                                                            
-                                                            <td class="p-3 text-center font-bold text-slate-700 text-xs col-cal">${food.totalCal.toFixed(0)} kcal</td>
-                                                            <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell col-macros">C:${food.totalCarb.toFixed(0)} P:${food.totalProt.toFixed(0)} G:${food.totalFat.toFixed(0)}</td>
-                                                            <td class="p-3 text-center no-print w-24 col-actions">
-                                                                <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                                                                    
-                                                                    <!-- Botões de mover -->
-                                                                    <div class="flex flex-col text-[8px] text-slate-400">
-                                                                        <button onclick="moveFood(${meal.id}, ${originalIndex}, -1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-up"></i></button>
-                                                                        <button onclick="moveFood(${meal.id}, ${originalIndex}, 1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-down"></i></button>
-                                                                    </div>
+                        // TABELA COM CABEÇALHO PARA TOTAIS (PARA ALINHAMENTO)
+                        contentHtml += `
+                            <div class="table-container">
+                                <table class="w-full text-left text-sm">
+                                    <thead>
+                                        <tr class="totals-row border-b border-slate-200">
+                                            <th class="p-2 text-right text-[10px] text-slate-400 font-bold uppercase col-name">Totais:</th>
+                                            <th class="p-2 text-center text-xs font-bold text-slate-500 col-qty"></th>
+                                            <th class="p-2 text-center text-xs font-bold theme-text col-cal">${mCal.toFixed(0)} kcal</th>
+                                            <th class="p-2 text-center text-[10px] font-bold text-blue-600 col-macro">Carbo: ${mCarb.toFixed(0)}g</th>
+                                            <th class="p-2 text-center text-[10px] font-bold text-emerald-600 col-macro">Prot: ${mProt.toFixed(0)}g</th>
+                                            <th class="p-2 text-center text-[10px] font-bold text-yellow-600 col-macro">Gord: ${mFat.toFixed(0)}g</th>
+                                            <th class="p-2 w-24 col-actions"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${groups[opt].map((food) => {
+                                            const originalIndex = meal.foods.indexOf(food);
+                                            return `
+                                            <tr class="hover:bg-slate-50 transition group">
+                                                <td class="p-3 text-slate-700 font-medium pl-4 transition col-name"
+                                                    contenteditable="true"
+                                                    onblur="updateFoodName(${meal.id}, ${originalIndex}, this.innerText)"
+                                                    onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+                                                    title="Clique para editar o nome"
+                                                >${food.name}</td>
+                                                
+                                                <td class="p-3 text-slate-600 bg-slate-50/50 text-xs col-qty">
+                                                    <div class="flex items-center justify-start gap-1 qty-wrapper">
+                                                        <input type="number" 
+                                                            class="qty-input" 
+                                                            value="${food.qty}" 
+                                                            onchange="updateFoodQty(${meal.id}, ${originalIndex}, this.value)"
+                                                            onkeydown="if(event.key==='Enter'){this.blur();}"
+                                                        > <span class="unit-text">g</span>
+                                                    </div>
+                                                </td>
+                                                
+                                                <td class="p-3 text-center font-bold text-slate-700 text-xs col-cal">${food.totalCal.toFixed(0)}</td>
+                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro">C: ${food.totalCarb.toFixed(0)}</td>
+                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro">P: ${food.totalProt.toFixed(0)}</td>
+                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro">G: ${food.totalFat.toFixed(0)}</td>
+                                                
+                                                <td class="p-3 text-center no-print w-24 col-actions">
+                                                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                                                        <!-- Botões de mover -->
+                                                        <div class="flex flex-col text-[8px] text-slate-400">
+                                                            <button onclick="moveFood(${meal.id}, ${originalIndex}, -1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-up"></i></button>
+                                                            <button onclick="moveFood(${meal.id}, ${originalIndex}, 1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-down"></i></button>
+                                                        </div>
 
-                                                                    <button onclick="removeFood(${meal.id}, ${originalIndex})" class="text-slate-300 hover:text-red-500 transition ml-1" title="Remover item" data-html2canvas-ignore="true">
-                                                                        <i class="fa-solid fa-times"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        `}).join('')}
-                                                </tbody>
-                                            </table>`;
+                                                        <button onclick="removeFood(${meal.id}, ${originalIndex})" class="text-slate-300 hover:text-red-500 transition ml-1" title="Remover item" data-html2canvas-ignore="true">
+                                                            <i class="fa-solid fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            `}).join('')}
+                                    </tbody>
+                                </table>
+                            </div>`;
                     }
                 });
 
@@ -1314,13 +1330,6 @@
                                     title="Clique para editar o nome da refeição">
                                     <i class="fa-solid fa-utensils theme-text text-sm"></i> ${meal.title}
                                 </h3>
-                            </div>
-
-                            <div class="flex flex-wrap gap-3 text-xs font-semibold">
-                                <div class="theme-text bg-white px-3 py-1 rounded-full border theme-border shadow-sm">~${mCal.toFixed(0)} kcal</div>
-                                <div class="text-blue-600 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">Carbo: ${mCarb.toFixed(0)}g</div>
-                                <div class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">Prot: ${mProt.toFixed(0)}g</div>
-                                <div class="text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full border border-yellow-100">Gord: ${mFat.toFixed(0)}g</div>
                             </div>
                         </div>
                         <div class="p-0">${contentHtml}</div>
