@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plano Alimentar – Dietas Personalizadas</title>
+    <!-- Tailwind CSS (Mantido, essencial para o estilo) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <!-- REMOVIDO: jQuery e jQuery Mask (Desnecessários e pesados) -->
 
     <style>
         :root {
@@ -20,7 +20,10 @@
             --border-color: #d1fae5;
         }
 
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            -webkit-font-smoothing: antialiased; /* Melhora renderização de fonte no mobile */
+        }
         
         .theme-bg { background-color: var(--primary) !important; }
         .theme-bg-hover:hover { background-color: var(--primary-hover) !important; }
@@ -37,6 +40,14 @@
             margin: 0; 
         }
 
+        /* Otimização para Mobile: Remove efeitos pesados de blur/vidro se o dispositivo for lento */
+        @media (max-width: 768px) {
+            .backdrop-blur-sm {
+                backdrop-filter: none !important;
+                background-color: rgba(255, 255, 255, 0.9) !important;
+            }
+        }
+
         /* --- CONFIGURAÇÃO DE IMPRESSÃO (NATIVO) --- */
         @media print {
             @page {
@@ -44,14 +55,16 @@
                 size: auto;
             }
 
-            /* --- CORREÇÃO DE FLICKERING/PISCAR --- */
+            /* --- OTIMIZAÇÃO CRÍTICA PARA IMPRESSÃO/PDF --- */
             * {
                 animation: none !important;
                 transition: none !important;
-                backdrop-filter: none !important; /* Remove efeito de vidro pesado */
+                transform: none !important; /* Evita repaints complexos */
+                backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
-                box-shadow: none !important; /* Remove sombras pesadas */
+                box-shadow: none !important;
                 text-shadow: none !important;
+                filter: none !important; /* Remove filtros que causam glitch */
             }
 
             body { 
@@ -64,13 +77,14 @@
             
             .no-print { display: none !important; }
             .print-only { display: block !important; }
-            #toast { display: none !important; } /* Garante que o toast suma */
+            #toast { display: none !important; }
 
             .container, #document-area {
                 max-width: 100% !important;
                 width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                overflow: visible !important;
             }
 
             table { width: 100% !important; }
@@ -80,17 +94,22 @@
                 page-break-inside: avoid; 
                 border: 1px solid #ddd;
                 box-shadow: none !important;
+                background: white !important;
             }
-
-            ::-webkit-scrollbar { display: none; }
             
-            /* Remove input styling on print */
+            /* Remove estilos de input na impressão para parecer texto puro */
             .qty-input {
                 border: none !important;
                 background: transparent !important;
                 padding: 0 !important;
                 text-align: center;
                 width: auto !important;
+            }
+            
+            /* Garante cores sólidas no cabeçalho das refeições para evitar o 'piscar' */
+            .meal-header {
+                background-color: #f8fafc !important; /* Slate-50 fallback */
+                border-bottom: 1px solid #e2e8f0 !important;
             }
         }
 
@@ -143,7 +162,7 @@
             text-align: center;
             background-color: transparent;
             border-bottom: 1px dashed #cbd5e1;
-            transition: all 0.2s;
+            transition: border 0.2s; /* Otimizado: anima apenas borda */
         }
         .qty-input:focus {
             outline: none;
@@ -183,13 +202,15 @@
                 
                 <!-- Logo Topo -->
                 <div class="mb-4 relative group cursor-pointer" onclick="document.getElementById('logo-upload').click()">
+                    <!-- Otimização: Adicionado crossorigin anonymous para evitar problemas de CORS no Canvas se necessário -->
                     <img id="logo-img-main" src="" class="h-24 object-contain hidden mx-auto">
                     <div id="logo-placeholder" class="w-24 h-24 bg-slate-50 rounded-full border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 mx-auto">
                         <i class="fa-solid fa-camera text-2xl mb-1"></i>
                         <span class="text-[10px]">Add Logo</span>
                     </div>
-                    <span class="text-xs text-blue-500 hover:underline mt-1 block no-print">Alterar Logo</span>
-                    <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+                    <span class="text-xs text-blue-500 hover:underline mt-1 block no-print">Alterar Logo (Max 2MB)</span>
+                    <!-- Otimização: handleImageUpload genérico com redimensionamento -->
+                    <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo-img-main', 'logo-placeholder')">
                 </div>
 
                 <!-- Dados do Paciente -->
@@ -441,7 +462,7 @@
                                 <span class="text-[10px]">Logo/Assinatura</span>
                             </div>
                             <span class="text-xs text-blue-500 hover:underline mt-1 block text-center md:text-right no-print">Adicionar Imagem</span>
-                            <input type="file" id="logo-upload-footer" accept="image/*" class="hidden" onchange="handleLogoUploadFooter(event)">
+                            <input type="file" id="logo-upload-footer" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo-img-footer', 'logo-placeholder-footer')">
                         </div>
                     </div>
                 </div>
@@ -746,6 +767,23 @@
             }
         }
 
+        function clearMealObservation(id) {
+            const meal = dietMeals.find(m => m.id === id);
+            if(meal) {
+                // Se tiver texto, pede confirmação. Se estiver vazio, não faz nada ou só limpa.
+                if (meal.observation && meal.observation.trim() !== "") {
+                    if(confirm("Deseja excluir o texto desta observação?")) {
+                        meal.observation = "";
+                        renderDiet();
+                        showToast("Observação excluída", "neutral");
+                    }
+                } else {
+                    meal.observation = "";
+                    renderDiet();
+                }
+            }
+        }
+
         function renderMealSelect() {
             const select = document.getElementById('select-meal');
             const currentVal = select.value;
@@ -954,9 +992,14 @@
 
                 // --- OBSERVAÇÃO ---
                 const observationHtml = `
-                    <div class="px-4 pb-4 pt-2 border-t border-slate-100">
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1 flex items-center gap-1">
-                            <i class="fa-regular fa-comment-dots"></i> Observações
+                    <div class="px-4 pb-4 pt-2 border-t border-slate-100 group/obs relative">
+                        <div class="flex justify-between items-center mb-1">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1">
+                                <i class="fa-regular fa-comment-dots"></i> Observações
+                            </div>
+                            <button onclick="clearMealObservation(${meal.id})" class="text-slate-300 hover:text-red-500 text-xs transition no-print opacity-0 group-hover/obs:opacity-100 px-2" title="Excluir Observação" data-html2canvas-ignore="true">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
                         </div>
                         <div class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm text-slate-600 min-h-[40px] focus:bg-white focus:ring-1 focus:ring-slate-300 outline-none transition"
                              contenteditable="true"
@@ -1113,32 +1156,62 @@
             showToast(`Tema alterado para ${themeName.charAt(0).toUpperCase() + themeName.slice(1)}`);
         }
 
-        function handleLogoUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const result = e.target.result;
-                    document.getElementById('logo-img-main').src = result;
-                    document.getElementById('logo-img-main').classList.remove('hidden');
-                    document.getElementById('logo-placeholder').classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+        // ============================================
+        // === OTIMIZAÇÃO: REDIMENSIONAR IMAGEM ===
+        // ============================================
 
-        function handleLogoUploadFooter(event) {
+        function handleImageUpload(event, imgId, placeholderId) {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const result = e.target.result;
-                    document.getElementById('logo-img-footer').src = result;
-                    document.getElementById('logo-img-footer').classList.remove('hidden');
-                    document.getElementById('logo-placeholder-footer').classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Configuração de redimensionamento
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Tamanho Máximo (ex: 300px) - Reduz peso drasticamente
+                    const MAX_WIDTH = 300;
+                    const MAX_HEIGHT = 150;
+                    
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Lógica de proporção
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Desenha imagem reduzida no canvas
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Converte para Base64 leve (JPEG 0.8 qualidade ou PNG)
+                    // Usando PNG para transparência do logo
+                    const dataUrl = canvas.toDataURL('image/png');
+
+                    // Aplica no DOM
+                    document.getElementById(imgId).src = dataUrl;
+                    document.getElementById(imgId).classList.remove('hidden');
+                    document.getElementById(placeholderId).classList.add('hidden');
+                    
+                    showToast("Logo otimizado e carregado!");
+                }
+                img.src = e.target.result;
             }
+            reader.readAsDataURL(file);
         }
 
         // ============================================
