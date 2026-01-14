@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plano Alimentar – Dietas Personalizadas</title>
-    <!-- Tailwind CSS (Mantido, essencial para o estilo) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
 
         body { 
             font-family: 'Inter', sans-serif; 
-            -webkit-font-smoothing: antialiased; /* Melhora renderização de fonte no mobile */
+            -webkit-font-smoothing: antialiased;
         }
         
         .theme-bg { background-color: var(--primary) !important; }
@@ -38,7 +38,6 @@
             margin: 0; 
         }
 
-        /* Otimização para Mobile: Remove efeitos pesados de blur/vidro se o dispositivo for lento */
         @media (max-width: 768px) {
             .backdrop-blur-sm {
                 backdrop-filter: none !important;
@@ -53,16 +52,15 @@
                 size: auto;
             }
 
-            /* --- OTIMIZAÇÃO CRÍTICA PARA IMPRESSÃO/PDF --- */
             * {
                 animation: none !important;
                 transition: none !important;
-                transform: none !important; /* Evita repaints complexos */
+                transform: none !important;
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
                 box-shadow: none !important;
                 text-shadow: none !important;
-                filter: none !important; /* Remove filtros que causam glitch */
+                filter: none !important;
             }
 
             body { 
@@ -85,8 +83,15 @@
                 overflow: visible !important;
             }
 
-            table { width: 100% !important; }
+            table { width: 100% !important; table-layout: fixed; }
             
+            /* Ajuste de colunas na impressão para alinhamento */
+            .col-name { width: 45% !important; }
+            .col-qty { width: 15% !important; white-space: nowrap !important; }
+            .col-cal { width: 15% !important; }
+            .col-macros { width: 25% !important; display: table-cell !important; }
+            .col-actions { display: none !important; }
+
             .card, .break-inside-avoid { 
                 break-inside: avoid; 
                 page-break-inside: avoid; 
@@ -94,18 +99,26 @@
                 box-shadow: none !important;
             }
             
-            /* Remove estilos de input na impressão para parecer texto puro */
+            /* Input limpo na impressão */
             .qty-input {
                 border: none !important;
                 background: transparent !important;
                 padding: 0 !important;
                 text-align: center;
                 width: auto !important;
+                font-weight: normal !important;
             }
             
-            /* Garante cores sólidas no cabeçalho das refeições para evitar o 'piscar' */
+            /* Correção "100g" quebrado */
+            .qty-wrapper {
+                white-space: nowrap !important;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+            }
+
             .meal-header {
-                background-color: #f8fafc !important; /* Slate-50 fallback */
+                background-color: #f8fafc !important;
                 border-bottom: 1px solid #e2e8f0 !important;
             }
         }
@@ -139,7 +152,6 @@
             text-align: center;
         }
 
-        /* Estilo visual para indicar que o texto é editável */
         [contenteditable="true"]:hover {
             background-color: #f8fafc;
             cursor: text;
@@ -159,7 +171,7 @@
             text-align: center;
             background-color: transparent;
             border-bottom: 1px dashed #cbd5e1;
-            transition: border 0.2s; /* Otimizado: anima apenas borda */
+            transition: border 0.2s;
         }
         .qty-input:focus {
             outline: none;
@@ -199,14 +211,12 @@
                 
                 <!-- Logo Topo -->
                 <div class="mb-4 relative group cursor-pointer" onclick="document.getElementById('logo-upload').click()">
-                    <!-- Otimização: Adicionado crossorigin anonymous para evitar problemas de CORS no Canvas se necessário -->
                     <img id="logo-img-main" src="" class="h-24 object-contain hidden mx-auto">
                     <div id="logo-placeholder" class="w-24 h-24 bg-slate-50 rounded-full border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 mx-auto">
                         <i class="fa-solid fa-camera text-2xl mb-1"></i>
                         <span class="text-[10px]">Add Logo</span>
                     </div>
                     <span class="text-xs text-blue-500 hover:underline mt-1 block no-print">Alterar Logo (Max 2MB)</span>
-                    <!-- Otimização: handleImageUpload genérico com redimensionamento -->
                     <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo-img-main', 'logo-placeholder')">
                 </div>
 
@@ -233,7 +243,6 @@
                         <i class="fa-solid fa-calculator text-6xl"></i>
                     </div>
                     
-                    <!-- EMOJI REMOVIDO -->
                     <h2 class="font-bold text-lg mb-4 flex items-center gap-2 relative z-10">
                         Área do Nutricionista
                     </h2>
@@ -268,12 +277,13 @@
 
                         <div>
                             <label class="text-[10px] text-slate-400 uppercase">Fórmula TMB</label>
+                            <!-- ID dos valores ajustados para lógica JS -->
                             <select id="calc-formula" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="toggleBodyFatInput(); calculateEnergy();">
                                 <option value="mifflin" selected>Mifflin-St Jeor (Padrão)</option>
                                 <option value="harris">Harris-Benedict</option>
-                                <option value="tinsley_p">Tinsley (P) - Ativos</option>
-                                <option value="tinsley_mlg">Tinsley (MLG)</option>
-                                <option value="cunningham">Cunningham (MLG)</option>
+                                <option value="tinsley_ph">Tinsley (Peso e Altura)</option>
+                                <option value="tinsley_katch">Tinsley / Katch–McArdle (MLG)</option>
+                                <option value="cunningham">Cunningham, 1980 (MLG)</option>
                             </select>
                         </div>
 
@@ -312,7 +322,7 @@
                     </div>
                 </div>
 
-                <!-- Painel de Metas e Comparação -->
+                <!-- Painel de Metas da Dieta -->
                 <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                     <h2 class="font-bold text-sm mb-3 flex items-center gap-2 text-slate-700 uppercase tracking-wide">
                         <i class="fa-solid fa-bullseye text-blue-500"></i> Metas da Dieta
@@ -340,7 +350,7 @@
                             </div>
                         </div>
 
-                        <!-- Comparativo Rápido -->
+                        <!-- Comparativo Rápido (Exibe Metas Calculadas) -->
                         <div id="comparison-widget" class="text-xs space-y-1 pt-2 border-t border-slate-100">
                             <!-- Preenchido via JS -->
                         </div>
@@ -831,7 +841,8 @@
             const formula = document.getElementById('calc-formula').value;
             const bfContainer = document.getElementById('bf-container');
             
-            if(formula === 'tinsley_mlg' || formula === 'cunningham') {
+            // Agora 'tinsley_katch' é o valor correto no select
+            if(formula === 'tinsley_katch' || formula === 'cunningham') {
                 bfContainer.classList.remove('hidden');
             } else {
                 bfContainer.classList.add('hidden');
@@ -842,6 +853,7 @@
         function calculateEnergy() {
             const weight = parseFloat(document.getElementById('calc-weight').value) || 0;
             const height = parseFloat(document.getElementById('calc-height').value) || 0;
+            const heightM = height / 100;
             const age = parseFloat(document.getElementById('calc-age').value) || 0;
             const bf = parseFloat(document.getElementById('calc-bf').value) || 0;
             const activity = parseFloat(document.getElementById('calc-activity').value) || 1.2;
@@ -880,23 +892,30 @@
                         }
                     }
                 }
-                else if (formula === 'tinsley_p') {
-                    // Tinsley (P) - Ativos
-                    bmr = (22 * weight) + 500;
+                else if (formula === 'tinsley_ph') {
+                    // Tinsley (Peso e Altura)
+                    if (height > 0) {
+                        if (sex === 'm') {
+                            // Homens: (9,65 * peso) + (573 * altura em metros) - 5,08
+                            bmr = (9.65 * weight) + (573 * heightM) - 5.08;
+                        } else {
+                            // Mulheres: (9,65 * peso) + (573 * altura em metros) - 4,92
+                            bmr = (9.65 * weight) + (573 * heightM) - 4.92;
+                        }
+                    }
                 }
-                else if (formula === 'tinsley_mlg') {
-                    // Tinsley (MLG)
-                    // MLG = Peso * (1 - (BF/100))
+                else if (formula === 'tinsley_katch') {
+                    // Tinsley / Katch–McArdle: 370 + (21,6 * MLG)
                     if (bf > 0) {
                         const mlg = weight * (1 - (bf/100));
-                        bmr = (25 * mlg) + 370;
+                        bmr = 370 + (21.6 * mlg);
                     }
                 }
                 else if (formula === 'cunningham') {
-                    // Cunningham (MLG)
+                    // Cunningham (MLG): 500 + (22 * MLG)
                     if (bf > 0) {
                         const mlg = weight * (1 - (bf/100));
-                        bmr = (22 * mlg) + 500;
+                        bmr = 500 + (22 * mlg);
                     }
                 }
 
@@ -1166,15 +1185,15 @@
                                                         const originalIndex = meal.foods.indexOf(food);
                                                         return `
                                                         <tr class="hover:bg-slate-50 transition group">
-                                                            <td class="p-3 text-slate-700 font-medium pl-4 w-1/2 transition"
+                                                            <td class="p-3 text-slate-700 font-medium pl-4 w-1/2 transition col-name"
                                                                 contenteditable="true"
                                                                 onblur="updateFoodName(${meal.id}, ${originalIndex}, this.innerText)"
                                                                 onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
                                                                 title="Clique para editar o nome"
                                                             >${food.name}</td>
                                                             
-                                                            <td class="p-3 text-center text-slate-600 bg-slate-50/50 text-xs">
-                                                                <div class="flex items-center justify-center gap-1">
+                                                            <td class="p-3 text-center text-slate-600 bg-slate-50/50 text-xs col-qty">
+                                                                <div class="flex items-center justify-center gap-1 qty-wrapper">
                                                                     <input type="number" 
                                                                         class="qty-input" 
                                                                         value="${food.qty}" 
@@ -1184,9 +1203,9 @@
                                                                 </div>
                                                             </td>
                                                             
-                                                            <td class="p-3 text-center font-bold text-slate-700 text-xs">${food.totalCal.toFixed(0)} kcal</td>
-                                                            <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell">C:${food.totalCarb.toFixed(0)} P:${food.totalProt.toFixed(0)} G:${food.totalFat.toFixed(0)}</td>
-                                                            <td class="p-3 text-center no-print w-24">
+                                                            <td class="p-3 text-center font-bold text-slate-700 text-xs col-cal">${food.totalCal.toFixed(0)} kcal</td>
+                                                            <td class="p-3 text-center text-slate-400 text-[10px] hidden sm:table-cell col-macros">C:${food.totalCarb.toFixed(0)} P:${food.totalProt.toFixed(0)} G:${food.totalFat.toFixed(0)}</td>
+                                                            <td class="p-3 text-center no-print w-24 col-actions">
                                                                 <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
                                                                     
                                                                     <!-- Botões de mover -->
@@ -1278,7 +1297,7 @@
                 container.innerHTML += mealHtml;
             });
 
-            // --- ATUALIZAÇÃO DO WIDGET DE COMPARAÇÃO ---
+            // --- ATUALIZAÇÃO DO WIDGET DE COMPARAÇÃO (METAS CALCULADAS) ---
             // Recalcula totais para o widget lateral
             const targetCal = parseFloat(document.getElementById('target-cal').value) || 2000;
             const pctC = parseFloat(document.getElementById('target-carb-pct').value) || 50;
@@ -1308,10 +1327,14 @@
             const widget = document.getElementById('comparison-widget');
             if(widget) {
                 widget.innerHTML = `
+                    <div class="flex justify-between items-center text-[11px] font-bold text-slate-500 mb-2 border-b border-slate-100 pb-1">
+                        <span>Metas Calculadas:</span>
+                        <span>(Consumido / Meta)</span>
+                    </div>
                     <div class="flex justify-between items-center">
                         <span class="text-slate-500">Calorias:</span>
                         <span class="font-bold ${diffCal > 100 ? 'text-red-500' : (diffCal < -100 ? 'text-yellow-500' : 'text-green-500')}">
-                            ${dailyTotal.cal.toFixed(0)} / ${targetCal.toFixed(0)} (${diffCal > 0 ? '+' : ''}${diffCal.toFixed(0)})
+                            ${dailyTotal.cal.toFixed(0)} / ${targetCal.toFixed(0)}
                         </span>
                     </div>
                     <div class="flex justify-between items-center">
