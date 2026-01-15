@@ -89,33 +89,27 @@
             table { width: 100% !important; table-layout: fixed !important; }
             
             /* --- ALTERAÇÕES DE LARGURA DE COLUNA --- */
-            
-            /* Nome: 55% */
             .col-name { width: 55% !important; }
             
-            /* CORREÇÃO: Quantidade Centralizada e Contida */
             .col-qty { 
                 width: 12% !important; 
                 text-align: center !important; 
                 white-space: nowrap !important;
                 overflow: hidden !important;
-                padding: 0 !important; /* Remove padding extra para ganhar espaço */
+                padding: 0 !important; 
             } 
             
-            /* FORÇA O ALINHAMENTO CENTRAL DO FLEX NA IMPRESSÃO */
             .col-qty .qty-wrapper {
                 justify-content: center !important;
                 width: 100% !important;
             }
             
-            /* Calorias */
             .col-cal { 
                 width: 9% !important; 
                 text-align: center !important; 
                 white-space: nowrap !important; 
             }
             
-            /* Macros */
             .col-macro { 
                 width: 8% !important; 
                 text-align: center !important;
@@ -132,14 +126,13 @@
                 box-shadow: none !important;
             }
             
-            /* CORREÇÃO: Input limpo e contido na impressão */
             .qty-input {
                 border: none !important;
                 background: transparent !important;
                 padding: 0 !important;
                 text-align: right !important;
                 width: auto !important;
-                max-width: 40px !important; /* Impede que o input cresça demais */
+                max-width: 40px !important;
                 font-weight: normal !important;
                 margin-right: 2px !important;
             }
@@ -926,9 +919,13 @@
             }
             
             const lastPatientId = localStorage.getItem('diet_last_patient_id');
+            let loaded = false;
+            
             if (lastPatientId) {
-                loadPatient(lastPatientId);
-            } else {
+                loaded = loadPatient(lastPatientId);
+            } 
+            
+            if (!loaded) {
                 createNewPatient();
             }
             renderFoodSelect();
@@ -1079,38 +1076,51 @@
 
         function loadPatient(id) {
             const d = localStorage.getItem('diet_data_' + id);
-            if (!d) return;
-            const data = JSON.parse(d);
-            currentPatientId = id;
-            dietMeals = data.meals || JSON.parse(JSON.stringify(defaultMeals));
-            currentTheme = data.theme || 'emerald';
+            if (!d) return false;
             
-            const fields = ['patient-name','patient-goal','diet-date','prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct'];
-            fields.forEach(f => { if(document.getElementById(f) && data.inputs[f]!==undefined) document.getElementById(f).value = data.inputs[f]; });
-            
-            if(data.selects) {
-                document.getElementById('calc-formula').value = data.selects['calc-formula'] || 'mifflin';
-                document.getElementById('calc-activity').value = data.selects['calc-activity'] || '1.55';
-                const rad = document.querySelector(`input[name="calc-sex"][value="${data.selects['calc-sex']}"]`);
-                if(rad) rad.checked = true;
-            }
-            if(data.images) {
-                const setImg = (id, phId, src) => {
-                    if(src) { document.getElementById(id).src=src; document.getElementById(id).classList.remove('hidden'); document.getElementById(phId).classList.add('hidden'); }
-                    else { document.getElementById(id).classList.add('hidden'); document.getElementById(phId).classList.remove('hidden'); }
-                };
-                setImg('logo-img-main', 'logo-placeholder', data.images.mainLogo);
-                setImg('logo-img-footer', 'logo-placeholder-footer', data.images.footerLogo);
-            }
-            if(data.history) {
-                const rows = document.querySelectorAll('#history-table tbody tr');
-                data.history.forEach((r,i) => { if(rows[i]) rows[i].querySelectorAll('td').forEach((c,j) => c.innerText = r[j]||""); });
-            }
-            if(data.goalsText) document.getElementById('goals-area').innerText = data.goalsText;
+            try {
+                const data = JSON.parse(d);
+                currentPatientId = id;
+                
+                // --- FIX: Ensure meals structure is valid ---
+                if (!data.meals || !Array.isArray(data.meals) || data.meals.length === 0) {
+                    dietMeals = JSON.parse(JSON.stringify(defaultMeals));
+                } else {
+                    dietMeals = data.meals;
+                }
+                
+                currentTheme = data.theme || 'emerald';
+                
+                const fields = ['patient-name','patient-goal','diet-date','prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct'];
+                fields.forEach(f => { if(document.getElementById(f) && data.inputs[f]!==undefined) document.getElementById(f).value = data.inputs[f]; });
+                
+                if(data.selects) {
+                    document.getElementById('calc-formula').value = data.selects['calc-formula'] || 'mifflin';
+                    document.getElementById('calc-activity').value = data.selects['calc-activity'] || '1.55';
+                    const rad = document.querySelector(`input[name="calc-sex"][value="${data.selects['calc-sex']}"]`);
+                    if(rad) rad.checked = true;
+                }
+                if(data.images) {
+                    const setImg = (id, phId, src) => {
+                        if(src) { document.getElementById(id).src=src; document.getElementById(id).classList.remove('hidden'); document.getElementById(phId).classList.add('hidden'); }
+                        else { document.getElementById(id).classList.add('hidden'); document.getElementById(phId).classList.remove('hidden'); }
+                    };
+                    setImg('logo-img-main', 'logo-placeholder', data.images.mainLogo);
+                    setImg('logo-img-footer', 'logo-placeholder-footer', data.images.footerLogo);
+                }
+                if(data.history) {
+                    const rows = document.querySelectorAll('#history-table tbody tr');
+                    data.history.forEach((r,i) => { if(rows[i]) rows[i].querySelectorAll('td').forEach((c,j) => c.innerText = r[j]||""); });
+                }
+                if(data.goalsText) document.getElementById('goals-area').innerText = data.goalsText;
 
-            setTheme(currentTheme); renderMealSelect(); renderDiet(); calculateEnergy(); updateDateDisplay(); toggleBodyFatInput();
-            localStorage.setItem('diet_last_patient_id', id);
-            closePatientModal(); showToast("Paciente carregado!");
+                setTheme(currentTheme); renderMealSelect(); renderDiet(); calculateEnergy(); updateDateDisplay(); toggleBodyFatInput();
+                localStorage.setItem('diet_last_patient_id', id);
+                closePatientModal(); showToast("Paciente carregado!");
+                return true;
+            } catch (e) {
+                return false;
+            }
         }
 
         function triggerAutoSave() { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveCurrentPatientState, 1000); }
@@ -1267,7 +1277,7 @@
             // CARD: INGESTÃO DIÁRIA (DARK) - Atualizado com nomes completos e emoji 🍎
             c.innerHTML += `<div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 break-inside-avoid mt-6"><div class="p-4 border-b border-slate-700 flex justify-between"><h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-chart-pie text-emerald-400"></i> 🍎 Ingestão Diária</h3><span class="text-xs text-slate-400">(Opções A)</span></div><div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calorias</div><div class="text-3xl font-bold">${dt.cal.toFixed(0)}</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Carboidratos</div><div class="text-2xl font-bold text-blue-400">${dt.c.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Proteínas</div><div class="text-2xl font-bold text-emerald-400">${dt.p.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Gorduras</div><div class="text-2xl font-bold text-yellow-400">${dt.f.toFixed(0)}g</div></div></div></div>`;
 
-            // CARD: METAS DIÁRIAS (AGORA DARK TAMBÉM) - Atualizado com nomes completos
+            // CARD: META DIÁRIA (AGORA DARK TAMBÉM) - Atualizado com nomes completos
             if(showGoals) {
                 c.innerHTML += `<div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 break-inside-avoid mt-4 relative group">
                     <button onclick="removeGoals()" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition no-print opacity-0 group-hover:opacity-100" title="Ocultar Metas"><i class="fa-solid fa-xmark"></i></button>
