@@ -38,6 +38,11 @@
             margin: 0; 
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
         @media (max-width: 768px) {
             .backdrop-blur-sm {
                 backdrop-filter: none !important;
@@ -225,9 +230,16 @@
                 </div>
             </div>
             
-            <button onclick="printDiet()" class="bg-white text-slate-700 hover:bg-slate-100 px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2">
-                <i class="fa-solid fa-print text-slate-600"></i> Imprimir / Salvar PDF
-            </button>
+            <div class="flex gap-2">
+                <!-- Botão Gerenciar Pacientes -->
+                <button onclick="openPatientModal()" class="bg-slate-900/30 hover:bg-slate-900/50 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-white/20">
+                    <i class="fa-solid fa-users"></i> <span id="current-patient-label">Pacientes</span>
+                </button>
+
+                <button onclick="printDiet()" class="bg-white text-slate-700 hover:bg-slate-100 px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-print text-slate-600"></i> Imprimir PDF
+                </button>
+            </div>
         </div>
     </header>
 
@@ -246,15 +258,15 @@
                         <span class="text-[10px]">Add Logo</span>
                     </div>
                     <span class="text-xs text-blue-500 hover:underline mt-1 block no-print">Alterar Logo (Max 2MB)</span>
-                    <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo-img-main', 'logo-placeholder')">
+                    <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo-img-main', 'logo-placeholder'); triggerAutoSave();">
                 </div>
 
                 <!-- Dados do Paciente -->
                 <div class="w-full max-w-2xl space-y-1">
-                    <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300" placeholder="Nome do Paciente" value="Paciente Exemplo">
-                    <input type="text" id="patient-goal" class="clean-input text-md font-medium text-slate-600 placeholder-slate-300" placeholder="Objetivo" value="Objetivo: Hipertrofia">
+                    <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300" placeholder="Nome do Paciente" value="Paciente Exemplo" onkeyup="triggerAutoSave()">
+                    <input type="text" id="patient-goal" class="clean-input text-md font-medium text-slate-600 placeholder-slate-300" placeholder="Objetivo" value="Objetivo: Hipertrofia" onkeyup="triggerAutoSave()">
                     <div class="relative">
-                        <input type="date" id="diet-date" class="clean-input text-sm text-slate-500 font-medium no-print" onchange="updateDateDisplay()">
+                        <input type="date" id="diet-date" class="clean-input text-sm text-slate-500 font-medium no-print" onchange="updateDateDisplay(); triggerAutoSave();">
                         <span id="date-display" class="hidden print-only text-sm text-slate-500 font-medium w-full text-center block"></span>
                     </div>
                 </div>
@@ -280,11 +292,11 @@
                     <div class="space-y-3 relative z-10 text-sm">
                         <div class="flex gap-2 bg-slate-700/50 p-1 rounded-lg">
                             <label class="flex-1 text-center cursor-pointer">
-                                <input type="radio" name="calc-sex" value="m" checked class="peer sr-only" onchange="calculateEnergy()">
+                                <input type="radio" name="calc-sex" value="m" checked class="peer sr-only" onchange="calculateEnergy(); triggerAutoSave();">
                                 <div class="py-1.5 rounded peer-checked:bg-blue-600 peer-checked:text-white text-slate-400 transition text-xs font-bold">Homem</div>
                             </label>
                             <label class="flex-1 text-center cursor-pointer">
-                                <input type="radio" name="calc-sex" value="f" class="peer sr-only" onchange="calculateEnergy()">
+                                <input type="radio" name="calc-sex" value="f" class="peer sr-only" onchange="calculateEnergy(); triggerAutoSave();">
                                 <div class="py-1.5 rounded peer-checked:bg-pink-600 peer-checked:text-white text-slate-400 transition text-xs font-bold">Mulher</div>
                             </label>
                         </div>
@@ -292,21 +304,21 @@
                         <div class="grid grid-cols-3 gap-2">
                             <div>
                                 <label class="text-[10px] text-slate-400 uppercase">Peso (kg)</label>
-                                <input type="number" id="calc-weight" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy()">
+                                <input type="number" id="calc-weight" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy(); triggerAutoSave();">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400 uppercase">Altura (cm)</label>
-                                <input type="number" id="calc-height" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy()">
+                                <input type="number" id="calc-height" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy(); triggerAutoSave();">
                             </div>
                             <div>
                                 <label class="text-[10px] text-slate-400 uppercase">Idade</label>
-                                <input type="number" id="calc-age" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy()">
+                                <input type="number" id="calc-age" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy(); triggerAutoSave();">
                             </div>
                         </div>
 
                         <div>
                             <label class="text-[10px] text-slate-400 uppercase">Fórmula TMB</label>
-                            <select id="calc-formula" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="toggleBodyFatInput(); calculateEnergy();">
+                            <select id="calc-formula" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="toggleBodyFatInput(); calculateEnergy(); triggerAutoSave();">
                                 <option value="mifflin" selected>Mifflin-St Jeor (Padrão)</option>
                                 <option value="harris">Harris-Benedict</option>
                                 <option value="tinsley_ph">Tinsley (Peso e Altura)</option>
@@ -318,12 +330,12 @@
                         <!-- Campo % Gordura (Escondido por padrão) -->
                         <div id="bf-container" class="hidden">
                             <label class="text-[10px] text-slate-400 uppercase">% Gordura (BF)</label>
-                            <input type="number" id="calc-bf" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="Ex: 15" onkeyup="calculateEnergy()">
+                            <input type="number" id="calc-bf" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="Ex: 15" onkeyup="calculateEnergy(); triggerAutoSave();">
                         </div>
 
                         <div>
                             <label class="text-[10px] text-slate-400 uppercase">Nível de Atividade</label>
-                            <select id="calc-activity" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="calculateEnergy()">
+                            <select id="calc-activity" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="calculateEnergy(); triggerAutoSave();">
                                 <option value="1.2">Sedentário (Pouco ou nenhum - FA 1 - 1,39)</option>
                                 <option value="1.375">Leve (1-3 dias/sem - FA 1,4 - 1,59)</option>
                                 <option value="1.55" selected>Moderado (3-5 dias/sem - FA 1,6 - 1,89)</option>
@@ -359,7 +371,7 @@
                     <div class="space-y-3">
                         <div>
                             <label class="text-xs font-bold text-slate-500">Meta Calórica (Kcal)</label>
-                            <input type="number" id="target-cal" class="w-full border border-slate-300 rounded p-2 text-center font-bold text-slate-700 focus:ring-2 focus:ring-blue-200 outline-none" value="2000" onkeyup="renderDiet()">
+                            <input type="number" id="target-cal" class="w-full border border-slate-300 rounded p-2 text-center font-bold text-slate-700 focus:ring-2 focus:ring-blue-200 outline-none" value="2000" onkeyup="renderDiet(); triggerAutoSave();">
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
@@ -369,9 +381,9 @@
                                 <span>Gord %</span>
                             </div>
                             <div class="flex gap-2">
-                                <input type="number" id="target-carb-pct" class="w-full p-1 text-center border rounded text-xs" value="50" onkeyup="renderDiet()">
-                                <input type="number" id="target-prot-pct" class="w-full p-1 text-center border rounded text-xs" value="30" onkeyup="renderDiet()">
-                                <input type="number" id="target-fat-pct" class="w-full p-1 text-center border rounded text-xs" value="20" onkeyup="renderDiet()">
+                                <input type="number" id="target-carb-pct" class="w-full p-1 text-center border rounded text-xs" value="50" onkeyup="renderDiet(); triggerAutoSave();">
+                                <input type="number" id="target-prot-pct" class="w-full p-1 text-center border rounded text-xs" value="30" onkeyup="renderDiet(); triggerAutoSave();">
+                                <input type="number" id="target-fat-pct" class="w-full p-1 text-center border rounded text-xs" value="20" onkeyup="renderDiet(); triggerAutoSave();">
                             </div>
                             <div class="text-[10px] text-center mt-1 text-slate-400">
                                 Total: <span id="total-pct-display">100</span>%
@@ -389,16 +401,16 @@
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                     <h3 class="text-xs font-bold text-slate-500 uppercase mb-3">Personalizar Cor</h3>
                     <div class="grid grid-cols-5 gap-3">
-                        <button onclick="setTheme('emerald')" class="w-8 h-8 rounded-full bg-emerald-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Esmeralda"></button>
-                        <button onclick="setTheme('blue')" class="w-8 h-8 rounded-full bg-blue-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Azul"></button>
-                        <button onclick="setTheme('indigo')" class="w-8 h-8 rounded-full bg-indigo-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Índigo"></button>
-                        <button onclick="setTheme('rose')" class="w-8 h-8 rounded-full bg-rose-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Rosa"></button>
-                        <button onclick="setTheme('amber')" class="w-8 h-8 rounded-full bg-amber-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Âmbar/Laranja"></button>
-                        <button onclick="setTheme('purple')" class="w-8 h-8 rounded-full bg-purple-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Roxo"></button>
-                        <button onclick="setTheme('cyan')" class="w-8 h-8 rounded-full bg-cyan-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Ciano"></button>
-                        <button onclick="setTheme('teal')" class="w-8 h-8 rounded-full bg-teal-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Turquesa"></button>
-                        <button onclick="setTheme('lime')" class="w-8 h-8 rounded-full bg-lime-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Limão"></button>
-                        <button onclick="setTheme('fuchsia')" class="w-8 h-8 rounded-full bg-fuchsia-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Fúcsia"></button>
+                        <button onclick="setTheme('emerald'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-emerald-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Esmeralda"></button>
+                        <button onclick="setTheme('blue'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-blue-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Azul"></button>
+                        <button onclick="setTheme('indigo'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-indigo-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Índigo"></button>
+                        <button onclick="setTheme('rose'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-rose-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Rosa"></button>
+                        <button onclick="setTheme('amber'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-amber-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Âmbar/Laranja"></button>
+                        <button onclick="setTheme('purple'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-purple-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Roxo"></button>
+                        <button onclick="setTheme('cyan'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-cyan-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Ciano"></button>
+                        <button onclick="setTheme('teal'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-teal-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Turquesa"></button>
+                        <button onclick="setTheme('lime'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-lime-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Limão"></button>
+                        <button onclick="setTheme('fuchsia'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-fuchsia-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Fúcsia"></button>
                     </div>
                 </div>
 
@@ -464,7 +476,7 @@
                             </div>
                         </div>
 
-                        <button onclick="addToPlan()" class="w-full theme-bg theme-bg-hover text-white font-semibold py-3 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                        <button onclick="addToPlan(); triggerAutoSave();" class="w-full theme-bg theme-bg-hover text-white font-semibold py-3 rounded-lg transition shadow-md flex justify-center items-center gap-2">
                             <i class="fa-solid fa-check"></i> Inserir
                         </button>
                     </div>
@@ -477,7 +489,7 @@
                     </h2>
                     <div class="flex gap-2">
                         <input type="text" id="new-meal-name" placeholder="Ex: Pré-Treino..." class="flex-1 p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm">
-                        <button onclick="addNewMeal()" class="bg-slate-800 text-white px-4 rounded-lg hover:bg-slate-700 transition">
+                        <button onclick="addNewMeal(); triggerAutoSave();" class="bg-slate-800 text-white px-4 rounded-lg hover:bg-slate-700 transition">
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     </div>
@@ -494,7 +506,7 @@
                         <!-- MENSAGEM DE AVISO -->
                         <div class="bg-amber-50 p-3 rounded-lg text-xs text-amber-800 mb-2 border border-amber-100 leading-relaxed">
                             <i class="fa-solid fa-triangle-exclamation mr-1"></i> 
-                            <strong>Atenção:</strong> Os alimentos adicionados ficarão salvos <u>apenas neste navegador</u>. Se você limpar o cache ou usar outro navegador, eles desaparecerão.
+                            <strong>Atenção:</strong> Os alimentos adicionados ficarão salvos no navegador.
                         </div>
                         
                         <input type="text" id="new-name" placeholder="Nome do Alimento" class="w-full p-2 text-sm border rounded">
@@ -550,7 +562,7 @@
                     <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-lg">
                         <i class="fa-solid fa-bullseye theme-text"></i> Orientações e Recomendações
                     </h3>
-                    <div id="goals-area" class="editable-div w-full p-2 bg-transparent text-slate-700 leading-relaxed" contenteditable="true" placeholder="Clique aqui para digitar as metas e orientações..."></div>
+                    <div id="goals-area" class="editable-div w-full p-2 bg-transparent text-slate-700 leading-relaxed" contenteditable="true" placeholder="Clique aqui para digitar as metas e orientações..." onblur="triggerAutoSave()"></div>
                 </div>
 
                 <!-- Histórico da composição corporal -->
@@ -559,7 +571,7 @@
                         <i class="fa-solid fa-weight-scale theme-text"></i> Histórico da composição corporal
                     </h3>
                     <div class="w-full">
-                        <table class="w-full text-xs text-center border-collapse border border-slate-300 table-fixed">
+                        <table id="history-table" class="w-full text-xs text-center border-collapse border border-slate-300 table-fixed">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-700 font-bold">
                                     <th class="measure-cell w-20">Data</th>
@@ -572,11 +584,11 @@
                                 </tr>
                             </thead>
                             <tbody class="text-slate-700">
-                                <tr><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td></tr>
-                                <tr><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td></tr>
-                                <tr><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td></tr>
-                                <tr><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td></tr>
-                                <tr><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td><td class="measure-cell" contenteditable="true"></td></tr>
+                                <tr><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td></tr>
+                                <tr><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td></tr>
+                                <tr><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td></tr>
+                                <tr><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td></tr>
+                                <tr><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td><td class="measure-cell" contenteditable="true" onblur="triggerAutoSave()"></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -587,21 +599,21 @@
                     
                     <!-- Dados Profissional (Esquerda - Vertical) -->
                     <div class="w-full md:w-1/2 flex flex-col gap-3 text-left">
-                        <input type="text" id="prof-name" class="clean-input text-left font-bold text-lg placeholder-slate-400" placeholder="Nome do Profissional">
+                        <input type="text" id="prof-name" class="clean-input text-left font-bold text-lg placeholder-slate-400" placeholder="Nome do Profissional" onkeyup="triggerAutoSave()">
                         
                         <div class="flex items-center gap-2">
                             <span class="font-semibold text-xs text-slate-500 w-8">CRN:</span>
-                            <input type="text" id="prof-crn" class="clean-input text-left text-sm font-medium placeholder-slate-400 flex-grow" placeholder="00000">
+                            <input type="text" id="prof-crn" class="clean-input text-left text-sm font-medium placeholder-slate-400 flex-grow" placeholder="00000" onkeyup="triggerAutoSave()">
                         </div>
                         
                         <div class="flex items-center gap-2">
                             <i class="fa-brands fa-whatsapp text-green-600 text-lg w-8 text-center"></i>
-                            <input type="text" id="prof-phone" class="clean-input text-left text-sm font-medium placeholder-slate-400 flex-grow" placeholder="(00) 00000-0000">
+                            <input type="text" id="prof-phone" class="clean-input text-left text-sm font-medium placeholder-slate-400 flex-grow" placeholder="(00) 00000-0000" onkeyup="triggerAutoSave()">
                         </div>
                         
                         <div class="flex items-center gap-2">
                             <i class="fa-brands fa-instagram text-pink-600 text-lg w-8 text-center"></i>
-                            <input type="text" id="prof-insta" class="clean-input text-left text-sm font-medium placeholder-slate-400 flex-grow" placeholder="@seu.perfil">
+                            <input type="text" id="prof-insta" class="clean-input text-left text-sm font-medium placeholder-slate-400 flex-grow" placeholder="@seu.perfil" onkeyup="triggerAutoSave()">
                         </div>
                     </div>
 
@@ -614,7 +626,7 @@
                                 <span class="text-[10px]">Logo/Assinatura</span>
                             </div>
                             <span class="text-xs text-blue-500 hover:underline mt-1 block text-center md:text-right no-print">Adicionar Imagem</span>
-                            <input type="file" id="logo-upload-footer" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo-img-footer', 'logo-placeholder-footer')">
+                            <input type="file" id="logo-upload-footer" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo-img-footer', 'logo-placeholder-footer'); triggerAutoSave();">
                         </div>
                     </div>
                 </div>
@@ -630,6 +642,35 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- MODAL DE PACIENTES -->
+    <div id="patient-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
+            <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-users"></i> Gerenciar Pacientes</h3>
+                <button onclick="closePatientModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
+            </div>
+            
+            <div class="p-4 bg-slate-50 border-b border-slate-200">
+                <button onclick="createNewPatient()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-user-plus"></i> Novo Paciente
+                </button>
+            </div>
+
+            <div class="p-0 max-h-[60vh] overflow-y-auto custom-scroll">
+                <ul id="patient-list" class="divide-y divide-slate-100">
+                    <!-- Lista Preenchida via JS -->
+                </ul>
+                <div id="empty-patients" class="p-8 text-center text-slate-400 text-sm italic hidden">
+                    Nenhum paciente salvo.
+                </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 text-[10px] text-slate-400 text-center border-t border-slate-200">
+                Os dados são salvos no navegador deste dispositivo.
+            </div>
+        </div>
     </div>
 
     <!-- Toast -->
@@ -826,8 +867,8 @@
             { id: 716, name: "Vinho, Tinto", cal: 65, carb: 0.2, prot: 0.0, fat: 0.0 }
         ];
 
-        // Refeições Pré-definidas
-        let dietMeals = [
+        // Default Meals Structure
+        const defaultMeals = [
             { id: 1, title: "Café da Manhã (Desjejum)", foods: [], observation: "" },
             { id: 2, title: "Lanche da Manhã (Colação)", foods: [], observation: "" },
             { id: 3, title: "Almoço", foods: [], observation: "" },
@@ -836,8 +877,11 @@
             { id: 6, title: "Ceia", foods: [], observation: "" }
         ];
 
+        let dietMeals = JSON.parse(JSON.stringify(defaultMeals));
         let currentTheme = 'emerald';
-        let showGoals = true; // Global state for goals card visibility
+        let showGoals = true;
+        let currentPatientId = null;
+        let saveTimeout;
 
         const themes = {
             emerald: { primary: '#059669', hover: '#047857', light: '#ecfdf5', text: '#065f46', border: '#d1fae5' },
@@ -845,7 +889,6 @@
             indigo: { primary: '#4f46e5', hover: '#4338ca', light: '#eef2ff', text: '#3730a3', border: '#e0e7ff' },
             rose: { primary: '#e11d48', hover: '#be123c', light: '#fff1f2', text: '#9f1239', border: '#ffe4e6' },
             amber: { primary: '#d97706', hover: '#b45309', light: '#fffbeb', text: '#92400e', border: '#fef3c7' },
-            // NOVAS CORES
             purple: { primary: '#9333ea', hover: '#7e22ce', light: '#f3e8ff', text: '#6b21a8', border: '#e9d5ff' },
             cyan: { primary: '#06b6d4', hover: '#0891b2', light: '#ecfeff', text: '#155e75', border: '#cffafe' },
             teal: { primary: '#14b8a6', hover: '#0d9488', light: '#f0fdfa', text: '#115e59', border: '#ccfbf1' },
@@ -854,7 +897,7 @@
         };
 
         function init() {
-            // -- NOVO: Carregar alimentos personalizados salvos --
+            // Carregar alimentos customizados globais
             loadCustomFoodsFromStorage();
 
             const dateInput = document.getElementById('diet-date');
@@ -862,16 +905,310 @@
                 dateInput.valueAsDate = new Date();
                 updateDateDisplay();
             }
-            renderFoodSelect(); // Renderiza todos inicialmente
+            
+            // Tentar carregar último paciente
+            const lastPatientId = localStorage.getItem('diet_last_patient_id');
+            if (lastPatientId) {
+                loadPatient(lastPatientId);
+            } else {
+                createNewPatient(); // Cria um padrão se não houver
+            }
+
+            renderFoodSelect();
+        }
+
+        // ==========================================
+        // === SISTEMA DE PACIENTES (DATABASE) ===
+        // ==========================================
+
+        function getPatientsList() {
+            const list = localStorage.getItem('diet_patients_list');
+            return list ? JSON.parse(list) : [];
+        }
+
+        function savePatientsList(list) {
+            localStorage.setItem('diet_patients_list', JSON.stringify(list));
+        }
+
+        function openPatientModal() {
+            const list = getPatientsList();
+            const ul = document.getElementById('patient-list');
+            ul.innerHTML = '';
+
+            if (list.length === 0) {
+                document.getElementById('empty-patients').classList.remove('hidden');
+            } else {
+                document.getElementById('empty-patients').classList.add('hidden');
+                list.forEach(p => {
+                    const isActive = p.id === currentPatientId;
+                    const date = new Date(p.lastModified).toLocaleDateString('pt-BR');
+                    
+                    const li = document.createElement('li');
+                    li.className = `p-3 flex justify-between items-center hover:bg-slate-100 transition cursor-pointer ${isActive ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`;
+                    li.onclick = (e) => {
+                        if(!e.target.closest('button')) loadPatient(p.id);
+                    };
+
+                    li.innerHTML = `
+                        <div>
+                            <div class="font-bold text-slate-800">${p.name}</div>
+                            <div class="text-[10px] text-slate-400">Modificado: ${date}</div>
+                        </div>
+                        <div class="flex gap-2">
+                            ${isActive ? '<span class="text-xs text-blue-500 font-bold px-2 py-1 bg-blue-100 rounded">Ativo</span>' : ''}
+                            <button onclick="deletePatient('${p.id}')" class="text-slate-300 hover:text-red-500 p-2 transition" title="Excluir">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    ul.appendChild(li);
+                });
+            }
+
+            document.getElementById('patient-modal').classList.remove('hidden');
+        }
+
+        function closePatientModal() {
+            document.getElementById('patient-modal').classList.add('hidden');
+        }
+
+        function createNewPatient() {
+            const newId = 'pat_' + Date.now();
+            currentPatientId = newId;
+            
+            // Resetar Variaveis
+            dietMeals = JSON.parse(JSON.stringify(defaultMeals));
+            currentTheme = 'emerald';
+            
+            // Resetar DOM Inputs
+            document.getElementById('patient-name').value = "Novo Paciente";
+            document.getElementById('patient-goal').value = "";
+            document.getElementById('diet-date').valueAsDate = new Date();
+            
+            // Limpar Logos
+            document.getElementById('logo-img-main').src = "";
+            document.getElementById('logo-img-main').classList.add('hidden');
+            document.getElementById('logo-placeholder').classList.remove('hidden');
+            document.getElementById('logo-img-footer').src = "";
+            document.getElementById('logo-img-footer').classList.add('hidden');
+            document.getElementById('logo-placeholder-footer').classList.remove('hidden');
+
+            // Resetar Metas/Calc
+            document.getElementById('target-cal').value = 2000;
+            document.getElementById('calc-weight').value = "";
+            document.getElementById('calc-height').value = "";
+            document.getElementById('calc-age').value = "";
+            
+            // Limpar Tabela Histórico
+            const rows = document.querySelectorAll('#history-table tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => cell.innerText = "");
+            });
+            
+            // Limpar Metas Texto
+            document.getElementById('goals-area').innerText = "";
+
+            // Salvar novo estado
+            saveCurrentPatientState();
+            
+            // Atualizar UI
             renderMealSelect();
             renderDiet();
+            setTheme('emerald');
+            closePatientModal();
+            showToast("Novo paciente criado!");
         }
+
+        function deletePatient(id) {
+            if(!confirm("Tem certeza? Isso apagará todos os dados deste paciente.")) return;
+            
+            let list = getPatientsList();
+            list = list.filter(p => p.id !== id);
+            savePatientsList(list);
+            
+            // Remover dados do storage
+            localStorage.removeItem('diet_data_' + id);
+
+            // Se apagou o atual, cria um novo
+            if(id === currentPatientId) {
+                createNewPatient();
+            } else {
+                openPatientModal(); // Re-render list
+            }
+        }
+
+        function loadPatient(id) {
+            const dataString = localStorage.getItem('diet_data_' + id);
+            if (!dataString) return;
+
+            const data = JSON.parse(dataString);
+            currentPatientId = id;
+
+            // 1. Restaurar Variáveis
+            dietMeals = data.meals || JSON.parse(JSON.stringify(defaultMeals));
+            currentTheme = data.theme || 'emerald';
+
+            // 2. Restaurar DOM Inputs Básicos
+            const fields = [
+                'patient-name', 'patient-goal', 'diet-date',
+                'prof-name', 'prof-crn', 'prof-phone', 'prof-insta',
+                'calc-weight', 'calc-height', 'calc-age', 'calc-bf', 
+                'target-cal', 'target-carb-pct', 'target-prot-pct', 'target-fat-pct'
+            ];
+            
+            fields.forEach(f => {
+                if(document.getElementById(f) && data.inputs[f] !== undefined) {
+                    document.getElementById(f).value = data.inputs[f];
+                }
+            });
+
+            // 3. Restaurar Selects
+            if(data.selects) {
+                document.getElementById('calc-formula').value = data.selects['calc-formula'] || 'mifflin';
+                document.getElementById('calc-activity').value = data.selects['calc-activity'] || '1.55';
+                const sexRadio = document.querySelector(`input[name="calc-sex"][value="${data.selects['calc-sex']}"]`);
+                if(sexRadio) sexRadio.checked = true;
+            }
+
+            // 4. Restaurar Imagens
+            if(data.images) {
+                if(data.images.mainLogo) {
+                    document.getElementById('logo-img-main').src = data.images.mainLogo;
+                    document.getElementById('logo-img-main').classList.remove('hidden');
+                    document.getElementById('logo-placeholder').classList.add('hidden');
+                } else {
+                    document.getElementById('logo-img-main').classList.add('hidden');
+                    document.getElementById('logo-placeholder').classList.remove('hidden');
+                }
+
+                if(data.images.footerLogo) {
+                    document.getElementById('logo-img-footer').src = data.images.footerLogo;
+                    document.getElementById('logo-img-footer').classList.remove('hidden');
+                    document.getElementById('logo-placeholder-footer').classList.add('hidden');
+                } else {
+                    document.getElementById('logo-img-footer').classList.add('hidden');
+                    document.getElementById('logo-placeholder-footer').classList.remove('hidden');
+                }
+            }
+
+            // 5. Restaurar Histórico e Textos
+            if(data.history) {
+                const rows = document.querySelectorAll('#history-table tbody tr');
+                data.history.forEach((rowData, i) => {
+                    if(rows[i]) {
+                        const cells = rows[i].querySelectorAll('td');
+                        rowData.forEach((cellText, j) => {
+                            if(cells[j]) cells[j].innerText = cellText;
+                        });
+                    }
+                });
+            }
+            if(data.goalsText) {
+                document.getElementById('goals-area').innerText = data.goalsText;
+            }
+
+            // 6. Atualizar UI
+            setTheme(currentTheme);
+            renderMealSelect();
+            renderDiet();
+            calculateEnergy();
+            updateDateDisplay();
+            toggleBodyFatInput();
+            
+            // Salvar ID como ultimo usado
+            localStorage.setItem('diet_last_patient_id', id);
+            
+            closePatientModal();
+            showToast(`Paciente ${data.inputs['patient-name']} carregado!`);
+        }
+
+        function triggerAutoSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(saveCurrentPatientState, 1000); // Salva 1s após parar de digitar
+        }
+
+        function saveCurrentPatientState() {
+            if (!currentPatientId) return;
+
+            // Coletar Inputs
+            const inputs = {};
+            const fields = [
+                'patient-name', 'patient-goal', 'diet-date',
+                'prof-name', 'prof-crn', 'prof-phone', 'prof-insta',
+                'calc-weight', 'calc-height', 'calc-age', 'calc-bf', 
+                'target-cal', 'target-carb-pct', 'target-prot-pct', 'target-fat-pct'
+            ];
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if(el) inputs[f] = el.value;
+            });
+
+            // Coletar Selects/Radios
+            const selects = {
+                'calc-formula': document.getElementById('calc-formula').value,
+                'calc-activity': document.getElementById('calc-activity').value,
+                'calc-sex': document.querySelector('input[name="calc-sex"]:checked').value
+            };
+
+            // Coletar Imagens (src base64)
+            const mainLogoSrc = document.getElementById('logo-img-main').src;
+            const footerLogoSrc = document.getElementById('logo-img-footer').src;
+            const images = {
+                mainLogo: mainLogoSrc.includes('data:') ? mainLogoSrc : null,
+                footerLogo: footerLogoSrc.includes('data:') ? footerLogoSrc : null
+            };
+
+            // Coletar Histórico
+            const history = [];
+            document.querySelectorAll('#history-table tbody tr').forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => rowData.push(cell.innerText));
+                history.push(rowData);
+            });
+
+            // Objeto Principal
+            const data = {
+                id: currentPatientId,
+                lastModified: Date.now(),
+                theme: currentTheme,
+                inputs: inputs,
+                selects: selects,
+                images: images,
+                meals: dietMeals,
+                history: history,
+                goalsText: document.getElementById('goals-area').innerText
+            };
+
+            // Salvar Dados
+            localStorage.setItem('diet_data_' + currentPatientId, JSON.stringify(data));
+
+            // Atualizar Lista de Pacientes (Metadados)
+            let list = getPatientsList();
+            const existingIndex = list.findIndex(p => p.id === currentPatientId);
+            const meta = { id: currentPatientId, name: inputs['patient-name'] || "Sem Nome", lastModified: Date.now() };
+            
+            if (existingIndex >= 0) {
+                list[existingIndex] = meta;
+            } else {
+                list.push(meta);
+            }
+            savePatientsList(list);
+            
+            // UI Feedback (Optional logic to update button label)
+            const btnLabel = document.getElementById('current-patient-label');
+            if(btnLabel) btnLabel.innerText = inputs['patient-name'] || "Pacientes";
+        }
+
+
+        // ==========================================
+        // === LÓGICA DE DIETA EXISTENTE (MANTIDA) ===
+        // ==========================================
 
         function toggleBodyFatInput() {
             const formula = document.getElementById('calc-formula').value;
             const bfContainer = document.getElementById('bf-container');
             
-            // Agora 'tinsley_katch' é o valor correto no select
             if(formula === 'tinsley_katch' || formula === 'cunningham') {
                 bfContainer.classList.remove('hidden');
             } else {
@@ -903,7 +1240,6 @@
 
                 // --- FÓRMULAS ---
                 if (formula === 'mifflin') {
-                    // Mifflin-St Jeor
                     if(height > 0 && age > 0) {
                         if(sex === 'm') {
                             bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
@@ -913,7 +1249,6 @@
                     }
                 } 
                 else if (formula === 'harris') {
-                    // Harris-Benedict
                     if(height > 0 && age > 0) {
                         if(sex === 'm') {
                             bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
@@ -923,26 +1258,21 @@
                     }
                 }
                 else if (formula === 'tinsley_ph') {
-                    // Tinsley (Peso e Altura)
                     if (height > 0) {
                         if (sex === 'm') {
-                            // Homens: (9,65 * peso) + (573 * altura em metros) - 5,08
                             bmr = (9.65 * weight) + (573 * heightM) - 5.08;
                         } else {
-                            // Mulheres: (9,65 * peso) + (573 * altura em metros) - 4,92
                             bmr = (9.65 * weight) + (573 * heightM) - 4.92;
                         }
                     }
                 }
                 else if (formula === 'tinsley_katch') {
-                    // Tinsley / Katch–McArdle: 370 + (21,6 * MLG)
                     if (bf > 0) {
                         const mlg = weight * (1 - (bf/100));
                         bmr = 370 + (21.6 * mlg);
                     }
                 }
                 else if (formula === 'cunningham') {
-                    // Cunningham (MLG): 500 + (22 * MLG)
                     if (bf > 0) {
                         const mlg = weight * (1 - (bf/100));
                         bmr = 500 + (22 * mlg);
@@ -982,6 +1312,7 @@
                 dietMeals = dietMeals.filter(m => m.id !== id);
                 renderMealSelect();
                 renderDiet();
+                triggerAutoSave();
                 showToast("Refeição removida", "neutral");
             }
         }
@@ -990,19 +1321,17 @@
             const index = dietMeals.findIndex(m => m.id === id);
             if (index === -1) return;
 
-            // Cria uma cópia profunda do objeto para evitar referências compartilhadas
             const originalMeal = dietMeals[index];
             const newMeal = JSON.parse(JSON.stringify(originalMeal));
             
-            // Atribui novo ID e atualiza o título
             newMeal.id = Date.now();
             newMeal.title = `${originalMeal.title} (Cópia)`;
 
-            // Insere logo após a refeição original
             dietMeals.splice(index + 1, 0, newMeal);
 
             renderDiet();
             renderMealSelect();
+            triggerAutoSave();
             showToast("Refeição duplicada com sucesso!");
         }
 
@@ -1014,23 +1343,23 @@
 
         function moveMeal(index, direction) {
             if (direction === -1 && index > 0) {
-                // Swap with previous
                 [dietMeals[index], dietMeals[index - 1]] = [dietMeals[index - 1], dietMeals[index]];
             } else if (direction === 1 && index < dietMeals.length - 1) {
-                // Swap with next
                 [dietMeals[index], dietMeals[index + 1]] = [dietMeals[index + 1], dietMeals[index]];
             } else {
-                return; // Can't move
+                return; 
             }
             renderDiet();
-            renderMealSelect(); // Sync dropdown
+            renderMealSelect();
+            triggerAutoSave();
         }
 
         function updateMealTitle(id, newName) {
             const meal = dietMeals.find(m => m.id === id);
             if(meal) {
                 meal.title = newName.trim();
-                renderMealSelect(); // Sync dropdown
+                renderMealSelect(); 
+                triggerAutoSave();
                 showToast("Nome da refeição atualizado", "neutral");
             }
         }
@@ -1039,6 +1368,7 @@
             const meal = dietMeals.find(m => m.id === id);
             if(meal) {
                 meal.observation = text;
+                triggerAutoSave();
                 showToast("Observação salva", "neutral");
             }
         }
@@ -1046,11 +1376,11 @@
         function clearMealObservation(id) {
             const meal = dietMeals.find(m => m.id === id);
             if(meal) {
-                // Se tiver texto, pede confirmação. Se estiver vazio, não faz nada ou só limpa.
                 if (meal.observation && meal.observation.trim() !== "") {
                     if(confirm("Deseja excluir o texto desta observação?")) {
                         meal.observation = "";
                         renderDiet();
+                        triggerAutoSave();
                         showToast("Observação excluída", "neutral");
                     }
                 } else {
@@ -1079,10 +1409,8 @@
             const select = document.getElementById('select-food');
             select.innerHTML = '';
             
-            // Ordenar alfabeticamente
             let sortedFoods = [...foodDatabase].sort((a, b) => a.name.localeCompare(b.name));
 
-            // Filtrar se houver texto
             if (filterText) {
                 const term = filterText.toLowerCase();
                 sortedFoods = sortedFoods.filter(f => f.name.toLowerCase().includes(term));
@@ -1101,13 +1429,11 @@
             sortedFoods.forEach(food => {
                 const option = document.createElement('option');
                 option.value = food.id;
-                // Marcador visual para alimentos personalizados
                 const marker = food.isCustom ? '★ ' : '';
                 option.text = `${marker}${food.name} (${food.cal.toFixed(0)}kcal/100g)`;
                 select.appendChild(option);
             });
             
-            // Selecionar o primeiro automaticamente
             if(sortedFoods.length > 0) select.value = sortedFoods[0].id;
         }
 
@@ -1116,7 +1442,6 @@
             const term = searchInput.value;
             renderFoodSelect(term);
             
-            // LÓGICA DO HINT VISUAL
             const hint = document.getElementById('search-hint');
             if (term.length > 0) {
                 hint.classList.remove('hidden');
@@ -1125,17 +1450,15 @@
             }
         }
 
-        // --- FUNÇÃO PARA ATUALIZAR NOME DO ALIMENTO ---
         function updateFoodName(mealId, foodIndex, newName) {
             const meal = dietMeals.find(m => m.id === mealId);
             if (meal && meal.foods[foodIndex]) {
-                // Atualiza o nome apenas na instância local da dieta
                 meal.foods[foodIndex].name = newName.trim();
+                triggerAutoSave();
                 showToast("Nome do alimento atualizado", "neutral");
             }
         }
         
-        // --- FUNÇÃO PARA ATUALIZAR QUANTIDADE DO ALIMENTO NA TABELA ---
         function updateFoodQty(mealId, foodIndex, newQtyVal) {
             const meal = dietMeals.find(m => m.id === mealId);
             if (meal && meal.foods[foodIndex]) {
@@ -1145,30 +1468,28 @@
                 const food = meal.foods[foodIndex];
                 const factor = qty / 100;
                 
-                // Recalcula tudo com base na quantidade nova
                 food.qty = qty;
                 food.totalCal = food.cal * factor;
                 food.totalCarb = food.carb * factor;
                 food.totalProt = food.prot * factor;
                 food.totalFat = food.fat * factor;
                 
-                renderDiet(); // Redesenha para atualizar totais
+                renderDiet();
+                triggerAutoSave();
                 showToast("Quantidade atualizada", "neutral");
             }
         }
         
-        // --- FUNÇÃO PARA MOVER ALIMENTO NA LISTA ---
         function moveFood(mealId, foodIndex, direction) {
             const meal = dietMeals.find(m => m.id === mealId);
             if (!meal) return;
             
             const newIndex = foodIndex + direction;
             
-            // Verifica limites
             if (newIndex >= 0 && newIndex < meal.foods.length) {
-                // Troca de posição
                 [meal.foods[foodIndex], meal.foods[newIndex]] = [meal.foods[newIndex], meal.foods[foodIndex]];
                 renderDiet();
+                triggerAutoSave();
             }
         }
 
@@ -1180,13 +1501,11 @@
 
             let dailyTotal = { cal: 0, carb: 0, prot: 0, fat: 0 };
 
-            // === 1. PREPARAR METAS (CÁLCULO) ===
             const targetCal = parseFloat(document.getElementById('target-cal').value) || 2000;
             const pctC = parseFloat(document.getElementById('target-carb-pct').value) || 50;
             const pctP = parseFloat(document.getElementById('target-prot-pct').value) || 30;
             const pctF = parseFloat(document.getElementById('target-fat-pct').value) || 20;
             
-            // Update total percentage display
             const totalPct = pctC + pctP + pctF;
             const totalPctEl = document.getElementById('total-pct-display');
             if(totalPctEl) {
@@ -1194,23 +1513,18 @@
                 totalPctEl.style.color = totalPct !== 100 ? 'red' : 'inherit';
             }
 
-            // Target Grams
             const targetGramsC = (targetCal * (pctC / 100)) / 4;
             const targetGramsP = (targetCal * (pctP / 100)) / 4;
             const targetGramsF = (targetCal * (pctF / 100)) / 9;
 
-
-            // === 2. RENDERIZAR REFEIÇÕES ===
             dietMeals.forEach((meal, index) => {
                 let mCal = 0, mCarb = 0, mProt = 0, mFat = 0;
                 meal.foods.forEach(f => {
-                    // Totais da refeição (Visual Header) - Soma tudo
                     mCal += f.totalCal;
                     mCarb += f.totalCarb;
                     mProt += f.totalProt;
                     mFat += f.totalFat;
 
-                    // Totais Diários (Apenas Opção A)
                     if(f.option === 'A') {
                         dailyTotal.cal += f.totalCal;
                         dailyTotal.carb += f.totalCarb;
@@ -1236,7 +1550,7 @@
                                 </div>
                             `;
                         }
-                        // TABELA DE ALIMENTOS
+                        
                         contentHtml += `
                             <div class="table-container">
                                 <table class="w-full text-left text-sm">
@@ -1270,7 +1584,6 @@
                                                 
                                                 <td class="p-3 text-center no-print w-24 col-actions">
                                                     <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                                                        <!-- Botões de mover -->
                                                         <div class="flex flex-col text-[8px] text-slate-400">
                                                             <button onclick="moveFood(${meal.id}, ${originalIndex}, -1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-up"></i></button>
                                                             <button onclick="moveFood(${meal.id}, ${originalIndex}, 1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-down"></i></button>
@@ -1293,7 +1606,6 @@
                     contentHtml = `<div class="p-6 text-center text-slate-400 text-sm italic no-print">Nenhum alimento adicionado.</div>`;
                 }
 
-                // --- TOTAIS DA REFEIÇÃO (NOVO LOCAL - FOOTER) ---
                 const totalsHtml = `
                     <div class="totals-footer p-3 bg-slate-50 border-t border-slate-100 flex justify-end gap-4 text-xs font-bold text-slate-600">
                         <span>Total Refeição:</span>
@@ -1304,7 +1616,6 @@
                     </div>
                 `;
 
-                // --- OBSERVAÇÃO ---
                 const observationHtml = `
                     <div class="px-4 pb-4 pt-2 border-t border-slate-100 group/obs relative">
                         <div class="flex justify-between items-center mb-1">
@@ -1325,7 +1636,6 @@
                 const mealHtml = `
                     <div class="card bg-white rounded-xl shadow-sm theme-border border overflow-hidden break-inside-avoid relative group">
                         
-                        <!-- BOTÕES DE AÇÃO: EXCLUIR E DUPLICAR -->
                         <div class="absolute top-4 right-4 flex gap-2 no-print opacity-0 group-hover:opacity-100 transition z-10" data-html2canvas-ignore="true">
                             <button onclick="duplicateMeal(${meal.id})" class="text-slate-300 hover:text-blue-500 transition" title="Duplicar Refeição">
                                 <i class="fa-regular fa-copy"></i>
@@ -1338,7 +1648,6 @@
                         <div class="meal-header theme-bg-light p-4 border-b theme-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             
                             <div class="flex items-center gap-3 flex-1 w-full sm:w-auto">
-                                <!-- Controles de Ordem da Refeição -->
                                 <div class="flex flex-col gap-1 no-print">
                                     <button onclick="moveMeal(${index}, -1)" class="text-[10px] leading-none px-1 py-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 ${index === 0 ? 'invisible' : ''}" title="Mover para cima">
                                         <i class="fa-solid fa-chevron-up"></i>
@@ -1365,7 +1674,6 @@
                 container.innerHTML += mealHtml;
             });
 
-            // === 3. ADICIONAR CARD DE RESUMO TOTAL (CONSUMIDO) ===
             const totalHtml = `
                 <div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 overflow-hidden break-inside-avoid mt-6">
                     <div class="p-4 border-b border-slate-700 flex justify-between items-center">
@@ -1396,11 +1704,9 @@
             `;
             container.innerHTML += totalHtml;
 
-            // === 4. NOVO CARD DE METAS (VISÍVEL PARA PACIENTE/IMPRESSÃO) ===
             if (showGoals) {
                 const goalsHtml = `
                     <div class="card bg-white rounded-xl shadow-sm border theme-border overflow-hidden break-inside-avoid mt-4 relative group">
-                         <!-- BOTÃO EXCLUIR -->
                         <button onclick="removeGoals()" class="absolute top-3 right-3 text-slate-300 hover:text-red-500 transition no-print opacity-0 group-hover:opacity-100" title="Ocultar Metas">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
@@ -1433,12 +1739,7 @@
                 container.innerHTML += goalsHtml;
             }
 
-            // === 5. ATUALIZAR SIDEBAR (COMPARATIVO) ===
             const diffCal = dailyTotal.cal - targetCal;
-            const diffC = dailyTotal.carb - targetGramsC;
-            const diffP = dailyTotal.prot - targetGramsP;
-            const diffF = dailyTotal.fat - targetGramsF;
-
             const widget = document.getElementById('comparison-widget');
             if(widget) {
                 widget.innerHTML = `
@@ -1482,7 +1783,6 @@
             if (isNaN(mealId)) { showToast("Crie ou selecione uma refeição!", "error"); return; }
             if (!qty || qty <= 0) { showToast("Quantidade inválida!", "error"); return; }
             
-            // Buscar na lista filtrada ou completa
             const food = foodDatabase.find(f => f.id === foodId);
             const meal = dietMeals.find(m => m.id === mealId);
             
@@ -1501,11 +1801,10 @@
                 renderDiet();
                 showToast(`Adicionado à ${meal.title}`);
                 
-                // Limpar busca para facilitar proxima inserção
                 document.getElementById('search-food').value = '';
-                // Esconder Hint
                 document.getElementById('search-hint').classList.add('hidden');
                 renderFoodSelect();
+                triggerAutoSave();
             }
         }
 
@@ -1514,6 +1813,7 @@
             if(meal) {
                 meal.foods.splice(foodIndex, 1);
                 renderDiet();
+                triggerAutoSave();
                 showToast("Item removido", "neutral");
             }
         }
@@ -1530,9 +1830,7 @@
             }
         }
 
-        // --- IMPRESSÃO (NATIVO) ---
         function printDiet() {
-            // Atualiza data antes de imprimir
             updateDateDisplay();
             window.print();
         }
@@ -1546,12 +1844,8 @@
             root.style.setProperty('--primary-light', t.light);
             root.style.setProperty('--primary-text', t.text);
             root.style.setProperty('--border-color', t.border);
-            showToast(`Tema alterado para ${themeName.charAt(0).toUpperCase() + themeName.slice(1)}`);
+            // showToast(`Tema alterado para ${themeName.charAt(0).toUpperCase() + themeName.slice(1)}`);
         }
-
-        // ============================================
-        // === OTIMIZAÇÃO: REDIMENSIONAR IMAGEM ===
-        // ============================================
 
         function handleImageUpload(event, imgId, placeholderId) {
             const file = event.target.files[0];
@@ -1561,18 +1855,15 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // Configuração de redimensionamento
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     
-                    // Tamanho Máximo (ex: 300px) - Reduz peso drasticamente
                     const MAX_WIDTH = 300;
                     const MAX_HEIGHT = 150;
                     
                     let width = img.width;
                     let height = img.height;
 
-                    // Lógica de proporção
                     if (width > height) {
                         if (width > MAX_WIDTH) {
                             height *= MAX_WIDTH / width;
@@ -1588,36 +1879,29 @@
                     canvas.width = width;
                     canvas.height = height;
                     
-                    // Desenha imagem reduzida no canvas
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Converte para Base64 leve (JPEG 0.8 qualidade ou PNG)
-                    // Usando PNG para transparência do logo
                     const dataUrl = canvas.toDataURL('image/png');
 
-                    // Aplica no DOM
                     document.getElementById(imgId).src = dataUrl;
                     document.getElementById(imgId).classList.remove('hidden');
                     document.getElementById(placeholderId).classList.add('hidden');
                     
                     showToast("Logo otimizado e carregado!");
+                    triggerAutoSave();
                 }
                 img.src = e.target.result;
             }
             reader.readAsDataURL(file);
         }
 
-        // ============================================
-        // === NOVAS FUNÇÕES PARA PERSISTÊNCIA ===
-        // ============================================
-
+        // --- ALIMENTOS CUSTOMIZADOS (GLOBAL) ---
         function loadCustomFoodsFromStorage() {
             const stored = localStorage.getItem('dietCustomFoods');
             if (stored) {
                 try {
                     const customFoods = JSON.parse(stored);
                     if (Array.isArray(customFoods)) {
-                        // Adiciona ao banco de dados principal
                         foodDatabase = [...foodDatabase, ...customFoods];
                     }
                 } catch (e) {
@@ -1627,14 +1911,9 @@
         }
 
         function saveCustomFoodToStorage(foodItem) {
-            // Recupera lista existente ou cria nova
             let stored = localStorage.getItem('dietCustomFoods');
             let customList = stored ? JSON.parse(stored) : [];
-            
-            // Adiciona novo item
             customList.push(foodItem);
-            
-            // Salva de volta
             localStorage.setItem('dietCustomFoods', JSON.stringify(customList));
         }
 
@@ -1648,18 +1927,14 @@
 
         function createCustomFood() {
             const name = document.getElementById('new-name').value;
-            // Novo: Pega a porção base do usuário
             const serving = parseFloat(document.getElementById('new-serving').value);
             const cal = parseFloat(document.getElementById('new-cal').value);
 
-            // Validações
             if (!name) { showToast("Preencha o nome!", "error"); return; }
             if (!serving || serving <= 0) { showToast("A porção deve ser maior que 0!", "error"); return; }
             if (isNaN(cal)) { showToast("Preencha as calorias!", "error"); return; }
 
-            // Fator de conversão para normalizar para 100g
             const factor = 100 / serving;
-
             const newId = Date.now(); 
             const newFood = {
                 id: newId,
@@ -1668,16 +1943,12 @@
                 carb: (parseFloat(document.getElementById('new-carb').value) || 0) * factor,
                 prot: (parseFloat(document.getElementById('new-prot').value) || 0) * factor,
                 fat: (parseFloat(document.getElementById('new-fat').value) || 0) * factor,
-                isCustom: true // Marcador para saber que é personalizado
+                isCustom: true 
             };
 
-            // Adiciona à lista em tempo real
             foodDatabase.push(newFood);
-            
-            // --- NOVO: SALVA NO NAVEGADOR ---
             saveCustomFoodToStorage(newFood);
             
-            // Limpa form e busca
             document.getElementById('search-food').value = '';
             document.getElementById('new-name').value = '';
             document.getElementById('new-cal').value = '';
@@ -1686,10 +1957,7 @@
             document.getElementById('new-fat').value = '';
             
             renderFoodSelect();
-            
-            // Seleciona o novo alimento criado
             document.getElementById('select-food').value = newId;
-            
             toggleCustomForm();
             showToast("Alimento criado e salvo!");
         }
