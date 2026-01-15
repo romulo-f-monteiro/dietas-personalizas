@@ -276,278 +276,276 @@
         <main class="flex-grow container mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <!-- COLUNA DA ESQUERDA: Controles (Oculto no PDF) -->
-            <div class="lg:col-span-4 no-print">
+            <div class="lg:col-span-4 space-y-6 no-print">
                 
-                <!-- CONTAINER STICKY PARA O MENU LATERAL -->
-                <div class="sticky top-4 space-y-6 max-h-[calc(100vh-2rem)] overflow-y-auto custom-scroll pr-1 pb-4">
+                <!-- === NOVA CALCULADORA DO PROFISSIONAL === -->
+                <div class="bg-slate-800 text-white p-5 rounded-xl shadow-lg border border-slate-700 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10">
+                        <i class="fa-solid fa-calculator text-6xl"></i>
+                    </div>
                     
-                    <!-- 1. Cor (Movido para cima) -->
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-xs font-bold text-slate-500 uppercase mb-3">Personalizar Cor</h3>
-                        <div class="grid grid-cols-5 gap-3">
-                            <button onclick="setTheme('emerald'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-emerald-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Esmeralda"></button>
-                            <button onclick="setTheme('blue'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-blue-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Azul"></button>
-                            <button onclick="setTheme('indigo'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-indigo-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Índigo"></button>
-                            <button onclick="setTheme('rose'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-rose-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Rosa"></button>
-                            <button onclick="setTheme('amber'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-amber-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Âmbar/Laranja"></button>
-                            <button onclick="setTheme('purple'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-purple-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Roxo"></button>
-                            <button onclick="setTheme('cyan'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-cyan-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Ciano"></button>
-                            <button onclick="setTheme('teal'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-teal-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Turquesa"></button>
-                            <button onclick="setTheme('lime'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-lime-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Limão"></button>
-                            <button onclick="setTheme('fuchsia'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-fuchsia-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Fúcsia"></button>
+                    <h2 class="font-bold text-lg mb-4 flex items-center gap-2 relative z-10">
+                        Área do Nutricionista
+                    </h2>
+
+                    <!-- Inputs Antropométricos -->
+                    <div class="space-y-3 relative z-10 text-sm">
+                        <div class="flex gap-2 bg-slate-700/50 p-1 rounded-lg">
+                            <label class="flex-1 text-center cursor-pointer">
+                                <input type="radio" name="calc-sex" value="m" checked class="peer sr-only" onchange="calculateEnergy(); triggerAutoSave();">
+                                <div class="py-1.5 rounded peer-checked:bg-blue-600 peer-checked:text-white text-slate-400 transition text-xs font-bold">Homem</div>
+                            </label>
+                            <label class="flex-1 text-center cursor-pointer">
+                                <input type="radio" name="calc-sex" value="f" class="peer sr-only" onchange="calculateEnergy(); triggerAutoSave();">
+                                <div class="py-1.5 rounded peer-checked:bg-pink-600 peer-checked:text-white text-slate-400 transition text-xs font-bold">Mulher</div>
+                            </label>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 uppercase">Peso (kg)</label>
+                                <input type="number" id="calc-weight" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy(); triggerAutoSave();">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 uppercase">Altura (cm)</label>
+                                <input type="number" id="calc-height" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy(); triggerAutoSave();">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 uppercase">Idade</label>
+                                <input type="number" id="calc-age" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy(); triggerAutoSave();">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-slate-400 uppercase">Fórmula TMB</label>
+                            <select id="calc-formula" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="toggleBodyFatInput(); calculateEnergy(); triggerAutoSave();">
+                                <option value="mifflin" selected>Mifflin-St Jeor (Padrão)</option>
+                                <option value="harris">Harris-Benedict</option>
+                                <option value="tinsley_ph">Tinsley (Peso e Altura)</option>
+                                <option value="tinsley_katch">Tinsley / Katch–McArdle (MLG)</option>
+                                <option value="cunningham">Cunningham, 1980 (MLG)</option>
+                            </select>
+                        </div>
+
+                        <!-- Campo % Gordura (Escondido por padrão) -->
+                        <div id="bf-container" class="hidden">
+                            <label class="text-[10px] text-slate-400 uppercase">% Gordura (BF)</label>
+                            <input type="number" id="calc-bf" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="Ex: 15" onkeyup="calculateEnergy(); triggerAutoSave();">
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-slate-400 uppercase">Nível de Atividade</label>
+                            <select id="calc-activity" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="calculateEnergy(); triggerAutoSave();">
+                                <option value="1.2">Sedentário (Pouco ou nenhum - FA 1 - 1,39)</option>
+                                <option value="1.375">Leve (1-3 dias/sem - FA 1,4 - 1,59)</option>
+                                <option value="1.55" selected>Moderado (3-5 dias/sem - FA 1,6 - 1,89)</option>
+                                <option value="1.725">Intenso (6-7 dias/sem - FA 1,9 - 2,49)</option>
+                                <option value="1.9">Muito Intenso (Atleta - FA > 2,5)</option>
+                            </select>
+                        </div>
+
+                        <!-- Resultados Calculados -->
+                        <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-700">
+                            <div class="text-center">
+                                <div class="text-[10px] text-slate-400">IMC</div>
+                                <div id="res-bmi" class="font-bold text-emerald-400 text-lg">--</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-[10px] text-slate-400">Basal (TMB)</div>
+                                <div id="res-bmr" class="font-bold text-white text-sm">--</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-[10px] text-slate-400">Total (GET)</div>
+                                <div id="res-tdee" class="font-bold text-white text-sm">--</div>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- 2. NOVA CALCULADORA DO PROFISSIONAL -->
-                    <div class="bg-slate-800 text-white p-5 rounded-xl shadow-lg border border-slate-700 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-2 opacity-10">
-                            <i class="fa-solid fa-calculator text-6xl"></i>
+                <!-- Painel de Metas da Dieta -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="font-bold text-sm mb-3 flex items-center gap-2 text-slate-700 uppercase tracking-wide">
+                        <i class="fa-solid fa-bullseye text-blue-500"></i> Metas da Dieta
+                    </h2>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500">Meta Calórica (Kcal)</label>
+                            <input type="number" id="target-cal" class="w-full border border-slate-300 rounded p-2 text-center font-bold text-slate-700 focus:ring-2 focus:ring-blue-200 outline-none" value="2000" onkeyup="renderDiet(); triggerAutoSave();">
                         </div>
-                        
-                        <h2 class="font-bold text-lg mb-4 flex items-center gap-2 relative z-10">
-                            Área do Nutricionista
-                        </h2>
 
-                        <!-- Inputs Antropométricos -->
-                        <div class="space-y-3 relative z-10 text-sm">
-                            <div class="flex gap-2 bg-slate-700/50 p-1 rounded-lg">
-                                <label class="flex-1 text-center cursor-pointer">
-                                    <input type="radio" name="calc-sex" value="m" checked class="peer sr-only" onchange="calculateEnergy(); triggerAutoSave();">
-                                    <div class="py-1.5 rounded peer-checked:bg-blue-600 peer-checked:text-white text-slate-400 transition text-xs font-bold">Homem</div>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            <div class="flex justify-between text-[10px] text-slate-400 uppercase font-bold mb-1">
+                                <span>Carbo %</span>
+                                <span>Prot %</span>
+                                <span>Gord %</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="number" id="target-carb-pct" class="w-full p-1 text-center border rounded text-xs" value="50" onkeyup="renderDiet(); triggerAutoSave();">
+                                <input type="number" id="target-prot-pct" class="w-full p-1 text-center border rounded text-xs" value="30" onkeyup="renderDiet(); triggerAutoSave();">
+                                <input type="number" id="target-fat-pct" class="w-full p-1 text-center border rounded text-xs" value="20" onkeyup="renderDiet(); triggerAutoSave();">
+                            </div>
+                            <div class="text-[10px] text-center mt-1 text-slate-400">
+                                Total: <span id="total-pct-display">100</span>%
+                            </div>
+                        </div>
+
+                        <!-- Comparativo Rápido (Exibe Metas Calculadas) -->
+                        <div id="comparison-widget" class="text-xs space-y-1 pt-2 border-t border-slate-100">
+                            <!-- Preenchido via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cor -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-3">Personalizar Cor</h3>
+                    <div class="grid grid-cols-5 gap-3">
+                        <button onclick="setTheme('emerald'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-emerald-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Esmeralda"></button>
+                        <button onclick="setTheme('blue'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-blue-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Azul"></button>
+                        <button onclick="setTheme('indigo'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-indigo-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Índigo"></button>
+                        <button onclick="setTheme('rose'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-rose-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Rosa"></button>
+                        <button onclick="setTheme('amber'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-amber-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Âmbar/Laranja"></button>
+                        <button onclick="setTheme('purple'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-purple-600 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Roxo"></button>
+                        <button onclick="setTheme('cyan'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-cyan-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Ciano"></button>
+                        <button onclick="setTheme('teal'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-teal-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Turquesa"></button>
+                        <button onclick="setTheme('lime'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-lime-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Verde Limão"></button>
+                        <button onclick="setTheme('fuchsia'); triggerAutoSave();" class="w-8 h-8 rounded-full bg-fuchsia-500 hover:scale-110 transition ring-2 ring-offset-1 ring-transparent focus:ring-slate-300" title="Fúcsia"></button>
+                    </div>
+                </div>
+
+                <!-- Adicionar Refeições (Card Principal) -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700">
+                        <i class="fa-solid fa-carrot theme-text"></i> Adicionar Refeições
+                    </h2>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Escolha a Refeição</label>
+                            <select id="select-meal" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm font-semibold text-slate-700">
+                                <!-- JS Populates -->
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Opção</label>
+                            <div class="flex gap-2">
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="meal-option" value="A" checked class="peer sr-only">
+                                    <div class="text-center py-2 border rounded-lg peer-checked:bg-slate-800 peer-checked:text-white text-xs font-semibold transition">Opção A</div>
                                 </label>
-                                <label class="flex-1 text-center cursor-pointer">
-                                    <input type="radio" name="calc-sex" value="f" class="peer sr-only" onchange="calculateEnergy(); triggerAutoSave();">
-                                    <div class="py-1.5 rounded peer-checked:bg-pink-600 peer-checked:text-white text-slate-400 transition text-xs font-bold">Mulher</div>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="meal-option" value="B" class="peer sr-only">
+                                    <div class="text-center py-2 border rounded-lg peer-checked:bg-slate-800 peer-checked:text-white text-xs font-semibold transition">Opção B</div>
+                                </label>
+                                <label class="flex-1 cursor-pointer">
+                                    <input type="radio" name="meal-option" value="C" class="peer sr-only">
+                                    <div class="text-center py-2 border rounded-lg peer-checked:bg-slate-800 peer-checked:text-white text-xs font-semibold transition">Opção C</div>
                                 </label>
                             </div>
+                        </div>
 
-                            <div class="grid grid-cols-3 gap-2">
-                                <div>
-                                    <label class="text-[10px] text-slate-400 uppercase">Peso (kg)</label>
-                                    <input type="number" id="calc-weight" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy(); triggerAutoSave();">
+                        <!-- BUSCA DE ALIMENTOS -->
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Alimento (TACO/Unicamp)</label>
+                            <!-- Input de pesquisa -->
+                            <div class="relative mb-2">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <i class="fa-solid fa-search text-slate-400"></i>
                                 </div>
-                                <div>
-                                    <label class="text-[10px] text-slate-400 uppercase">Altura (cm)</label>
-                                    <input type="number" id="calc-height" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy(); triggerAutoSave();">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] text-slate-400 uppercase">Idade</label>
-                                    <input type="number" id="calc-age" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="0" onkeyup="calculateEnergy(); triggerAutoSave();">
-                                </div>
+                                <input type="text" id="search-food" onkeyup="filterFoods()" placeholder="Buscar alimento (ex: arroz, frango)..." class="w-full p-2 pl-10 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm">
+                            </div>
+                            
+                            <!-- DICA VISUAL PARA CLICAR NA LISTA -->
+                            <div id="search-hint" class="hidden bg-blue-50 text-blue-600 text-xs p-2 rounded mb-2 flex items-center gap-2 border border-blue-100 animate-pulse">
+                                <i class="fa-solid fa-arrow-down"></i> Selecione o alimento na lista abaixo:
                             </div>
 
-                            <div>
-                                <label class="text-[10px] text-slate-400 uppercase">Fórmula TMB</label>
-                                <select id="calc-formula" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="toggleBodyFatInput(); calculateEnergy(); triggerAutoSave();">
-                                    <option value="mifflin" selected>Mifflin-St Jeor (Padrão)</option>
-                                    <option value="harris">Harris-Benedict</option>
-                                    <option value="tinsley_ph">Tinsley (Peso e Altura)</option>
-                                    <option value="tinsley_katch">Tinsley / Katch–McArdle (MLG)</option>
-                                    <option value="cunningham">Cunningham, 1980 (MLG)</option>
-                                </select>
-                            </div>
+                            <!-- Select Filtrável -->
+                            <select id="select-food" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none custom-scroll text-sm">
+                                <!-- JS Populates -->
+                            </select>
+                        </div>
 
-                            <!-- Campo % Gordura (Escondido por padrão) -->
-                            <div id="bf-container" class="hidden">
-                                <label class="text-[10px] text-slate-400 uppercase">% Gordura (BF)</label>
-                                <input type="number" id="calc-bf" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-center focus:border-emerald-500 outline-none" placeholder="Ex: 15" onkeyup="calculateEnergy(); triggerAutoSave();">
-                            </div>
-
-                            <div>
-                                <label class="text-[10px] text-slate-400 uppercase">Nível de Atividade</label>
-                                <select id="calc-activity" class="w-full bg-slate-700 border border-slate-600 rounded p-1.5 text-white text-xs outline-none" onchange="calculateEnergy(); triggerAutoSave();">
-                                    <option value="1.2">Sedentário (Pouco ou nenhum - FA 1 - 1,39)</option>
-                                    <option value="1.375">Leve (1-3 dias/sem - FA 1,4 - 1,59)</option>
-                                    <option value="1.55" selected>Moderado (3-5 dias/sem - FA 1,6 - 1,89)</option>
-                                    <option value="1.725">Intenso (6-7 dias/sem - FA 1,9 - 2,49)</option>
-                                    <option value="1.9">Muito Intenso (Atleta - FA > 2,5)</option>
-                                </select>
-                            </div>
-
-                            <!-- Resultados Calculados -->
-                            <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-700">
-                                <div class="text-center">
-                                    <div class="text-[10px] text-slate-400">IMC</div>
-                                    <div id="res-bmi" class="font-bold text-emerald-400 text-lg">--</div>
-                                </div>
-                                <div class="text-center">
-                                    <div class="text-[10px] text-slate-400">Basal (TMB)</div>
-                                    <div id="res-bmr" class="font-bold text-white text-sm">--</div>
-                                </div>
-                                <div class="text-center">
-                                    <div class="text-[10px] text-slate-400">Total (GET)</div>
-                                    <div id="res-tdee" class="font-bold text-white text-sm">--</div>
-                                </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Quantidade</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="input-qty" value="100" class="flex-1 p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none" placeholder="Ex: 100">
+                                <span class="flex items-center bg-slate-100 border border-slate-200 px-3 rounded-lg text-slate-500 text-sm">g/ml</span>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 3. Painel de Metas da Dieta -->
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <h2 class="font-bold text-sm mb-3 flex items-center gap-2 text-slate-700 uppercase tracking-wide">
-                            <i class="fa-solid fa-bullseye text-blue-500"></i> Metas da Dieta
-                        </h2>
+                        <button onclick="addToPlan(); triggerAutoSave();" class="w-full theme-bg theme-bg-hover text-white font-semibold py-3 rounded-lg transition shadow-md flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-check"></i> Inserir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Nova Refeição -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700">
+                        <i class="fa-solid fa-calendar-plus theme-text"></i> Criar Refeição Extra
+                    </h2>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-meal-name" placeholder="Ex: Pré-Treino..." class="flex-1 p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm">
+                        <button onclick="addNewMeal(); triggerAutoSave();" class="bg-slate-800 text-white px-4 rounded-lg hover:bg-slate-700 transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Adicionar Novos Alimentos -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700 cursor-pointer" onclick="toggleCustomForm()">
+                        <i class="fa-solid fa-pen-to-square text-blue-500"></i> Adicionar Novos Alimentos
+                        <i class="fa-solid fa-chevron-down ml-auto text-xs text-slate-400"></i>
+                    </h2>
+                    
+                    <div id="custom-food-form" class="hidden space-y-3 pt-2 border-t border-slate-100">
+                        <!-- MENSAGEM DE AVISO -->
+                        <div class="bg-amber-50 p-3 rounded-lg text-xs text-amber-800 mb-2 border border-amber-100 leading-relaxed">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i> 
+                            <strong>Atenção:</strong> Os alimentos adicionados ficarão salvos no navegador.
+                        </div>
                         
-                        <div class="space-y-3">
-                            <div>
-                                <label class="text-xs font-bold text-slate-500">Meta Calórica (Kcal)</label>
-                                <input type="number" id="target-cal" class="w-full border border-slate-300 rounded p-2 text-center font-bold text-slate-700 focus:ring-2 focus:ring-blue-200 outline-none" value="2000" onkeyup="renderDiet(); triggerAutoSave();">
-                            </div>
-
-                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                <div class="flex justify-between text-[10px] text-slate-400 uppercase font-bold mb-1">
-                                    <span>Carbo %</span>
-                                    <span>Prot %</span>
-                                    <span>Gord %</span>
-                                </div>
-                                <div class="flex gap-2">
-                                    <input type="number" id="target-carb-pct" class="w-full p-1 text-center border rounded text-xs" value="50" onkeyup="renderDiet(); triggerAutoSave();">
-                                    <input type="number" id="target-prot-pct" class="w-full p-1 text-center border rounded text-xs" value="30" onkeyup="renderDiet(); triggerAutoSave();">
-                                    <input type="number" id="target-fat-pct" class="w-full p-1 text-center border rounded text-xs" value="20" onkeyup="renderDiet(); triggerAutoSave();">
-                                </div>
-                                <div class="text-[10px] text-center mt-1 text-slate-400">
-                                    Total: <span id="total-pct-display">100</span>%
-                                </div>
-                            </div>
-
-                            <!-- Comparativo Rápido -->
-                            <div id="comparison-widget" class="text-xs space-y-1 pt-2 border-t border-slate-100">
-                                <!-- Preenchido via JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. Adicionar Refeições (Card Principal) -->
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700">
-                            <i class="fa-solid fa-carrot theme-text"></i> Adicionar Refeições
-                        </h2>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">Escolha a Refeição</label>
-                                <select id="select-meal" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm font-semibold text-slate-700">
-                                    <!-- JS Populates -->
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">Opção</label>
-                                <div class="flex gap-2">
-                                    <label class="flex-1 cursor-pointer">
-                                        <input type="radio" name="meal-option" value="A" checked class="peer sr-only">
-                                        <div class="text-center py-2 border rounded-lg peer-checked:bg-slate-800 peer-checked:text-white text-xs font-semibold transition">Opção A</div>
-                                    </label>
-                                    <label class="flex-1 cursor-pointer">
-                                        <input type="radio" name="meal-option" value="B" class="peer sr-only">
-                                        <div class="text-center py-2 border rounded-lg peer-checked:bg-slate-800 peer-checked:text-white text-xs font-semibold transition">Opção B</div>
-                                    </label>
-                                    <label class="flex-1 cursor-pointer">
-                                        <input type="radio" name="meal-option" value="C" class="peer sr-only">
-                                        <div class="text-center py-2 border rounded-lg peer-checked:bg-slate-800 peer-checked:text-white text-xs font-semibold transition">Opção C</div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- BUSCA DE ALIMENTOS -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">Alimento (TACO/Unicamp)</label>
-                                <!-- Input de pesquisa -->
-                                <div class="relative mb-2">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <i class="fa-solid fa-search text-slate-400"></i>
-                                    </div>
-                                    <input type="text" id="search-food" onkeyup="filterFoods()" placeholder="Buscar alimento (ex: arroz, frango)..." class="w-full p-2 pl-10 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm">
-                                </div>
-                                
-                                <!-- DICA VISUAL -->
-                                <div id="search-hint" class="hidden bg-blue-50 text-blue-600 text-xs p-2 rounded mb-2 flex items-center gap-2 border border-blue-100 animate-pulse">
-                                    <i class="fa-solid fa-arrow-down"></i> Selecione o alimento na lista abaixo:
-                                </div>
-
-                                <!-- Select Filtrável -->
-                                <select id="select-food" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none custom-scroll text-sm">
-                                    <!-- JS Populates -->
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-slate-600 mb-1">Quantidade</label>
-                                <div class="flex gap-2">
-                                    <input type="number" id="input-qty" value="100" class="flex-1 p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none" placeholder="Ex: 100">
-                                    <span class="flex items-center bg-slate-100 border border-slate-200 px-3 rounded-lg text-slate-500 text-sm">g/ml</span>
-                                </div>
-                            </div>
-
-                            <button onclick="addToPlan(); triggerAutoSave();" class="w-full theme-bg theme-bg-hover text-white font-semibold py-3 rounded-lg transition shadow-md flex justify-center items-center gap-2">
-                                <i class="fa-solid fa-check"></i> Inserir
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 5. Nova Refeição -->
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700">
-                            <i class="fa-solid fa-calendar-plus theme-text"></i> Criar Refeição Extra
-                        </h2>
-                        <div class="flex gap-2">
-                            <input type="text" id="new-meal-name" placeholder="Ex: Pré-Treino..." class="flex-1 p-2.5 bg-slate-50 border border-slate-300 rounded-lg theme-ring outline-none text-sm">
-                            <button onclick="addNewMeal(); triggerAutoSave();" class="bg-slate-800 text-white px-4 rounded-lg hover:bg-slate-700 transition">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 6. Adicionar Novos Alimentos -->
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700 cursor-pointer" onclick="toggleCustomForm()">
-                            <i class="fa-solid fa-pen-to-square text-blue-500"></i> Adicionar Novos Alimentos
-                            <i class="fa-solid fa-chevron-down ml-auto text-xs text-slate-400"></i>
-                        </h2>
+                        <input type="text" id="new-name" placeholder="Nome do Alimento" class="w-full p-2 text-sm border rounded">
                         
-                        <div id="custom-food-form" class="hidden space-y-3 pt-2 border-t border-slate-100">
-                            <div class="bg-amber-50 p-3 rounded-lg text-xs text-amber-800 mb-2 border border-amber-100 leading-relaxed">
-                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> 
-                                <strong>Atenção:</strong> Os alimentos adicionados ficarão salvos no navegador.
+                        <!-- Novo campo de Porção Base -->
+                        <div class="relative">
+                            <label class="text-[10px] text-slate-400 uppercase font-bold ml-1">Porção utilizada nos dados abaixo:</label>
+                            <div class="flex gap-2 mb-2">
+                                <input type="number" id="new-serving" placeholder="Porção (g)" value="100" class="w-1/3 p-2 text-sm border rounded bg-slate-50 text-center font-semibold">
+                                <span class="flex items-center text-xs text-slate-500">gramas (padrão)</span>
                             </div>
-                            
-                            <input type="text" id="new-name" placeholder="Nome do Alimento" class="w-full p-2 text-sm border rounded">
-                            
-                            <div class="relative">
-                                <label class="text-[10px] text-slate-400 uppercase font-bold ml-1">Porção utilizada nos dados abaixo:</label>
-                                <div class="flex gap-2 mb-2">
-                                    <input type="number" id="new-serving" placeholder="Porção (g)" value="100" class="w-1/3 p-2 text-sm border rounded bg-slate-50 text-center font-semibold">
-                                    <span class="flex items-center text-xs text-slate-500">gramas (padrão)</span>
-                                </div>
-                            </div>
+                        </div>
 
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="text-[10px] text-slate-400 font-bold ml-1">Calorias</label>
-                                    <input type="number" id="new-cal" placeholder="Kcal" class="w-full p-2 text-sm border rounded">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] text-slate-400 font-bold ml-1">Carbo</label>
-                                    <input type="number" id="new-carb" placeholder="Carb (g)" class="w-full p-2 text-sm border rounded">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] text-slate-400 font-bold ml-1">Proteína</label>
-                                    <input type="number" id="new-prot" placeholder="Prot (g)" class="w-full p-2 text-sm border rounded">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] text-slate-400 font-bold ml-1">Gordura</label>
-                                    <input type="number" id="new-fat" placeholder="Gord (g)" class="w-full p-2 text-sm border rounded">
-                                </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 font-bold ml-1">Calorias</label>
+                                <input type="number" id="new-cal" placeholder="Kcal" class="w-full p-2 text-sm border rounded">
                             </div>
-                            <button onclick="createCustomFood()" class="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 py-2 rounded-lg text-sm font-semibold transition border border-blue-200 mt-2">
-                                Salvar no Banco (Permanente)
-                            </button>
-                            
-                            <div class="mt-4 pt-4 border-t border-slate-100">
-                                 <button onclick="clearCustomFoods()" class="text-xs text-red-400 hover:text-red-600 underline w-full text-center">
-                                    Limpar alimentos personalizados salvos
-                                 </button>
+                            <div>
+                                <label class="text-[10px] text-slate-400 font-bold ml-1">Carbo</label>
+                                <input type="number" id="new-carb" placeholder="Carb (g)" class="w-full p-2 text-sm border rounded">
                             </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 font-bold ml-1">Proteína</label>
+                                <input type="number" id="new-prot" placeholder="Prot (g)" class="w-full p-2 text-sm border rounded">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 font-bold ml-1">Gordura</label>
+                                <input type="number" id="new-fat" placeholder="Gord (g)" class="w-full p-2 text-sm border rounded">
+                            </div>
+                        </div>
+                        <button onclick="createCustomFood()" class="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 py-2 rounded-lg text-sm font-semibold transition border border-blue-200 mt-2">
+                            Salvar no Banco (Permanente)
+                        </button>
+                        
+                        <div class="mt-4 pt-4 border-t border-slate-100">
+                             <button onclick="clearCustomFoods()" class="text-xs text-red-400 hover:text-red-600 underline w-full text-center">
+                                Limpar alimentos personalizados salvos
+                             </button>
                         </div>
                     </div>
                 </div>
@@ -567,7 +565,7 @@
                     <div id="goals-area" class="editable-div w-full p-2 bg-transparent text-slate-700 leading-relaxed" contenteditable="true" placeholder="Clique aqui para digitar as metas e orientações..." onblur="triggerAutoSave()"></div>
                 </div>
 
-                <!-- Histórico -->
+                <!-- Histórico da composição corporal -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mt-6 break-inside-avoid w-full overflow-hidden">
                     <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-lg">
                         <i class="fa-solid fa-weight-scale theme-text"></i> Histórico da composição corporal
@@ -598,21 +596,28 @@
 
                 <!-- Rodapé -->
                 <div class="mt-8 pt-8 border-t border-slate-300 flex flex-col md:flex-row justify-between items-center gap-8 text-slate-800 break-inside-avoid">
+                    
+                    <!-- Dados Profissional (Esquerda - Vertical) -->
                     <div class="w-full md:w-1/2 flex flex-col gap-3 text-left">
                         <input type="text" id="prof-name" class="clean-input text-left font-bold text-lg placeholder-slate-400" placeholder="Nome do Profissional" onkeyup="triggerAutoSave()">
+                        
                         <div class="flex items-center gap-2">
                             <span class="font-semibold text-xs text-slate-500 w-8">CRN:</span>
                             <input type="text" id="prof-crn" class="clean-input text-left text-sm font-medium placeholder-slate-400 flex-grow" placeholder="00000" onkeyup="triggerAutoSave()">
                         </div>
+                        
                         <div class="flex items-center gap-2">
                             <i class="fa-brands fa-whatsapp text-green-600 text-lg w-8 text-center"></i>
                             <input type="text" id="prof-phone" class="clean-input text-left text-sm font-medium placeholder-slate-400 flex-grow" placeholder="(00) 00000-0000" onkeyup="triggerAutoSave()">
                         </div>
+                        
                         <div class="flex items-center gap-2">
                             <i class="fa-brands fa-instagram text-pink-600 text-lg w-8 text-center"></i>
                             <input type="text" id="prof-insta" class="clean-input text-left text-sm font-medium placeholder-slate-400 flex-grow" placeholder="@seu.perfil" onkeyup="triggerAutoSave()">
                         </div>
                     </div>
+
+                    <!-- Logo Secundária (Direita) -->
                     <div class="w-full md:w-1/2 flex flex-col items-center md:items-end">
                         <div class="relative group cursor-pointer" onclick="document.getElementById('logo-upload-footer').click()">
                             <img id="logo-img-footer" src="" class="h-24 object-contain hidden">
@@ -626,6 +631,7 @@
                     </div>
                 </div>
 
+                <!-- Créditos e Fonte (TACO) -->
                 <div class="text-center mt-10 pb-4 border-t border-slate-100 pt-4 break-inside-avoid">
                     <p class="text-[10px] text-slate-500 italic mb-1">
                         Alimentos da tabela UNICAMP. Tabela Brasileira de Composição de Alimentos – TACO (4ª Edição)
@@ -638,7 +644,7 @@
         </main>
     </div>
 
-    <!-- MODAL DE PACIENTES -->
+    <!-- MODAL DE PACIENTES ATUALIZADO COM AVISO E BACKUP -->
     <div id="patient-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center backdrop-blur-sm p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
             <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
@@ -646,6 +652,7 @@
                 <button onclick="closePatientModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
             </div>
             
+            <!-- AVISO DE LOCAL STORAGE (SOLICITADO) -->
             <div class="p-4 bg-amber-50 border-b border-amber-100 text-xs text-amber-800 leading-relaxed">
                 <div class="flex gap-2">
                     <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
@@ -661,6 +668,7 @@
                     <i class="fa-solid fa-user-plus"></i> Novo Paciente
                 </button>
                 
+                <!-- BOTÕES DE BACKUP -->
                 <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200">
                      <button onclick="exportBackup()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition">
                         <i class="fa-solid fa-download"></i> Baixar Backup
@@ -668,12 +676,15 @@
                      <button onclick="document.getElementById('backup-upload').click()" class="bg-slate-600 hover:bg-slate-700 text-white py-2 px-3 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition">
                         <i class="fa-solid fa-upload"></i> Restaurar Backup
                     </button>
+                    <!-- Input invisível para carregar arquivo -->
                     <input type="file" id="backup-upload" accept=".json" class="hidden" onchange="importBackup(event)">
                 </div>
             </div>
 
             <div class="p-0 max-h-[50vh] overflow-y-auto custom-scroll">
-                <ul id="patient-list" class="divide-y divide-slate-100"></ul>
+                <ul id="patient-list" class="divide-y divide-slate-100">
+                    <!-- Lista Preenchida via JS -->
+                </ul>
                 <div id="empty-patients" class="p-8 text-center text-slate-400 text-sm italic hidden">
                     Nenhum paciente salvo.
                 </div>
@@ -689,7 +700,9 @@
 
     <script>
         // --- DADOS DA TABELA TACO (200+ Alimentos) ---
+        // Valores por 100g de parte comestível
         let foodDatabase = [
+            // === CEREAIS, LEGUMINOSAS E DERIVADOS ===
             { id: 101, name: "Arroz Integral, Cozido", cal: 124, carb: 25.8, prot: 2.6, fat: 1.0 },
             { id: 102, name: "Arroz Tipo 1, Cozido", cal: 128, carb: 28.1, prot: 2.5, fat: 0.2 },
             { id: 103, name: "Arroz Tipo 2, Cozido", cal: 130, carb: 28.2, prot: 2.6, fat: 0.4 },
@@ -725,6 +738,8 @@
             { id: 133, name: "Tapioca, Goma Hidratada", cal: 236, carb: 54.8, prot: 0.0, fat: 0.0 },
             { id: 134, name: "Torrada, Pão Francês", cal: 377, carb: 74.6, prot: 10.5, fat: 3.6 },
             { id: 135, name: "Trigo para Kibe, Cru", cal: 342, carb: 72.9, prot: 11.2, fat: 1.5 },
+
+            // === VERDURAS, LEGUMES E TUBÉRCULOS ===
             { id: 201, name: "Abóbora, Cabotian, Cozida", cal: 48, carb: 10.8, prot: 1.4, fat: 0.7 },
             { id: 202, name: "Abobrinha, Italiana, Cozida", cal: 15, carb: 3.0, prot: 1.1, fat: 0.1 },
             { id: 203, name: "Acelga, Crua", cal: 21, carb: 4.6, prot: 1.4, fat: 0.1 },
@@ -755,6 +770,8 @@
             { id: 228, name: "Rúcula, Crua", cal: 13, carb: 2.2, prot: 1.8, fat: 0.1 },
             { id: 229, name: "Tomate, Salada", cal: 15, carb: 3.1, prot: 1.1, fat: 0.2 },
             { id: 230, name: "Vagem, Cozida", cal: 25, carb: 5.3, prot: 1.8, fat: 0.2 },
+
+            // === FRUTAS ===
             { id: 301, name: "Abacate, Cru", cal: 96, carb: 6.0, prot: 1.2, fat: 8.4 },
             { id: 302, name: "Abacaxi, Cru", cal: 48, carb: 12.3, prot: 0.9, fat: 0.1 },
             { id: 303, name: "Acerola, Crua", cal: 33, carb: 8.0, prot: 0.9, fat: 0.2 },
@@ -785,6 +802,8 @@
             { id: 328, name: "Pêssego, Cru", cal: 36, carb: 9.3, prot: 0.8, fat: 0.0 },
             { id: 329, name: "Tangerina/Mexerica, Crua", cal: 38, carb: 9.3, prot: 0.7, fat: 0.1 },
             { id: 330, name: "Uva, Itália, Crua", cal: 53, carb: 13.6, prot: 0.9, fat: 0.2 },
+
+            // === CARNES, PESCADOS E OVOS ===
             { id: 401, name: "Boi, Acém, Moído, Cozido", cal: 212, carb: 0.0, prot: 26.7, fat: 10.9 },
             { id: 402, name: "Boi, Alcatra, Grelhada", cal: 241, carb: 0.0, prot: 31.9, fat: 11.6 },
             { id: 403, name: "Boi, Contrafilé, Grelhado", cal: 278, carb: 0.0, prot: 32.4, fat: 15.5 },
@@ -815,6 +834,8 @@
             { id: 428, name: "Porco, Lombo, Assado", cal: 210, carb: 0.0, prot: 35.7, fat: 6.4 },
             { id: 429, name: "Presunto, Cozido", cal: 120, carb: 1.0, prot: 16.5, fat: 5.5 },
             { id: 430, name: "Salsicha, Cozida", cal: 246, carb: 2.0, prot: 13.0, fat: 21.0 },
+
+            // === LEITE E DERIVADOS ===
             { id: 501, name: "Creme de Leite", cal: 221, carb: 4.5, prot: 1.5, fat: 22.0 },
             { id: 502, name: "Iogurte, Natural", cal: 51, carb: 5.3, prot: 4.1, fat: 3.0 },
             { id: 503, name: "Iogurte, Natural, Desnatado", cal: 41, carb: 6.8, prot: 3.8, fat: 0.1 },
@@ -832,6 +853,8 @@
             { id: 515, name: "Queijo, Prato", cal: 360, carb: 1.9, prot: 22.7, fat: 29.1 },
             { id: 516, name: "Queijo, Ricota", cal: 140, carb: 3.8, prot: 12.6, fat: 8.1 },
             { id: 517, name: "Requeijão, Cremoso", cal: 308, carb: 2.4, prot: 9.6, fat: 28.9 },
+
+            // === ÓLEOS, GORDURAS E OLEAGINOSAS ===
             { id: 601, name: "Amendoim, Torrado", cal: 606, carb: 18.7, prot: 22.5, fat: 54.0 },
             { id: 602, name: "Azeite de Dendê", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0 },
             { id: 603, name: "Azeite de Oliva, Extra Virgem", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0 },
@@ -843,6 +866,8 @@
             { id: 609, name: "Noz, Crua", cal: 620, carb: 18.4, prot: 14.0, fat: 59.4 },
             { id: 610, name: "Óleo de Milho", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0 },
             { id: 611, name: "Óleo de Soja", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0 },
+
+            // === BEBIDAS, DOCES E OUTROS ===
             { id: 701, name: "Achocolatado, Pó", cal: 401, carb: 90.0, prot: 2.0, fat: 2.3 },
             { id: 702, name: "Açúcar, Mascavo", cal: 369, carb: 95.5, prot: 0.8, fat: 0.0 },
             { id: 703, name: "Açúcar, Refinado", cal: 387, carb: 99.5, prot: 0.3, fat: 0.0 },
@@ -891,62 +916,30 @@
         };
 
         function init() {
+            // Carregar alimentos customizados globais
             loadCustomFoodsFromStorage();
+
             const dateInput = document.getElementById('diet-date');
             if(dateInput) {
                 dateInput.valueAsDate = new Date();
                 updateDateDisplay();
             }
             
+            // Tentar carregar último paciente
             const lastPatientId = localStorage.getItem('diet_last_patient_id');
             if (lastPatientId) {
                 loadPatient(lastPatientId);
             } else {
-                createNewPatient();
+                createNewPatient(); // Cria um padrão se não houver
             }
+
             renderFoodSelect();
         }
 
         // ==========================================
-        // === SISTEMA DE EDITAR MACROS NA TABELA ===
+        // === SISTEMA DE BACKUP (EXPORT/IMPORT) ===
         // ==========================================
 
-        function updateFoodMacro(mealId, foodIndex, type, newValue) {
-            const meal = dietMeals.find(m => m.id === mealId);
-            if (!meal || !meal.foods[foodIndex]) return;
-
-            const food = meal.foods[foodIndex];
-            const val = parseFloat(newValue.replace(/[^0-9.]/g, '')); // Remove 'kcal', 'g'
-
-            if (isNaN(val)) return; // Se não for número, ignora
-
-            // Atualiza o valor total naquela entrada específica
-            if (type === 'cal') food.totalCal = val;
-            if (type === 'carb') food.totalCarb = val;
-            if (type === 'prot') food.totalProt = val;
-            if (type === 'fat') food.totalFat = val;
-
-            // --- LÓGICA DE INTELIGÊNCIA ---
-            // Se o usuário mudou o total manualmente, devemos atualizar a BASE (kcal por 100g)
-            // para que se ele mudar a quantidade depois, a proporção se mantenha correta.
-            // Ex: Tinha 100g = 100kcal. Usuário mudou para 150kcal (manualmente).
-            // Nova base deve ser 150kcal por 100g.
-            if (food.qty > 0) {
-                const factor = food.qty / 100;
-                if (type === 'cal') food.cal = val / factor;
-                if (type === 'carb') food.carb = val / factor;
-                if (type === 'prot') food.prot = val / factor;
-                if (type === 'fat') food.fat = val / factor;
-            }
-
-            renderDiet();
-            triggerAutoSave();
-            showToast("Valor atualizado", "neutral");
-        }
-
-        // ... (Restante das funções: exportBackup, importBackup, patients logic, etc. mantidas iguais) ...
-        // ... (Para economizar espaço na resposta, o código JS é identico exceto a adição de updateFoodMacro acima) ...
-        
         function exportBackup() {
             const backup = {
                 meta: { date: new Date().toISOString(), version: '1.0' },
@@ -954,17 +947,22 @@
                 customFoods: localStorage.getItem('dietCustomFoods'),
                 patientData: {}
             };
+
+            // Coleta dados individuais de cada paciente
             const list = getPatientsList();
             list.forEach(p => {
                 const key = 'diet_data_' + p.id;
                 backup.patientData[key] = localStorage.getItem(key);
             });
+
+            // Cria o arquivo Blob e link de download
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
+            // Nome do arquivo com data
             const dateStr = new Date().toISOString().slice(0,10);
             downloadAnchorNode.setAttribute("download", `backup_dietas_${dateStr}.json`);
-            document.body.appendChild(downloadAnchorNode);
+            document.body.appendChild(downloadAnchorNode); // necessário para firefox
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
         }
@@ -972,37 +970,57 @@
         function importBackup(event) {
             const file = event.target.files[0];
             if (!file) return;
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const backup = JSON.parse(e.target.result);
-                    if(!backup.meta || !backup.patientsList) throw new Error("Formato inválido.");
-                    if(confirm("Restaurar backup substituirá dados atuais. Continuar?")) {
+                    
+                    // Validação simples
+                    if(!backup.meta || !backup.patientsList) { 
+                        throw new Error("Formato de arquivo inválido ou antigo."); 
+                    }
+
+                    if(confirm("ATENÇÃO: Restaurar o backup substituirá todos os pacientes e dados atuais pelos do arquivo. Continuar?")) {
+                        // Restaura Listas Globais
                         if(backup.patientsList) localStorage.setItem('diet_patients_list', backup.patientsList);
                         if(backup.customFoods) localStorage.setItem('dietCustomFoods', backup.customFoods);
+                        
+                        // Restaura Dados Individuais dos Pacientes
                         if(backup.patientData) {
                             for (const [key, value] of Object.entries(backup.patientData)) {
                                 if(value) localStorage.setItem(key, value);
                             }
                         }
-                        alert("Backup restaurado!");
+                        
+                        alert("Backup restaurado com sucesso! A página será recarregada.");
                         location.reload();
                     }
-                } catch (err) { alert("Erro: " + err.message); }
+                } catch (err) {
+                    alert("Erro ao ler arquivo de backup: " + err.message);
+                }
             };
             reader.readAsText(file);
         }
+
+        // ==========================================
+        // === SISTEMA DE PACIENTES (DATABASE) ===
+        // ==========================================
 
         function getPatientsList() {
             const list = localStorage.getItem('diet_patients_list');
             return list ? JSON.parse(list) : [];
         }
-        function savePatientsList(list) { localStorage.setItem('diet_patients_list', JSON.stringify(list)); }
-        
+
+        function savePatientsList(list) {
+            localStorage.setItem('diet_patients_list', JSON.stringify(list));
+        }
+
         function openPatientModal() {
             const list = getPatientsList();
             const ul = document.getElementById('patient-list');
             ul.innerHTML = '';
+
             if (list.length === 0) {
                 document.getElementById('empty-patients').classList.remove('hidden');
             } else {
@@ -1010,269 +1028,1039 @@
                 list.forEach(p => {
                     const isActive = p.id === currentPatientId;
                     const date = new Date(p.lastModified).toLocaleDateString('pt-BR');
+                    
                     const li = document.createElement('li');
                     li.className = `p-3 flex justify-between items-center hover:bg-slate-100 transition cursor-pointer ${isActive ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`;
-                    li.onclick = (e) => { if(!e.target.closest('button')) loadPatient(p.id); };
-                    li.innerHTML = `<div><div class="font-bold text-slate-800">${p.name}</div><div class="text-[10px] text-slate-400">Mod: ${date}</div></div><div class="flex gap-2">${isActive ? '<span class="text-xs text-blue-500 font-bold px-2 py-1 bg-blue-100 rounded">Ativo</span>' : ''}<button onclick="deletePatient('${p.id}')" class="text-slate-300 hover:text-red-500 p-2 transition"><i class="fa-solid fa-trash"></i></button></div>`;
+                    li.onclick = (e) => {
+                        if(!e.target.closest('button')) loadPatient(p.id);
+                    };
+
+                    li.innerHTML = `
+                        <div>
+                            <div class="font-bold text-slate-800">${p.name}</div>
+                            <div class="text-[10px] text-slate-400">Modificado: ${date}</div>
+                        </div>
+                        <div class="flex gap-2">
+                            ${isActive ? '<span class="text-xs text-blue-500 font-bold px-2 py-1 bg-blue-100 rounded">Ativo</span>' : ''}
+                            <button onclick="deletePatient('${p.id}')" class="text-slate-300 hover:text-red-500 p-2 transition" title="Excluir">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
                     ul.appendChild(li);
                 });
             }
+
             document.getElementById('patient-modal').classList.remove('hidden');
         }
-        function closePatientModal() { document.getElementById('patient-modal').classList.add('hidden'); }
+
+        function closePatientModal() {
+            document.getElementById('patient-modal').classList.add('hidden');
+        }
 
         function createNewPatient() {
-            currentPatientId = 'pat_' + Date.now();
+            const newId = 'pat_' + Date.now();
+            currentPatientId = newId;
+            
+            // Resetar Variaveis
             dietMeals = JSON.parse(JSON.stringify(defaultMeals));
             currentTheme = 'emerald';
+            
+            // Resetar DOM Inputs
             document.getElementById('patient-name').value = "Novo Paciente";
             document.getElementById('patient-goal').value = "";
             document.getElementById('diet-date').valueAsDate = new Date();
+            
+            // Limpar Logos
+            document.getElementById('logo-img-main').src = "";
             document.getElementById('logo-img-main').classList.add('hidden');
             document.getElementById('logo-placeholder').classList.remove('hidden');
+            document.getElementById('logo-img-footer').src = "";
             document.getElementById('logo-img-footer').classList.add('hidden');
             document.getElementById('logo-placeholder-footer').classList.remove('hidden');
+
+            // Resetar Metas/Calc
             document.getElementById('target-cal').value = 2000;
             document.getElementById('calc-weight').value = "";
             document.getElementById('calc-height').value = "";
             document.getElementById('calc-age').value = "";
-            document.getElementById('goals-area').innerText = "";
-            document.querySelectorAll('#history-table td').forEach(c => c.innerText = "");
             
+            // Limpar Tabela Histórico
+            const rows = document.querySelectorAll('#history-table tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => cell.innerText = "");
+            });
+            
+            // Limpar Metas Texto
+            document.getElementById('goals-area').innerText = "";
+
+            // Salvar novo estado
             saveCurrentPatientState();
-            renderMealSelect(); renderDiet(); setTheme('emerald'); closePatientModal(); showToast("Novo paciente criado!");
+            
+            // Atualizar UI
+            renderMealSelect();
+            renderDiet();
+            setTheme('emerald');
+            closePatientModal();
+            showToast("Novo paciente criado!");
         }
 
         function deletePatient(id) {
-            if(!confirm("Apagar paciente?")) return;
-            let list = getPatientsList().filter(p => p.id !== id);
+            if(!confirm("Tem certeza? Isso apagará todos os dados deste paciente.")) return;
+            
+            let list = getPatientsList();
+            list = list.filter(p => p.id !== id);
             savePatientsList(list);
+            
+            // Remover dados do storage
             localStorage.removeItem('diet_data_' + id);
-            if(id === currentPatientId) createNewPatient();
-            else openPatientModal();
+
+            // Se apagou o atual, cria um novo
+            if(id === currentPatientId) {
+                createNewPatient();
+            } else {
+                openPatientModal(); // Re-render list
+            }
         }
 
         function loadPatient(id) {
-            const d = localStorage.getItem('diet_data_' + id);
-            if (!d) return;
-            const data = JSON.parse(d);
+            const dataString = localStorage.getItem('diet_data_' + id);
+            if (!dataString) return;
+
+            const data = JSON.parse(dataString);
             currentPatientId = id;
+
+            // 1. Restaurar Variáveis
             dietMeals = data.meals || JSON.parse(JSON.stringify(defaultMeals));
             currentTheme = data.theme || 'emerald';
+
+            // 2. Restaurar DOM Inputs Básicos
+            const fields = [
+                'patient-name', 'patient-goal', 'diet-date',
+                'prof-name', 'prof-crn', 'prof-phone', 'prof-insta',
+                'calc-weight', 'calc-height', 'calc-age', 'calc-bf', 
+                'target-cal', 'target-carb-pct', 'target-prot-pct', 'target-fat-pct'
+            ];
             
-            const fields = ['patient-name','patient-goal','diet-date','prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct'];
-            fields.forEach(f => { if(document.getElementById(f) && data.inputs[f]!==undefined) document.getElementById(f).value = data.inputs[f]; });
-            
+            fields.forEach(f => {
+                if(document.getElementById(f) && data.inputs[f] !== undefined) {
+                    document.getElementById(f).value = data.inputs[f];
+                }
+            });
+
+            // 3. Restaurar Selects
             if(data.selects) {
                 document.getElementById('calc-formula').value = data.selects['calc-formula'] || 'mifflin';
                 document.getElementById('calc-activity').value = data.selects['calc-activity'] || '1.55';
-                const rad = document.querySelector(`input[name="calc-sex"][value="${data.selects['calc-sex']}"]`);
-                if(rad) rad.checked = true;
+                const sexRadio = document.querySelector(`input[name="calc-sex"][value="${data.selects['calc-sex']}"]`);
+                if(sexRadio) sexRadio.checked = true;
             }
+
+            // 4. Restaurar Imagens
             if(data.images) {
-                const setImg = (id, phId, src) => {
-                    if(src) { document.getElementById(id).src=src; document.getElementById(id).classList.remove('hidden'); document.getElementById(phId).classList.add('hidden'); }
-                    else { document.getElementById(id).classList.add('hidden'); document.getElementById(phId).classList.remove('hidden'); }
-                };
-                setImg('logo-img-main', 'logo-placeholder', data.images.mainLogo);
-                setImg('logo-img-footer', 'logo-placeholder-footer', data.images.footerLogo);
+                if(data.images.mainLogo) {
+                    document.getElementById('logo-img-main').src = data.images.mainLogo;
+                    document.getElementById('logo-img-main').classList.remove('hidden');
+                    document.getElementById('logo-placeholder').classList.add('hidden');
+                } else {
+                    document.getElementById('logo-img-main').classList.add('hidden');
+                    document.getElementById('logo-placeholder').classList.remove('hidden');
+                }
+
+                if(data.images.footerLogo) {
+                    document.getElementById('logo-img-footer').src = data.images.footerLogo;
+                    document.getElementById('logo-img-footer').classList.remove('hidden');
+                    document.getElementById('logo-placeholder-footer').classList.add('hidden');
+                } else {
+                    document.getElementById('logo-img-footer').classList.add('hidden');
+                    document.getElementById('logo-placeholder-footer').classList.remove('hidden');
+                }
             }
+
+            // 5. Restaurar Histórico e Textos
             if(data.history) {
                 const rows = document.querySelectorAll('#history-table tbody tr');
-                data.history.forEach((r,i) => { if(rows[i]) rows[i].querySelectorAll('td').forEach((c,j) => c.innerText = r[j]||""); });
-            }
-            if(data.goalsText) document.getElementById('goals-area').innerText = data.goalsText;
-
-            setTheme(currentTheme); renderMealSelect(); renderDiet(); calculateEnergy(); updateDateDisplay(); toggleBodyFatInput();
-            localStorage.setItem('diet_last_patient_id', id);
-            closePatientModal(); showToast("Paciente carregado!");
-        }
-
-        function triggerAutoSave() { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveCurrentPatientState, 1000); }
-        function saveCurrentPatientState() {
-            if (!currentPatientId) return;
-            const inputs = {};
-            ['patient-name','patient-goal','diet-date','prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct'].forEach(f => inputs[f] = document.getElementById(f).value);
-            
-            const history = [];
-            document.querySelectorAll('#history-table tbody tr').forEach(r => {
-                const row = []; r.querySelectorAll('td').forEach(c => row.push(c.innerText)); history.push(row);
-            });
-
-            const data = {
-                id: currentPatientId, lastModified: Date.now(), theme: currentTheme, inputs, history, meals: dietMeals,
-                goalsText: document.getElementById('goals-area').innerText,
-                selects: { 'calc-formula': document.getElementById('calc-formula').value, 'calc-activity': document.getElementById('calc-activity').value, 'calc-sex': document.querySelector('input[name="calc-sex"]:checked').value },
-                images: { mainLogo: document.getElementById('logo-img-main').src.includes('data:') ? document.getElementById('logo-img-main').src : null, footerLogo: document.getElementById('logo-img-footer').src.includes('data:') ? document.getElementById('logo-img-footer').src : null }
-            };
-            localStorage.setItem('diet_data_' + currentPatientId, JSON.stringify(data));
-            
-            let list = getPatientsList();
-            const idx = list.findIndex(p => p.id === currentPatientId);
-            const meta = { id: currentPatientId, name: inputs['patient-name'] || "Sem Nome", lastModified: Date.now() };
-            if (idx >= 0) list[idx] = meta; else list.push(meta);
-            savePatientsList(list);
-            const lbl = document.getElementById('current-patient-label'); if(lbl) lbl.innerText = inputs['patient-name'] || "Pacientes";
-        }
-
-        function toggleBodyFatInput() {
-            const f = document.getElementById('calc-formula').value;
-            if(f==='tinsley_katch'||f==='cunningham') document.getElementById('bf-container').classList.remove('hidden');
-            else document.getElementById('bf-container').classList.add('hidden');
-        }
-        function calculateEnergy() {
-            const w = parseFloat(document.getElementById('calc-weight').value)||0, h = parseFloat(document.getElementById('calc-height').value)||0, a = parseFloat(document.getElementById('calc-age').value)||0, bf = parseFloat(document.getElementById('calc-bf').value)||0, act = parseFloat(document.getElementById('calc-activity').value)||1.2, s = document.querySelector('input[name="calc-sex"]:checked').value, f = document.getElementById('calc-formula').value;
-            
-            if(w>0 && h>0) document.getElementById('res-bmi').innerText = (w/((h/100)*(h/100))).toFixed(1);
-            else document.getElementById('res-bmi').innerText = '--';
-
-            let bmr = 0;
-            if(w>0) {
-                if(f==='mifflin' && h>0 && a>0) bmr = (10*w) + (6.25*h) - (5*a) + (s==='m'?5:-161);
-                else if(f==='harris' && h>0 && a>0) bmr = s==='m' ? 88.362+(13.397*w)+(4.799*h)-(5.677*a) : 447.593+(9.247*w)+(3.098*h)-(4.330*a);
-                else if(f==='tinsley_ph' && h>0) bmr = (9.65*w) + (573*(h/100)) - (s==='m'?5.08:4.92);
-                else if((f==='tinsley_katch'||f==='cunningham') && bf>0) { const mlg = w*(1-(bf/100)); bmr = f==='cunningham' ? 500+(22*mlg) : 370+(21.6*mlg); }
-            }
-            if(bmr>0) { document.getElementById('res-bmr').innerText = bmr.toFixed(0)+' kcal'; document.getElementById('res-tdee').innerText = (bmr*act).toFixed(0)+' kcal'; }
-            else { document.getElementById('res-bmr').innerText = '--'; document.getElementById('res-tdee').innerText = '--'; }
-        }
-
-        // --- MANIPULAÇÃO DE DADOS ---
-        function addNewMeal() {
-            const n = document.getElementById('new-meal-name').value.trim();
-            if(!n) return showToast("Nome vazio","error");
-            dietMeals.push({ id: Date.now(), title: n, foods: [], observation: "" });
-            document.getElementById('new-meal-name').value=''; renderMealSelect(); renderDiet(); showToast("Criada!");
-        }
-        function deleteMeal(id) { if(confirm("Apagar refeição?")) { dietMeals = dietMeals.filter(m=>m.id!==id); renderMealSelect(); renderDiet(); triggerAutoSave(); } }
-        function duplicateMeal(id) {
-            const idx = dietMeals.findIndex(m=>m.id===id); if(idx===-1)return;
-            const c = JSON.parse(JSON.stringify(dietMeals[idx])); c.id=Date.now(); c.title+=' (Cópia)';
-            dietMeals.splice(idx+1,0,c); renderDiet(); renderMealSelect(); triggerAutoSave();
-        }
-        function moveMeal(i, d) {
-            if((d===-1&&i>0)||(d===1&&i<dietMeals.length-1)) { [dietMeals[i], dietMeals[i+d]] = [dietMeals[i+d], dietMeals[i]]; renderDiet(); renderMealSelect(); triggerAutoSave(); }
-        }
-        function updateMealTitle(id, v) { const m=dietMeals.find(x=>x.id===id); if(m){ m.title=v.trim(); renderMealSelect(); triggerAutoSave(); } }
-        function updateMealObservation(id, v) { const m=dietMeals.find(x=>x.id===id); if(m){ m.observation=v; triggerAutoSave(); } }
-        function clearMealObservation(id) { const m=dietMeals.find(x=>x.id===id); if(m && confirm("Limpar obs?")) { m.observation=""; renderDiet(); triggerAutoSave(); } }
-        
-        function renderMealSelect() {
-            const s = document.getElementById('select-meal'); const old = s.value; s.innerHTML='';
-            dietMeals.forEach(m => { const o=document.createElement('option'); o.value=m.id; o.text=m.title; s.appendChild(o); });
-            if(old) s.value=old;
-        }
-
-        function renderFoodSelect(ft="") {
-            const s = document.getElementById('select-food'); s.innerHTML='';
-            let list = [...foodDatabase].sort((a,b)=>a.name.localeCompare(b.name));
-            if(ft) list = list.filter(f=>f.name.toLowerCase().includes(ft.toLowerCase()));
-            
-            if(list.length===0) { const o=document.createElement('option'); o.text="Sem resultados"; s.appendChild(o); s.disabled=true; return; }
-            s.disabled=false;
-            list.forEach(f => { const o=document.createElement('option'); o.value=f.id; o.text=`${f.isCustom?'★ ':''}${f.name} (${f.cal.toFixed(0)}kcal)`; s.appendChild(o); });
-            if(list.length>0) s.value=list[0].id;
-        }
-        function filterFoods() { const v=document.getElementById('search-food').value; renderFoodSelect(v); document.getElementById('search-hint').classList.toggle('hidden', v.length===0); }
-
-        function updateFoodName(mid, fid, v) { const m=dietMeals.find(x=>x.id===mid); if(m&&m.foods[fid]) { m.foods[fid].name=v.trim(); triggerAutoSave(); } }
-        function updateFoodQty(mid, fid, v) {
-            const m=dietMeals.find(x=>x.id===mid); if(!m||!m.foods[fid]) return;
-            const q=parseFloat(v); if(isNaN(q)||q<=0) return;
-            const f=m.foods[fid], fac=q/100;
-            f.qty=q; f.totalCal=f.cal*fac; f.totalCarb=f.carb*fac; f.totalProt=f.prot*fac; f.totalFat=f.fat*fac;
-            renderDiet(); triggerAutoSave();
-        }
-        function moveFood(mid, fid, d) {
-            const m=dietMeals.find(x=>x.id===mid); if(!m)return;
-            const ni=fid+d; if(ni>=0 && ni<m.foods.length) { [m.foods[fid], m.foods[ni]] = [m.foods[ni], m.foods[fid]]; renderDiet(); triggerAutoSave(); }
-        }
-        function removeFood(mid, fid) { const m=dietMeals.find(x=>x.id===mid); if(m) { m.foods.splice(fid,1); renderDiet(); triggerAutoSave(); } }
-        function removeGoals() { showGoals=false; renderDiet(); }
-
-        function renderDiet() {
-            const c = document.getElementById('diet-container'); c.innerHTML='';
-            let dt = {cal:0, c:0, p:0, f:0};
-            const tc = parseFloat(document.getElementById('target-cal').value)||2000;
-            const pc = parseFloat(document.getElementById('target-carb-pct').value)||50;
-            const pp = parseFloat(document.getElementById('target-prot-pct').value)||30;
-            const pf = parseFloat(document.getElementById('target-fat-pct').value)||20;
-            document.getElementById('total-pct-display').innerText = (pc+pp+pf);
-
-            dietMeals.forEach((m, idx) => {
-                let mc={cal:0, c:0, p:0, f:0};
-                m.foods.forEach(f => {
-                    mc.cal+=f.totalCal; mc.c+=f.totalCarb; mc.p+=f.totalProt; mc.f+=f.totalFat;
-                    if(f.option==='A'){ dt.cal+=f.totalCal; dt.c+=f.totalCarb; dt.p+=f.totalProt; dt.f+=f.totalFat; }
-                });
-
-                let html = '';
-                ['A','B','C'].forEach(opt => {
-                    const g = m.foods.filter(f=>f.option===opt);
-                    if(g.length>0) {
-                        if(opt!=='A' || m.foods.some(x=>x.option!=='A')) html+=`<div class="bg-slate-50 px-4 py-2 text-xs font-bold text-slate-500 uppercase border-y border-slate-100 mt-2">${opt==='A'?'Opção Principal':'Opção '+opt}</div>`;
-                        html+=`<div class="table-container"><table class="w-full text-left text-sm"><tbody class="divide-y divide-slate-100">`;
-                        g.forEach(f => {
-                            const originalIndex = m.foods.indexOf(f);
-                            html+=`<tr class="hover:bg-slate-50 group">
-                                <td class="p-3 font-medium col-name" contenteditable="true" onblur="updateFoodName(${m.id},${originalIndex},this.innerText)">${f.name}</td>
-                                <td class="p-3 col-qty"><input type="number" class="qty-input" value="${f.qty}" onchange="updateFoodQty(${m.id},${originalIndex},this.value)"> g</td>
-                                <td class="p-3 text-center text-xs col-cal cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'cal',this.innerText)" title="Clique para editar">${f.totalCal.toFixed(0)} kcal</td>
-                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'carb',this.innerText)" title="Clique para editar">C: ${f.totalCarb.toFixed(0)}</td>
-                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'prot',this.innerText)" title="Clique para editar">P: ${f.totalProt.toFixed(0)}</td>
-                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'fat',this.innerText)" title="Clique para editar">G: ${f.totalFat.toFixed(0)}</td>
-                                <td class="p-3 text-center w-24 col-actions no-print"><div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100"><button onclick="moveFood(${m.id},${originalIndex},-1)" class="text-slate-400 hover:text-blue-500"><i class="fa-solid fa-chevron-up"></i></button><button onclick="moveFood(${m.id},${originalIndex},1)" class="text-slate-400 hover:text-blue-500"><i class="fa-solid fa-chevron-down"></i></button><button onclick="removeFood(${m.id},${originalIndex})" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-times"></i></button></div></td>
-                            </tr>`;
+                data.history.forEach((rowData, i) => {
+                    if(rows[i]) {
+                        const cells = rows[i].querySelectorAll('td');
+                        rowData.forEach((cellText, j) => {
+                            if(cells[j]) cells[j].innerText = cellText;
                         });
-                        html+=`</tbody></table></div>`;
                     }
                 });
-                
-                if(m.foods.length===0) html=`<div class="p-6 text-center text-slate-400 text-sm italic no-print">Nenhum alimento.</div>`;
+            }
+            if(data.goalsText) {
+                document.getElementById('goals-area').innerText = data.goalsText;
+            }
 
-                c.innerHTML += `<div class="card bg-white rounded-xl shadow-sm theme-border border overflow-hidden break-inside-avoid relative group mt-4">
-                    <div class="absolute top-4 right-4 flex gap-2 no-print opacity-0 group-hover:opacity-100 z-10"><button onclick="duplicateMeal(${m.id})" class="text-slate-300 hover:text-blue-500"><i class="fa-regular fa-copy"></i></button><button onclick="deleteMeal(${m.id})" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button></div>
-                    <div class="meal-header theme-bg-light p-4 border-b theme-border flex justify-between items-center"><div class="flex items-center gap-3"><div class="flex flex-col gap-1 no-print"><button onclick="moveMeal(${idx},-1)"><i class="fa-solid fa-chevron-up text-slate-400 text-[10px]"></i></button><button onclick="moveMeal(${idx},1)"><i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i></button></div><h3 class="font-bold text-slate-700 cursor-text" contenteditable="true" onblur="updateMealTitle(${m.id},this.innerText)">${m.title}</h3></div></div>
-                    <div>${html}</div>
-                    <div class="totals-footer p-3 bg-slate-50 border-t border-slate-100 flex justify-end gap-4 text-xs font-bold text-slate-600"><span>Total:</span><span>${mc.cal.toFixed(0)} kcal</span><span class="text-blue-600">C: ${mc.c.toFixed(0)}g</span><span class="text-emerald-600">P: ${mc.p.toFixed(0)}g</span><span class="text-yellow-600">G: ${mc.f.toFixed(0)}g</span></div>
-                    <div class="px-4 pb-4 pt-2 border-t border-slate-100 relative group/obs"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-slate-400 uppercase">Observações</span><button onclick="clearMealObservation(${m.id})" class="no-print opacity-0 group-hover/obs:opacity-100 text-slate-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div><div class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm text-slate-600 outline-none" contenteditable="true" onblur="updateMealObservation(${m.id},this.innerText)">${m.observation||''}</div></div>
-                </div>`;
+            // 6. Atualizar UI
+            setTheme(currentTheme);
+            renderMealSelect();
+            renderDiet();
+            calculateEnergy();
+            updateDateDisplay();
+            toggleBodyFatInput();
+            
+            // Salvar ID como ultimo usado
+            localStorage.setItem('diet_last_patient_id', id);
+            
+            closePatientModal();
+            showToast(`Paciente ${data.inputs['patient-name']} carregado!`);
+        }
+
+        function triggerAutoSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(saveCurrentPatientState, 1000); // Salva 1s após parar de digitar
+        }
+
+        function saveCurrentPatientState() {
+            if (!currentPatientId) return;
+
+            // Coletar Inputs
+            const inputs = {};
+            const fields = [
+                'patient-name', 'patient-goal', 'diet-date',
+                'prof-name', 'prof-crn', 'prof-phone', 'prof-insta',
+                'calc-weight', 'calc-height', 'calc-age', 'calc-bf', 
+                'target-cal', 'target-carb-pct', 'target-prot-pct', 'target-fat-pct'
+            ];
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if(el) inputs[f] = el.value;
             });
 
-            c.innerHTML += `<div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 break-inside-avoid mt-6"><div class="p-4 border-b border-slate-700 flex justify-between"><h3 class="font-bold">Ingestão Diária</h3><span class="text-xs text-slate-400">(Opções A)</span></div><div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"><div><div class="text-xs text-slate-400">Calorias</div><div class="text-3xl font-bold">${dt.cal.toFixed(0)}</div></div><div><div class="text-xs text-slate-400">Carbo</div><div class="text-2xl font-bold text-blue-400">${dt.c.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400">Prot</div><div class="text-2xl font-bold text-emerald-400">${dt.p.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400">Gord</div><div class="text-2xl font-bold text-yellow-400">${dt.f.toFixed(0)}g</div></div></div></div>`;
+            // Coletar Selects/Radios
+            const selects = {
+                'calc-formula': document.getElementById('calc-formula').value,
+                'calc-activity': document.getElementById('calc-activity').value,
+                'calc-sex': document.querySelector('input[name="calc-sex"]:checked').value
+            };
 
-            if(showGoals) {
-                c.innerHTML += `<div class="card bg-white rounded-xl shadow-sm border theme-border break-inside-avoid mt-4 relative group"><button onclick="removeGoals()" class="absolute top-3 right-3 text-slate-300 hover:text-red-500 no-print opacity-0 group-hover:opacity-100"><i class="fa-solid fa-xmark"></i></button><div class="p-3 border-b theme-border theme-bg-light"><h3 class="font-bold text-sm text-slate-700">Metas Diárias</h3></div><div class="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center"><div><div class="text-[10px] text-slate-400 font-bold">Meta Kcal</div><div class="text-xl font-bold text-slate-700">${tc.toFixed(0)}</div></div><div><div class="text-[10px] text-slate-400 font-bold">Meta C</div><div class="text-lg font-bold text-blue-600">${(tc*(pc/100)/4).toFixed(0)}g</div></div><div><div class="text-[10px] text-slate-400 font-bold">Meta P</div><div class="text-lg font-bold text-emerald-600">${(tc*(pp/100)/4).toFixed(0)}g</div></div><div><div class="text-[10px] text-slate-400 font-bold">Meta G</div><div class="text-lg font-bold text-yellow-600">${(tc*(pf/100)/9).toFixed(0)}g</div></div></div></div>`;
+            // Coletar Imagens (src base64)
+            const mainLogoSrc = document.getElementById('logo-img-main').src;
+            const footerLogoSrc = document.getElementById('logo-img-footer').src;
+            const images = {
+                mainLogo: mainLogoSrc.includes('data:') ? mainLogoSrc : null,
+                footerLogo: footerLogoSrc.includes('data:') ? footerLogoSrc : null
+            };
+
+            // Coletar Histórico
+            const history = [];
+            document.querySelectorAll('#history-table tbody tr').forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => rowData.push(cell.innerText));
+                history.push(rowData);
+            });
+
+            // Objeto Principal
+            const data = {
+                id: currentPatientId,
+                lastModified: Date.now(),
+                theme: currentTheme,
+                inputs: inputs,
+                selects: selects,
+                images: images,
+                meals: dietMeals,
+                history: history,
+                goalsText: document.getElementById('goals-area').innerText
+            };
+
+            // Salvar Dados
+            localStorage.setItem('diet_data_' + currentPatientId, JSON.stringify(data));
+
+            // Atualizar Lista de Pacientes (Metadados)
+            let list = getPatientsList();
+            const existingIndex = list.findIndex(p => p.id === currentPatientId);
+            const meta = { id: currentPatientId, name: inputs['patient-name'] || "Sem Nome", lastModified: Date.now() };
+            
+            if (existingIndex >= 0) {
+                list[existingIndex] = meta;
+            } else {
+                list.push(meta);
             }
-            // Widget Comparison
-            const w=document.getElementById('comparison-widget'); if(w) w.innerHTML=`<div class="flex justify-between border-b pb-1 mb-2 text-[11px] font-bold text-slate-500"><span>Consumido / Meta</span></div><div class="flex justify-between"><span class="text-slate-500">Cal:</span><span class="font-bold ${dt.cal-tc>100?'text-red-500':'text-green-500'}">${dt.cal.toFixed(0)} / ${tc.toFixed(0)}</span></div><div class="flex justify-between"><span class="text-blue-500">C:</span><span>${dt.c.toFixed(0)} / ${(tc*(pc/100)/4).toFixed(0)}</span></div><div class="flex justify-between"><span class="text-emerald-500">P:</span><span>${dt.p.toFixed(0)} / ${(tc*(pp/100)/4).toFixed(0)}</span></div><div class="flex justify-between"><span class="text-yellow-500">G:</span><span>${dt.f.toFixed(0)} / ${(tc*(pf/100)/9).toFixed(0)}</span></div>`;
+            savePatientsList(list);
+            
+            // UI Feedback (Optional logic to update button label)
+            const btnLabel = document.getElementById('current-patient-label');
+            if(btnLabel) btnLabel.innerText = inputs['patient-name'] || "Pacientes";
+        }
+
+
+        // ==========================================
+        // === LÓGICA DE DIETA EXISTENTE (MANTIDA) ===
+        // ==========================================
+
+        function toggleBodyFatInput() {
+            const formula = document.getElementById('calc-formula').value;
+            const bfContainer = document.getElementById('bf-container');
+            
+            if(formula === 'tinsley_katch' || formula === 'cunningham') {
+                bfContainer.classList.remove('hidden');
+            } else {
+                bfContainer.classList.add('hidden');
+            }
+        }
+
+        // --- CÁLCULOS NUTRICIONAIS ---
+        function calculateEnergy() {
+            const weight = parseFloat(document.getElementById('calc-weight').value) || 0;
+            const height = parseFloat(document.getElementById('calc-height').value) || 0;
+            const heightM = height / 100;
+            const age = parseFloat(document.getElementById('calc-age').value) || 0;
+            const bf = parseFloat(document.getElementById('calc-bf').value) || 0;
+            const activity = parseFloat(document.getElementById('calc-activity').value) || 1.2;
+            const sex = document.querySelector('input[name="calc-sex"]:checked').value;
+            const formula = document.getElementById('calc-formula').value;
+
+            // IMC
+            if(weight > 0 && height > 0) {
+                const bmi = weight / ((height/100) * (height/100));
+                document.getElementById('res-bmi').innerText = bmi.toFixed(1);
+            } else {
+                document.getElementById('res-bmi').innerText = '--';
+            }
+
+            if(weight > 0) {
+                let bmr = 0;
+
+                // --- FÓRMULAS ---
+                if (formula === 'mifflin') {
+                    if(height > 0 && age > 0) {
+                        if(sex === 'm') {
+                            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+                        } else {
+                            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+                        }
+                    }
+                } 
+                else if (formula === 'harris') {
+                    if(height > 0 && age > 0) {
+                        if(sex === 'm') {
+                            bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+                        } else {
+                            bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+                        }
+                    }
+                }
+                else if (formula === 'tinsley_ph') {
+                    if (height > 0) {
+                        if (sex === 'm') {
+                            bmr = (9.65 * weight) + (573 * heightM) - 5.08;
+                        } else {
+                            bmr = (9.65 * weight) + (573 * heightM) - 4.92;
+                        }
+                    }
+                }
+                else if (formula === 'tinsley_katch') {
+                    if (bf > 0) {
+                        const mlg = weight * (1 - (bf/100));
+                        bmr = 370 + (21.6 * mlg);
+                    }
+                }
+                else if (formula === 'cunningham') {
+                    if (bf > 0) {
+                        const mlg = weight * (1 - (bf/100));
+                        bmr = 500 + (22 * mlg);
+                    }
+                }
+
+                if (bmr > 0) {
+                    const tdee = bmr * activity;
+                    document.getElementById('res-bmr').innerText = bmr.toFixed(0) + ' kcal';
+                    document.getElementById('res-tdee').innerText = tdee.toFixed(0) + ' kcal';
+                } else {
+                    document.getElementById('res-bmr').innerText = '--';
+                    document.getElementById('res-tdee').innerText = '--';
+                }
+            } else {
+                document.getElementById('res-bmr').innerText = '--';
+                document.getElementById('res-tdee').innerText = '--';
+            }
+        }
+
+        // --- GESTÃO DE REFEIÇÕES ---
+
+        function addNewMeal() {
+            const nameInput = document.getElementById('new-meal-name');
+            const name = nameInput.value.trim();
+            if(!name) { showToast("Digite o nome da refeição", "error"); return; }
+            const newId = Date.now();
+            dietMeals.push({ id: newId, title: name, foods: [], observation: "" });
+            nameInput.value = '';
+            renderMealSelect();
+            renderDiet();
+            showToast("Refeição criada!");
+        }
+
+        function deleteMeal(id) {
+            if(confirm("Tem certeza que deseja apagar esta refeição inteira?")) {
+                dietMeals = dietMeals.filter(m => m.id !== id);
+                renderMealSelect();
+                renderDiet();
+                triggerAutoSave();
+                showToast("Refeição removida", "neutral");
+            }
+        }
+
+        function duplicateMeal(id) {
+            const index = dietMeals.findIndex(m => m.id === id);
+            if (index === -1) return;
+
+            const originalMeal = dietMeals[index];
+            const newMeal = JSON.parse(JSON.stringify(originalMeal));
+            
+            newMeal.id = Date.now();
+            newMeal.title = `${originalMeal.title} (Cópia)`;
+
+            dietMeals.splice(index + 1, 0, newMeal);
+
+            renderDiet();
+            renderMealSelect();
+            triggerAutoSave();
+            showToast("Refeição duplicada com sucesso!");
+        }
+
+        function removeGoals() {
+            showGoals = false;
+            renderDiet();
+            showToast("Metas diárias ocultadas!", "neutral");
+        }
+
+        function moveMeal(index, direction) {
+            if (direction === -1 && index > 0) {
+                [dietMeals[index], dietMeals[index - 1]] = [dietMeals[index - 1], dietMeals[index]];
+            } else if (direction === 1 && index < dietMeals.length - 1) {
+                [dietMeals[index], dietMeals[index + 1]] = [dietMeals[index + 1], dietMeals[index]];
+            } else {
+                return; 
+            }
+            renderDiet();
+            renderMealSelect();
+            triggerAutoSave();
+        }
+
+        function updateMealTitle(id, newName) {
+            const meal = dietMeals.find(m => m.id === id);
+            if(meal) {
+                meal.title = newName.trim();
+                renderMealSelect(); 
+                triggerAutoSave();
+                showToast("Nome da refeição atualizado", "neutral");
+            }
+        }
+
+        function updateMealObservation(id, text) {
+            const meal = dietMeals.find(m => m.id === id);
+            if(meal) {
+                meal.observation = text;
+                triggerAutoSave();
+                showToast("Observação salva", "neutral");
+            }
+        }
+
+        function clearMealObservation(id) {
+            const meal = dietMeals.find(m => m.id === id);
+            if(meal) {
+                if (meal.observation && meal.observation.trim() !== "") {
+                    if(confirm("Deseja excluir o texto desta observação?")) {
+                        meal.observation = "";
+                        renderDiet();
+                        triggerAutoSave();
+                        showToast("Observação excluída", "neutral");
+                    }
+                } else {
+                    meal.observation = "";
+                    renderDiet();
+                }
+            }
+        }
+
+        function renderMealSelect() {
+            const select = document.getElementById('select-meal');
+            const currentVal = select.value;
+            select.innerHTML = '';
+            dietMeals.forEach(meal => {
+                const option = document.createElement('option');
+                option.value = meal.id;
+                option.text = meal.title;
+                select.appendChild(option);
+            });
+            if(currentVal) select.value = currentVal;
+        }
+
+        // --- GESTÃO DE ALIMENTOS E BUSCA ---
+
+        function renderFoodSelect(filterText = "") {
+            const select = document.getElementById('select-food');
+            select.innerHTML = '';
+            
+            let sortedFoods = [...foodDatabase].sort((a, b) => a.name.localeCompare(b.name));
+
+            if (filterText) {
+                const term = filterText.toLowerCase();
+                sortedFoods = sortedFoods.filter(f => f.name.toLowerCase().includes(term));
+            }
+
+            if (sortedFoods.length === 0) {
+                const option = document.createElement('option');
+                option.text = "Nenhum alimento encontrado";
+                select.appendChild(option);
+                select.disabled = true;
+                return;
+            } else {
+                select.disabled = false;
+            }
+
+            sortedFoods.forEach(food => {
+                const option = document.createElement('option');
+                option.value = food.id;
+                const marker = food.isCustom ? '★ ' : '';
+                option.text = `${marker}${food.name} (${food.cal.toFixed(0)}kcal/100g)`;
+                select.appendChild(option);
+            });
+            
+            if(sortedFoods.length > 0) select.value = sortedFoods[0].id;
+        }
+
+        function filterFoods() {
+            const searchInput = document.getElementById('search-food');
+            const term = searchInput.value;
+            renderFoodSelect(term);
+            
+            const hint = document.getElementById('search-hint');
+            if (term.length > 0) {
+                hint.classList.remove('hidden');
+            } else {
+                hint.classList.add('hidden');
+            }
+        }
+
+        function updateFoodName(mealId, foodIndex, newName) {
+            const meal = dietMeals.find(m => m.id === mealId);
+            if (meal && meal.foods[foodIndex]) {
+                meal.foods[foodIndex].name = newName.trim();
+                triggerAutoSave();
+                showToast("Nome do alimento atualizado", "neutral");
+            }
+        }
+        
+        function updateFoodQty(mealId, foodIndex, newQtyVal) {
+            const meal = dietMeals.find(m => m.id === mealId);
+            if (meal && meal.foods[foodIndex]) {
+                const qty = parseFloat(newQtyVal);
+                if (isNaN(qty) || qty <= 0) return;
+
+                const food = meal.foods[foodIndex];
+                const factor = qty / 100;
+                
+                food.qty = qty;
+                food.totalCal = food.cal * factor;
+                food.totalCarb = food.carb * factor;
+                food.totalProt = food.prot * factor;
+                food.totalFat = food.fat * factor;
+                
+                renderDiet();
+                triggerAutoSave();
+                showToast("Quantidade atualizada", "neutral");
+            }
+        }
+        
+        function moveFood(mealId, foodIndex, direction) {
+            const meal = dietMeals.find(m => m.id === mealId);
+            if (!meal) return;
+            
+            const newIndex = foodIndex + direction;
+            
+            if (newIndex >= 0 && newIndex < meal.foods.length) {
+                [meal.foods[foodIndex], meal.foods[newIndex]] = [meal.foods[newIndex], meal.foods[foodIndex]];
+                renderDiet();
+                triggerAutoSave();
+            }
+        }
+
+        // --- RENDERIZAÇÃO DA DIETA ---
+
+        function renderDiet() {
+            const container = document.getElementById('diet-container');
+            container.innerHTML = '';
+
+            let dailyTotal = { cal: 0, carb: 0, prot: 0, fat: 0 };
+
+            const targetCal = parseFloat(document.getElementById('target-cal').value) || 2000;
+            const pctC = parseFloat(document.getElementById('target-carb-pct').value) || 50;
+            const pctP = parseFloat(document.getElementById('target-prot-pct').value) || 30;
+            const pctF = parseFloat(document.getElementById('target-fat-pct').value) || 20;
+            
+            const totalPct = pctC + pctP + pctF;
+            const totalPctEl = document.getElementById('total-pct-display');
+            if(totalPctEl) {
+                totalPctEl.innerText = totalPct;
+                totalPctEl.style.color = totalPct !== 100 ? 'red' : 'inherit';
+            }
+
+            const targetGramsC = (targetCal * (pctC / 100)) / 4;
+            const targetGramsP = (targetCal * (pctP / 100)) / 4;
+            const targetGramsF = (targetCal * (pctF / 100)) / 9;
+
+            dietMeals.forEach((meal, index) => {
+                let mCal = 0, mCarb = 0, mProt = 0, mFat = 0;
+                meal.foods.forEach(f => {
+                    mCal += f.totalCal;
+                    mCarb += f.totalCarb;
+                    mProt += f.totalProt;
+                    mFat += f.totalFat;
+
+                    if(f.option === 'A') {
+                        dailyTotal.cal += f.totalCal;
+                        dailyTotal.carb += f.totalCarb;
+                        dailyTotal.prot += f.totalProt;
+                        dailyTotal.fat += f.totalFat;
+                    }
+                });
+
+                const groups = { 'A': [], 'B': [], 'C': [] };
+                meal.foods.forEach(f => {
+                    if(!groups[f.option]) groups[f.option] = [];
+                    groups[f.option].push(f);
+                });
+
+                let contentHtml = '';
+                ['A', 'B', 'C'].forEach(opt => {
+                    if (groups[opt].length > 0) {
+                        const showHeader = opt !== 'A' || (groups['B'].length > 0 || groups['C'].length > 0);
+                        if (showHeader) {
+                            contentHtml += `
+                                <div class="bg-slate-50 px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide border-y border-slate-100 mt-2">
+                                    ${opt === 'A' ? 'Opção Principal' : `Opção ${opt}`}
+                                </div>
+                            `;
+                        }
+                        
+                        contentHtml += `
+                            <div class="table-container">
+                                <table class="w-full text-left text-sm">
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${groups[opt].map((food) => {
+                                            const originalIndex = meal.foods.indexOf(food);
+                                            return `
+                                            <tr class="hover:bg-slate-50 transition group">
+                                                <td class="p-3 text-slate-700 font-medium pl-4 transition col-name"
+                                                    contenteditable="true"
+                                                    onblur="updateFoodName(${meal.id}, ${originalIndex}, this.innerText)"
+                                                    onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+                                                    title="Clique para editar o nome"
+                                                >${food.name}</td>
+                                                
+                                                <td class="p-3 text-slate-600 bg-slate-50/50 text-xs col-qty whitespace-nowrap">
+                                                    <div class="flex items-center justify-start gap-1 qty-wrapper">
+                                                        <input type="number" 
+                                                            class="qty-input" 
+                                                            value="${food.qty}" 
+                                                            onchange="updateFoodQty(${meal.id}, ${originalIndex}, this.value)"
+                                                            onkeydown="if(event.key==='Enter'){this.blur();}"
+                                                        > <span class="unit-text">g</span>
+                                                    </div>
+                                                </td>
+                                                
+                                                <td class="p-3 text-center font-bold text-slate-700 text-xs col-cal whitespace-nowrap">${food.totalCal.toFixed(0)} kcal</td>
+                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro whitespace-nowrap">C: ${food.totalCarb.toFixed(0)}</td>
+                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro whitespace-nowrap">P: ${food.totalProt.toFixed(0)}</td>
+                                                <td class="p-3 text-center text-slate-500 text-[10px] col-macro whitespace-nowrap">G: ${food.totalFat.toFixed(0)}</td>
+                                                
+                                                <td class="p-3 text-center no-print w-24 col-actions">
+                                                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                                                        <div class="flex flex-col text-[8px] text-slate-400">
+                                                            <button onclick="moveFood(${meal.id}, ${originalIndex}, -1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-up"></i></button>
+                                                            <button onclick="moveFood(${meal.id}, ${originalIndex}, 1)" class="hover:text-blue-500 p-0.5"><i class="fa-solid fa-chevron-down"></i></button>
+                                                        </div>
+
+                                                        <button onclick="removeFood(${meal.id}, ${originalIndex})" class="text-slate-300 hover:text-red-500 transition ml-1" title="Remover item" data-html2canvas-ignore="true">
+                                                            <i class="fa-solid fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            `}).join('')}
+                                    </tbody>
+                                </table>
+                            </div>`;
+                    }
+                });
+
+                if (meal.foods.length === 0) {
+                    contentHtml = `<div class="p-6 text-center text-slate-400 text-sm italic no-print">Nenhum alimento adicionado.</div>`;
+                }
+
+                const totalsHtml = `
+                    <div class="totals-footer p-3 bg-slate-50 border-t border-slate-100 flex justify-end gap-4 text-xs font-bold text-slate-600">
+                        <span>Total Refeição:</span>
+                        <span>${mCal.toFixed(0)} kcal</span>
+                        <span class="text-blue-600">Carbo: ${mCarb.toFixed(0)}g</span>
+                        <span class="text-emerald-600">Prot: ${mProt.toFixed(0)}g</span>
+                        <span class="text-yellow-600">Gord: ${mFat.toFixed(0)}g</span>
+                    </div>
+                `;
+
+                const observationHtml = `
+                    <div class="px-4 pb-4 pt-2 border-t border-slate-100 group/obs relative">
+                        <div class="flex justify-between items-center mb-1">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1">
+                                <i class="fa-regular fa-comment-dots"></i> Observações
+                            </div>
+                            <button onclick="clearMealObservation(${meal.id})" class="text-slate-300 hover:text-red-500 text-xs transition no-print opacity-0 group-hover/obs:opacity-100 px-2" title="Excluir Observação" data-html2canvas-ignore="true">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <div class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm text-slate-600 min-h-[40px] focus:bg-white focus:ring-1 focus:ring-slate-300 outline-none transition"
+                             contenteditable="true"
+                             placeholder="Ex: Beber copo d'água antes..."
+                             onblur="updateMealObservation(${meal.id}, this.innerText)">${meal.observation || ''}</div>
+                    </div>
+                `;
+
+                const mealHtml = `
+                    <div class="card bg-white rounded-xl shadow-sm theme-border border overflow-hidden break-inside-avoid relative group">
+                        
+                        <div class="absolute top-4 right-4 flex gap-2 no-print opacity-0 group-hover:opacity-100 transition z-10" data-html2canvas-ignore="true">
+                            <button onclick="duplicateMeal(${meal.id})" class="text-slate-300 hover:text-blue-500 transition" title="Duplicar Refeição">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                            <button onclick="deleteMeal(${meal.id})" class="text-slate-300 hover:text-red-500 transition" title="Apagar Refeição">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+
+                        <div class="meal-header theme-bg-light p-4 border-b theme-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            
+                            <div class="flex items-center gap-3 flex-1 w-full sm:w-auto">
+                                <div class="flex flex-col gap-1 no-print">
+                                    <button onclick="moveMeal(${index}, -1)" class="text-[10px] leading-none px-1 py-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 ${index === 0 ? 'invisible' : ''}" title="Mover para cima">
+                                        <i class="fa-solid fa-chevron-up"></i>
+                                    </button>
+                                    <button onclick="moveMeal(${index}, 1)" class="text-[10px] leading-none px-1 py-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 ${index === dietMeals.length - 1 ? 'invisible' : ''}" title="Mover para baixo">
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </button>
+                                </div>
+
+                                <h3 class="font-bold text-slate-700 flex items-center gap-2 flex-1 cursor-text hover:bg-white/50 px-2 py-1 rounded border border-transparent hover:border-slate-200 transition"
+                                    contenteditable="true" 
+                                    onblur="updateMealTitle(${meal.id}, this.innerText)"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+                                    title="Clique para editar o nome da refeição">
+                                    <i class="fa-solid fa-utensils theme-text text-sm"></i> ${meal.title}
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="p-0">${contentHtml}</div>
+                        ${totalsHtml}
+                        ${observationHtml}
+                    </div>
+                `;
+                container.innerHTML += mealHtml;
+            });
+
+            const totalHtml = `
+                <div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 overflow-hidden break-inside-avoid mt-6">
+                    <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+                        <h3 class="font-bold text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-emerald-400"></i> Ingestão Diária
+                        </h3>
+                        <span class="text-xs text-slate-400 font-normal">(Soma das Opções A)</span>
+                    </div>
+                    <div class="p-6 grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 gap-6 text-center">
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calorias</div>
+                            <div class="text-3xl font-bold text-white">${dailyTotal.cal.toFixed(0)} <span class="text-sm font-normal text-slate-400">kcal</span></div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Carboidratos</div>
+                            <div class="text-2xl font-bold text-blue-400">${dailyTotal.carb.toFixed(1)} <span class="text-sm font-normal text-slate-400">g</span></div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Proteínas</div>
+                            <div class="text-2xl font-bold text-emerald-400">${dailyTotal.prot.toFixed(1)} <span class="text-sm font-normal text-slate-400">g</span></div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Gorduras</div>
+                            <div class="text-2xl font-bold text-yellow-400">${dailyTotal.fat.toFixed(1)} <span class="text-sm font-normal text-slate-400">g</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += totalHtml;
+
+            if (showGoals) {
+                const goalsHtml = `
+                    <div class="card bg-white rounded-xl shadow-sm border theme-border overflow-hidden break-inside-avoid mt-4 relative group">
+                        <button onclick="removeGoals()" class="absolute top-3 right-3 text-slate-300 hover:text-red-500 transition no-print opacity-0 group-hover:opacity-100" title="Ocultar Metas">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+
+                        <div class="p-3 border-b theme-border theme-bg-light flex justify-between items-center">
+                            <h3 class="font-bold text-sm flex items-center gap-2 text-slate-700 uppercase tracking-wide">
+                                <i class="fa-solid fa-flag-checkered theme-text"></i> Metas Diárias
+                            </h3>
+                        </div>
+                        <div class="p-4 grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 gap-4 text-center">
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Kcal</div>
+                                <div class="text-xl font-bold text-slate-700">${targetCal.toFixed(0)}</div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Carbo</div>
+                                <div class="text-lg font-bold text-blue-600">${targetGramsC.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctC}%)</span></div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Prot</div>
+                                <div class="text-lg font-bold text-emerald-600">${targetGramsP.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctP}%)</span></div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Meta Gord</div>
+                                <div class="text-lg font-bold text-yellow-600">${targetGramsF.toFixed(0)}g <span class="text-[10px] text-slate-400 font-normal">(${pctF}%)</span></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += goalsHtml;
+            }
+
+            const diffCal = dailyTotal.cal - targetCal;
+            const widget = document.getElementById('comparison-widget');
+            if(widget) {
+                widget.innerHTML = `
+                    <div class="flex justify-between items-center text-[11px] font-bold text-slate-500 mb-2 border-b border-slate-100 pb-1">
+                        <span>Metas Calculadas:</span>
+                        <span>(Consumido / Meta)</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Calorias:</span>
+                        <span class="font-bold ${diffCal > 100 ? 'text-red-500' : (diffCal < -100 ? 'text-yellow-500' : 'text-green-500')}">
+                            ${dailyTotal.cal.toFixed(0)} / ${targetCal.toFixed(0)}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-blue-500">Carbo:</span>
+                        <span class="font-medium text-slate-600">
+                            ${dailyTotal.carb.toFixed(0)}g / ${targetGramsC.toFixed(0)}g
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-emerald-500">Prot:</span>
+                        <span class="font-medium text-slate-600">
+                            ${dailyTotal.prot.toFixed(0)}g / ${targetGramsP.toFixed(0)}g
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-yellow-500">Gord:</span>
+                        <span class="font-medium text-slate-600">
+                            ${dailyTotal.fat.toFixed(0)}g / ${targetGramsF.toFixed(0)}g
+                        </span>
+                    </div>
+                `;
+            }
         }
 
         function addToPlan() {
-            const mid=parseInt(document.getElementById('select-meal').value), fid=parseInt(document.getElementById('select-food').value), q=parseFloat(document.getElementById('input-qty').value), opt=document.querySelector('input[name="meal-option"]:checked').value;
-            if(isNaN(mid)||!q||q<=0) return showToast("Erro nos dados","error");
-            const f=foodDatabase.find(x=>x.id===fid), m=dietMeals.find(x=>x.id===mid);
-            if(f&&m) { const fac=q/100; m.foods.push({...f, qty:q, option:opt, totalCal:f.cal*fac, totalCarb:f.carb*fac, totalProt:f.prot*fac, totalFat:f.fat*fac}); renderDiet(); showToast("Adicionado!"); triggerAutoSave(); }
+            const mealId = parseInt(document.getElementById('select-meal').value);
+            const foodId = parseInt(document.getElementById('select-food').value);
+            const qty = parseFloat(document.getElementById('input-qty').value);
+            const option = document.querySelector('input[name="meal-option"]:checked').value;
+            if (isNaN(mealId)) { showToast("Crie ou selecione uma refeição!", "error"); return; }
+            if (!qty || qty <= 0) { showToast("Quantidade inválida!", "error"); return; }
+            
+            const food = foodDatabase.find(f => f.id === foodId);
+            const meal = dietMeals.find(m => m.id === mealId);
+            
+            if (food && meal) {
+                const factor = qty / 100;
+                const newEntry = {
+                    ...food,
+                    qty: qty,
+                    option: option,
+                    totalCal: food.cal * factor,
+                    totalCarb: food.carb * factor,
+                    totalProt: food.prot * factor,
+                    totalFat: food.fat * factor
+                };
+                meal.foods.push(newEntry);
+                renderDiet();
+                showToast(`Adicionado à ${meal.title}`);
+                
+                document.getElementById('search-food').value = '';
+                document.getElementById('search-hint').classList.add('hidden');
+                renderFoodSelect();
+                triggerAutoSave();
+            }
         }
 
-        // Custom Food Logic
-        function loadCustomFoodsFromStorage() { try{const c=JSON.parse(localStorage.getItem('dietCustomFoods')); if(Array.isArray(c)) foodDatabase=[...foodDatabase,...c];}catch(e){} }
-        function saveCustomFoodToStorage(f) { const c=JSON.parse(localStorage.getItem('dietCustomFoods'))||[]; c.push(f); localStorage.setItem('dietCustomFoods',JSON.stringify(c)); }
-        function clearCustomFoods() { if(confirm("Limpar alimentos?")) { localStorage.removeItem('dietCustomFoods'); location.reload(); } }
-        function createCustomFood() {
-            const n=document.getElementById('new-name').value, s=parseFloat(document.getElementById('new-serving').value), c=parseFloat(document.getElementById('new-cal').value);
-            if(!n||!s||isNaN(c)) return showToast("Preencha tudo","error");
-            const fac=100/s, nf={id:Date.now(), name:n, cal:c*fac, carb:(parseFloat(document.getElementById('new-carb').value)||0)*fac, prot:(parseFloat(document.getElementById('new-prot').value)||0)*fac, fat:(parseFloat(document.getElementById('new-fat').value)||0)*fac, isCustom:true};
-            foodDatabase.push(nf); saveCustomFoodToStorage(nf); renderFoodSelect(); document.getElementById('select-food').value=nf.id; toggleCustomForm(); showToast("Criado!");
+        function removeFood(mealId, foodIndex) {
+            const meal = dietMeals.find(m => m.id === mealId);
+            if(meal) {
+                meal.foods.splice(foodIndex, 1);
+                renderDiet();
+                triggerAutoSave();
+                showToast("Item removido", "neutral");
+            }
         }
-        function toggleCustomForm() { document.getElementById('custom-food-form').classList.toggle('hidden'); }
-        function setTheme(n) { currentTheme=n; const t=themes[n], r=document.documentElement; r.style.setProperty('--primary',t.primary); r.style.setProperty('--primary-hover',t.hover); r.style.setProperty('--primary-light',t.light); r.style.setProperty('--primary-text',t.text); r.style.setProperty('--border-color',t.border); }
-        function updateDateDisplay() { const d=document.getElementById('diet-date').value; if(d) document.getElementById('date-display').innerText=d.split('-').reverse().join('/'); }
-        function printDiet() { updateDateDisplay(); window.print(); }
-        function showToast(m,t) { const x=document.getElementById('toast'); document.getElementById('toast-msg').innerText=m; x.classList.remove('translate-y-20','opacity-0'); setTimeout(()=>x.classList.add('translate-y-20','opacity-0'),3000); }
-        function handleImageUpload(e, id, pid) { const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=(v)=>{ const i=new Image(); i.onload=()=>{ const c=document.createElement('canvas'), ctx=c.getContext('2d'); let w=i.width, h=i.height; if(w>h){if(w>300){h*=300/w;w=300}}else{if(h>150){w*=150/h;h=150}} c.width=w; c.height=h; ctx.drawImage(i,0,0,w,h); const d=c.toDataURL('image/png'); document.getElementById(id).src=d; document.getElementById(id).classList.remove('hidden'); document.getElementById(pid).classList.add('hidden'); triggerAutoSave(); }; i.src=v.target.result; }; r.readAsDataURL(f); }
+
+        function updateDateDisplay() {
+            const dateInput = document.getElementById('diet-date');
+            const display = document.getElementById('date-display');
+            const dateVal = dateInput.value;
+            if(dateVal) {
+                const [year, month, day] = dateVal.split('-');
+                display.innerText = `${day}/${month}/${year}`;
+            } else {
+                display.innerText = "";
+            }
+        }
+
+        function printDiet() {
+            updateDateDisplay();
+            window.print();
+        }
+
+        function setTheme(themeName) {
+            currentTheme = themeName;
+            const t = themes[themeName];
+            const root = document.documentElement;
+            root.style.setProperty('--primary', t.primary);
+            root.style.setProperty('--primary-hover', t.hover);
+            root.style.setProperty('--primary-light', t.light);
+            root.style.setProperty('--primary-text', t.text);
+            root.style.setProperty('--border-color', t.border);
+            // showToast(`Tema alterado para ${themeName.charAt(0).toUpperCase() + themeName.slice(1)}`);
+        }
+
+        function handleImageUpload(event, imgId, placeholderId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const MAX_WIDTH = 300;
+                    const MAX_HEIGHT = 150;
+                    
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/png');
+
+                    document.getElementById(imgId).src = dataUrl;
+                    document.getElementById(imgId).classList.remove('hidden');
+                    document.getElementById(placeholderId).classList.add('hidden');
+                    
+                    showToast("Logo otimizado e carregado!");
+                    triggerAutoSave();
+                }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // --- ALIMENTOS CUSTOMIZADOS (GLOBAL) ---
+        function loadCustomFoodsFromStorage() {
+            const stored = localStorage.getItem('dietCustomFoods');
+            if (stored) {
+                try {
+                    const customFoods = JSON.parse(stored);
+                    if (Array.isArray(customFoods)) {
+                        foodDatabase = [...foodDatabase, ...customFoods];
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar alimentos personalizados", e);
+                }
+            }
+        }
+
+        function saveCustomFoodToStorage(foodItem) {
+            let stored = localStorage.getItem('dietCustomFoods');
+            let customList = stored ? JSON.parse(stored) : [];
+            customList.push(foodItem);
+            localStorage.setItem('dietCustomFoods', JSON.stringify(customList));
+        }
+
+        function clearCustomFoods() {
+            if(confirm("Isso apagará todos os alimentos que você criou manualmente do histórico deste navegador. Confirmar?")) {
+                localStorage.removeItem('dietCustomFoods');
+                showToast("Alimentos personalizados limpos. Recarregue a página.", "neutral");
+                setTimeout(() => location.reload(), 1500);
+            }
+        }
+
+        function createCustomFood() {
+            const name = document.getElementById('new-name').value;
+            const serving = parseFloat(document.getElementById('new-serving').value);
+            const cal = parseFloat(document.getElementById('new-cal').value);
+
+            if (!name) { showToast("Preencha o nome!", "error"); return; }
+            if (!serving || serving <= 0) { showToast("A porção deve ser maior que 0!", "error"); return; }
+            if (isNaN(cal)) { showToast("Preencha as calorias!", "error"); return; }
+
+            const factor = 100 / serving;
+            const newId = Date.now(); 
+            const newFood = {
+                id: newId,
+                name: name, 
+                cal: cal * factor,
+                carb: (parseFloat(document.getElementById('new-carb').value) || 0) * factor,
+                prot: (parseFloat(document.getElementById('new-prot').value) || 0) * factor,
+                fat: (parseFloat(document.getElementById('new-fat').value) || 0) * factor,
+                isCustom: true 
+            };
+
+            foodDatabase.push(newFood);
+            saveCustomFoodToStorage(newFood);
+            
+            document.getElementById('search-food').value = '';
+            document.getElementById('new-name').value = '';
+            document.getElementById('new-cal').value = '';
+            document.getElementById('new-carb').value = '';
+            document.getElementById('new-prot').value = '';
+            document.getElementById('new-fat').value = '';
+            
+            renderFoodSelect();
+            document.getElementById('select-food').value = newId;
+            toggleCustomForm();
+            showToast("Alimento criado e salvo!");
+        }
+
+        function toggleCustomForm() {
+            document.getElementById('custom-food-form').classList.toggle('hidden');
+        }
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
 
         init();
     </script>
 </body>
 </html>
+
