@@ -644,7 +644,7 @@
         </main>
     </div>
 
-    <!-- MODAL DE PACIENTES -->
+    <!-- MODAL DE PACIENTES ATUALIZADO COM AVISO E BACKUP -->
     <div id="patient-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center backdrop-blur-sm p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
             <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
@@ -652,23 +652,42 @@
                 <button onclick="closePatientModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
             </div>
             
-            <div class="p-4 bg-slate-50 border-b border-slate-200">
+            <!-- AVISO DE LOCAL STORAGE (SOLICITADO) -->
+            <div class="p-4 bg-amber-50 border-b border-amber-100 text-xs text-amber-800 leading-relaxed">
+                <div class="flex gap-2">
+                    <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                    <div>
+                        <strong>Aviso Importante:</strong> Os dados deste app ficam salvos <u>apenas neste navegador</u>. Se você limpar o cache, usar uma guia anônima ou trocar de computador, os dados não aparecerão.
+                        <div class="mt-1 font-bold">Faça Backups regularmente se quiser garantir seus dados!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 border-b border-slate-200 space-y-3">
                 <button onclick="createNewPatient()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm flex items-center justify-center gap-2 transition">
                     <i class="fa-solid fa-user-plus"></i> Novo Paciente
                 </button>
+                
+                <!-- BOTÕES DE BACKUP -->
+                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200">
+                     <button onclick="exportBackup()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-download"></i> Baixar Backup
+                    </button>
+                     <button onclick="document.getElementById('backup-upload').click()" class="bg-slate-600 hover:bg-slate-700 text-white py-2 px-3 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-upload"></i> Restaurar Backup
+                    </button>
+                    <!-- Input invisível para carregar arquivo -->
+                    <input type="file" id="backup-upload" accept=".json" class="hidden" onchange="importBackup(event)">
+                </div>
             </div>
 
-            <div class="p-0 max-h-[60vh] overflow-y-auto custom-scroll">
+            <div class="p-0 max-h-[50vh] overflow-y-auto custom-scroll">
                 <ul id="patient-list" class="divide-y divide-slate-100">
                     <!-- Lista Preenchida via JS -->
                 </ul>
                 <div id="empty-patients" class="p-8 text-center text-slate-400 text-sm italic hidden">
                     Nenhum paciente salvo.
                 </div>
-            </div>
-
-            <div class="p-3 bg-slate-50 text-[10px] text-slate-400 text-center border-t border-slate-200">
-                Os dados são salvos no navegador deste dispositivo.
             </div>
         </div>
     </div>
@@ -915,6 +934,73 @@
             }
 
             renderFoodSelect();
+        }
+
+        // ==========================================
+        // === SISTEMA DE BACKUP (EXPORT/IMPORT) ===
+        // ==========================================
+
+        function exportBackup() {
+            const backup = {
+                meta: { date: new Date().toISOString(), version: '1.0' },
+                patientsList: localStorage.getItem('diet_patients_list'),
+                customFoods: localStorage.getItem('dietCustomFoods'),
+                patientData: {}
+            };
+
+            // Coleta dados individuais de cada paciente
+            const list = getPatientsList();
+            list.forEach(p => {
+                const key = 'diet_data_' + p.id;
+                backup.patientData[key] = localStorage.getItem(key);
+            });
+
+            // Cria o arquivo Blob e link de download
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            // Nome do arquivo com data
+            const dateStr = new Date().toISOString().slice(0,10);
+            downloadAnchorNode.setAttribute("download", `backup_dietas_${dateStr}.json`);
+            document.body.appendChild(downloadAnchorNode); // necessário para firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    
+                    // Validação simples
+                    if(!backup.meta || !backup.patientsList) { 
+                        throw new Error("Formato de arquivo inválido ou antigo."); 
+                    }
+
+                    if(confirm("ATENÇÃO: Restaurar o backup substituirá todos os pacientes e dados atuais pelos do arquivo. Continuar?")) {
+                        // Restaura Listas Globais
+                        if(backup.patientsList) localStorage.setItem('diet_patients_list', backup.patientsList);
+                        if(backup.customFoods) localStorage.setItem('dietCustomFoods', backup.customFoods);
+                        
+                        // Restaura Dados Individuais dos Pacientes
+                        if(backup.patientData) {
+                            for (const [key, value] of Object.entries(backup.patientData)) {
+                                if(value) localStorage.setItem(key, value);
+                            }
+                        }
+                        
+                        alert("Backup restaurado com sucesso! A página será recarregada.");
+                        location.reload();
+                    }
+                } catch (err) {
+                    alert("Erro ao ler arquivo de backup: " + err.message);
+                }
+            };
+            reader.readAsText(file);
         }
 
         // ==========================================
