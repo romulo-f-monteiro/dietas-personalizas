@@ -423,9 +423,9 @@
 
                             <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
                                 <div class="flex justify-between text-[10px] text-slate-400 uppercase font-bold mb-1">
-                                    <span>Carbo %</span>
-                                    <span>Prot %</span>
-                                    <span>Gord %</span>
+                                    <span>Carbo</span>
+                                    <span>Prot</span>
+                                    <span>Gord</span>
                                 </div>
                                 <div class="flex gap-2">
                                     <input type="number" id="target-carb-pct" class="w-full p-1 text-center border rounded text-xs" value="50" onkeyup="renderDiet(); triggerAutoSave();">
@@ -556,7 +556,7 @@
                                     <input type="number" id="new-cal" placeholder="Kcal" class="w-full p-2 text-sm border rounded">
                                 </div>
                                 <div>
-                                    <label class="text-[10px] text-slate-400 font-bold ml-1">Carbo</label>
+                                    <label class="text-[10px] text-slate-400 font-bold ml-1">Carboidrato</label>
                                     <input type="number" id="new-carb" placeholder="Carb (g)" class="w-full p-2 text-sm border rounded">
                                 </div>
                                 <div>
@@ -571,6 +571,20 @@
                             <button onclick="createCustomFood()" class="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 py-2 rounded-lg text-sm font-semibold transition border border-blue-200 mt-2">
                                 Salvar no Banco (Permanente)
                             </button>
+
+                            <!-- NOVOS BOTÕES DE BACKUP DE ALIMENTOS -->
+                            <div class="mt-4 pt-4 border-t border-slate-100">
+                                <p class="text-[10px] text-slate-400 mb-2 italic text-center">Salve sua lista personalizada em um arquivo para não perder seus cadastros.</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="exportFoodBackup()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 py-2 rounded text-xs font-bold transition border border-indigo-200">
+                                        <i class="fa-solid fa-download"></i> Baixar Lista
+                                    </button>
+                                    <button onclick="document.getElementById('food-backup-upload').click()" class="bg-slate-100 text-slate-600 hover:bg-slate-200 py-2 rounded text-xs font-bold transition border border-slate-300">
+                                        <i class="fa-solid fa-upload"></i> Restaurar Lista
+                                    </button>
+                                    <input type="file" id="food-backup-upload" accept=".json" class="hidden" onchange="importFoodBackup(event)">
+                                </div>
+                            </div>
                             
                             <div class="mt-4 pt-4 border-t border-slate-100">
                                  <button onclick="clearCustomFoods()" class="text-xs text-red-400 hover:text-red-600 underline w-full text-center">
@@ -675,7 +689,51 @@
         </main>
     </div>
 
-    <!-- MODAL DE PACIENTES ATUALIZADO COM AVISO E BACKUP -->
+    <!-- MODAL DE SUBSTITUIÇÃO -->
+    <div id="substitution-modal" class="fixed inset-0 modal-overlay z-[60] hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-exchange-alt"></i> Encontrar Substituto</h3>
+                <button onclick="closeSubModal()" class="text-indigo-200 hover:text-white"><i class="fa-solid fa-times"></i></button>
+            </div>
+            
+            <div class="p-4 bg-indigo-50 border-b border-indigo-100">
+                <div id="sub-source-info" class="text-sm text-indigo-900 mb-3 font-medium"></div>
+                
+                <div class="flex gap-2">
+                    <button onclick="filterSubstitutes('carb')" id="btn-sub-carb" class="flex-1 py-2 rounded-lg text-xs font-bold border border-blue-200 bg-white text-blue-600 hover:bg-blue-50 transition shadow-sm">
+                        Igualar Carboidrato
+                    </button>
+                    <button onclick="filterSubstitutes('prot')" id="btn-sub-prot" class="flex-1 py-2 rounded-lg text-xs font-bold border border-emerald-200 bg-white text-emerald-600 hover:bg-emerald-50 transition shadow-sm">
+                        Igualar Proteína
+                    </button>
+                    <button onclick="filterSubstitutes('fat')" id="btn-sub-fat" class="flex-1 py-2 rounded-lg text-xs font-bold border border-yellow-200 bg-white text-yellow-600 hover:bg-yellow-50 transition shadow-sm">
+                        Igualar Gordura
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scroll p-0">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-slate-500 font-bold text-xs sticky top-0 border-b">
+                        <tr>
+                            <th class="p-3">Alimento Sugerido</th>
+                            <th class="p-3 text-center w-24">Qtd Necessária</th>
+                            <th class="p-3 text-center w-20">Dif. Kcal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sub-list" class="divide-y divide-slate-100 text-slate-700">
+                        <!-- JS Populate -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-3 bg-slate-50 border-t text-center text-xs text-slate-400">
+                * A quantidade é calculada para atingir o mesmo valor do macronutriente selecionado.
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PACIENTES -->
     <div id="patient-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center backdrop-blur-sm p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
             <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
@@ -683,7 +741,6 @@
                 <button onclick="closePatientModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
             </div>
             
-            <!-- AVISO DE LOCAL STORAGE (SOLICITADO) -->
             <div class="p-4 bg-amber-50 border-b border-amber-100 text-xs text-amber-800 leading-relaxed">
                 <div class="flex gap-2">
                     <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
@@ -699,7 +756,6 @@
                     <i class="fa-solid fa-user-plus"></i> Novo Paciente
                 </button>
                 
-                <!-- BOTÕES DE BACKUP -->
                 <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200">
                      <button onclick="exportBackup()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition">
                         <i class="fa-solid fa-download"></i> Baixar Backup
@@ -707,7 +763,6 @@
                      <button onclick="document.getElementById('backup-upload').click()" class="bg-slate-600 hover:bg-slate-700 text-white py-2 px-3 rounded-lg text-xs font-bold shadow-sm flex items-center justify-center gap-2 transition">
                         <i class="fa-solid fa-upload"></i> Restaurar Backup
                     </button>
-                    <!-- Input invisível para carregar arquivo -->
                     <input type="file" id="backup-upload" accept=".json" class="hidden" onchange="importBackup(event)">
                 </div>
             </div>
@@ -1055,6 +1110,49 @@
             };
             reader.readAsText(file);
         }
+        
+        // --- FUNÇÕES DE BACKUP DE ALIMENTOS ---
+        function exportFoodBackup() {
+            const foods = localStorage.getItem('dietCustomFoods');
+            if(!foods) return showToast("Nenhum alimento personalizado para salvar.", "error");
+            
+            const backup = { foods: foods, type: "food_backup" };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            const dateStr = new Date().toISOString().slice(0,10);
+            downloadAnchorNode.setAttribute("download", `meus_alimentos_${dateStr}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importFoodBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    if(backup.type !== "food_backup" && !Array.isArray(JSON.parse(backup.foods || "[]"))) throw new Error("Formato inválido.");
+                    
+                    if(confirm("Isso irá adicionar os alimentos do arquivo à sua lista atual. Continuar?")) {
+                        const newFoods = JSON.parse(backup.foods);
+                        const currentFoods = JSON.parse(localStorage.getItem('dietCustomFoods') || "[]");
+                        // Merge avoiding exact duplicates by ID
+                        const merged = [...currentFoods];
+                        newFoods.forEach(nf => {
+                            if(!merged.find(cf => cf.id === nf.id)) merged.push(nf);
+                        });
+                        
+                        localStorage.setItem('dietCustomFoods', JSON.stringify(merged));
+                        alert("Alimentos restaurados com sucesso!");
+                        location.reload();
+                    }
+                } catch (err) { alert("Erro ao importar: O arquivo não parece ser um backup de alimentos."); }
+            };
+            reader.readAsText(file);
+        }
 
         function getPatientsList() {
             const list = localStorage.getItem('diet_patients_list');
@@ -1266,6 +1364,96 @@
         function removeFood(mid, fid) { const m=dietMeals.find(x=>x.id===mid); if(m) { m.foods.splice(fid,1); renderDiet(); triggerAutoSave(); } }
         function removeGoals() { showGoals=false; renderDiet(); }
 
+        // --- SISTEMA DE SUBSTITUIÇÃO (NOVO) ---
+        let currentSubSource = null;
+        function openSubstitutionModal(mealId, foodIndex) {
+            const meal = dietMeals.find(m => m.id === mealId);
+            if (!meal || !meal.foods[foodIndex]) return;
+            const f = meal.foods[foodIndex];
+            
+            currentSubSource = {
+                name: f.name,
+                cal: f.totalCal,
+                carb: f.totalCarb,
+                prot: f.totalProt,
+                fat: f.totalFat
+            };
+            
+            document.getElementById('sub-source-info').innerHTML = `
+                Alimento Base: <span class="text-black font-bold">${f.name}</span> (${f.qty}g)<br>
+                <div class="grid grid-cols-4 gap-2 mt-1 text-xs text-slate-500">
+                    <span>Kcal: ${f.totalCal.toFixed(0)}</span>
+                    <span>C: ${f.totalCarb.toFixed(1)}g</span>
+                    <span>P: ${f.totalProt.toFixed(1)}g</span>
+                    <span>G: ${f.totalFat.toFixed(1)}g</span>
+                </div>
+            `;
+            
+            // Default filter: Carb or Cal
+            filterSubstitutes('carb');
+            document.getElementById('substitution-modal').classList.remove('hidden');
+        }
+        
+        function closeSubModal() { document.getElementById('substitution-modal').classList.add('hidden'); }
+        
+        function filterSubstitutes(macro) {
+            const tbody = document.getElementById('sub-list');
+            tbody.innerHTML = '';
+            
+            // Highlight active button
+            ['carb','prot','fat'].forEach(m => {
+                const btn = document.getElementById('btn-sub-'+m);
+                if(m === macro) btn.classList.add('ring-2', 'ring-offset-1');
+                else btn.classList.remove('ring-2', 'ring-offset-1');
+            });
+            
+            const targetVal = currentSubSource[macro];
+            
+            if (targetVal <= 0.5) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">O alimento base tem quase 0g deste nutriente.</td></tr>`;
+                return;
+            }
+
+            // Find candidates
+            const candidates = foodDatabase.map(f => {
+                // macro content per 1g of product
+                const contentPerGram = f[macro] / 100;
+                
+                if (contentPerGram <= 0) return null;
+                
+                // Qty needed to match targetVal
+                const neededQty = targetVal / contentPerGram;
+                
+                // Calculate resulting Calories of this substitute portion
+                const resultingCal = (f.cal / 100) * neededQty;
+                const calDiff = resultingCal - currentSubSource.cal;
+                
+                return {
+                    name: f.name,
+                    qty: neededQty,
+                    calDiff: calDiff
+                };
+            }).filter(x => x !== null);
+            
+            // Sort by lowest Calorie Difference to keep diet balanced
+            candidates.sort((a,b) => Math.abs(a.calDiff) - Math.abs(b.calDiff));
+            
+            // Show top 20
+            candidates.slice(0, 20).forEach(c => {
+                const tr = document.createElement('tr');
+                const diffClass = c.calDiff > 0 ? 'text-red-500' : 'text-emerald-500';
+                const sign = c.calDiff > 0 ? '+' : '';
+                
+                tr.className = "hover:bg-slate-50 border-b border-slate-50";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium">${c.name}</td>
+                    <td class="p-3 text-center font-bold text-blue-600">${c.qty.toFixed(0)}g</td>
+                    <td class="p-3 text-center text-xs ${diffClass}">${sign}${c.calDiff.toFixed(0)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         function renderDiet() {
             const c = document.getElementById('diet-container'); c.innerHTML='';
             let dt = {cal:0, c:0, p:0, f:0};
@@ -1297,7 +1485,14 @@
                                 <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'carb',this.innerText)" title="Clique para editar">C: ${f.totalCarb.toFixed(0)}</td>
                                 <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'prot',this.innerText)" title="Clique para editar">P: ${f.totalProt.toFixed(0)}</td>
                                 <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'fat',this.innerText)" title="Clique para editar">G: ${f.totalFat.toFixed(0)}</td>
-                                <td class="p-3 text-center w-24 col-actions no-print"><div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100"><button onclick="moveFood(${m.id},${originalIndex},-1)" class="text-slate-400 hover:text-blue-500"><i class="fa-solid fa-chevron-up"></i></button><button onclick="moveFood(${m.id},${originalIndex},1)" class="text-slate-400 hover:text-blue-500"><i class="fa-solid fa-chevron-down"></i></button><button onclick="removeFood(${m.id},${originalIndex})" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-times"></i></button></div></td>
+                                <td class="p-3 text-center w-28 col-actions no-print">
+                                    <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100">
+                                        <button onclick="openSubstitutionModal(${m.id}, ${originalIndex})" class="text-indigo-400 hover:text-indigo-600 px-1" title="Encontrar Substituto"><i class="fa-solid fa-exchange-alt"></i></button>
+                                        <button onclick="moveFood(${m.id},${originalIndex},-1)" class="text-slate-400 hover:text-blue-500 px-1"><i class="fa-solid fa-chevron-up"></i></button>
+                                        <button onclick="moveFood(${m.id},${originalIndex},1)" class="text-slate-400 hover:text-blue-500 px-1"><i class="fa-solid fa-chevron-down"></i></button>
+                                        <button onclick="removeFood(${m.id},${originalIndex})" class="text-slate-300 hover:text-red-500 px-1"><i class="fa-solid fa-times"></i></button>
+                                    </div>
+                                </td>
                             </tr>`;
                         });
                         html+=`</tbody></table></div>`;
@@ -1316,7 +1511,7 @@
             });
 
             // CARD: INGESTÃO DIÁRIA (DARK) - Atualizado com nomes completos e emoji 🍎
-            c.innerHTML += `<div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 break-inside-avoid mt-6"><div class="p-4 border-b border-slate-700 flex justify-between"><h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-chart-pie text-emerald-400"></i> 🍎 Ingestão Diária</h3><span class="text-xs text-slate-400">(Opções A)</span></div><div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calorias</div><div class="text-3xl font-bold">${dt.cal.toFixed(0)}</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Carboidratos</div><div class="text-2xl font-bold text-blue-400">${dt.c.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Proteínas</div><div class="text-2xl font-bold text-emerald-400">${dt.p.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Gorduras</div><div class="text-2xl font-bold text-yellow-400">${dt.f.toFixed(0)}g</div></div></div></div>`;
+            c.innerHTML += `<div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 break-inside-avoid mt-6"><div class="p-4 border-b border-slate-700 flex justify-between"><h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-chart-pie text-emerald-400"></i> 🍎 Ingestão Diária</h3><span class="text-xs text-slate-400">(Opções A)</span></div><div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calorias</div><div class="text-3xl font-bold">${dt.cal.toFixed(0)}</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Carboidrato</div><div class="text-2xl font-bold text-blue-400">${dt.c.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Proteína</div><div class="text-2xl font-bold text-emerald-400">${dt.p.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Gordura</div><div class="text-2xl font-bold text-yellow-400">${dt.f.toFixed(0)}g</div></div></div></div>`;
 
             // CARD: META DIÁRIA (AGORA DARK TAMBÉM) - Atualizado com nomes completos
             if(showGoals) {
@@ -1333,22 +1528,22 @@
                             <div class="text-3xl font-bold text-white">${tc.toFixed(0)}</div>
                         </div>
                         <div>
-                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Carboidratos</div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Carboidrato</div>
                             <div class="text-2xl font-bold text-blue-400">${(tc*(pc/100)/4).toFixed(0)}g <span class="text-xs text-slate-500 font-normal">(${pc}%)</span></div>
                         </div>
                         <div>
-                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Proteínas</div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Proteína</div>
                             <div class="text-2xl font-bold text-emerald-400">${(tc*(pp/100)/4).toFixed(0)}g <span class="text-xs text-slate-500 font-normal">(${pp}%)</span></div>
                         </div>
                         <div>
-                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Gorduras</div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Gordura</div>
                             <div class="text-2xl font-bold text-yellow-400">${(tc*(pf/100)/9).toFixed(0)}g <span class="text-xs text-slate-500 font-normal">(${pf}%)</span></div>
                         </div>
                     </div>
                 </div>`;
             }
             // Widget Comparison - Atualizado com alinhamento à direita e nomes completos
-            const w=document.getElementById('comparison-widget'); if(w) w.innerHTML=`<div class="flex justify-end border-b pb-1 mb-2 text-[11px] font-bold text-slate-500"><span>Consumido / Meta</span></div><div class="flex justify-between"><span class="text-slate-500">Calorias:</span><span class="font-bold ${dt.cal-tc>100?'text-red-500':'text-green-500'}">${dt.cal.toFixed(0)} / ${tc.toFixed(0)}</span></div><div class="flex justify-between"><span class="text-blue-500">Carboidratos:</span><span>${dt.c.toFixed(0)} / ${(tc*(pc/100)/4).toFixed(0)}</span></div><div class="flex justify-between"><span class="text-emerald-500">Proteínas:</span><span>${dt.p.toFixed(0)} / ${(tc*(pp/100)/4).toFixed(0)}</span></div><div class="flex justify-between"><span class="text-yellow-500">Gorduras:</span><span>${dt.f.toFixed(0)} / ${(tc*(pf/100)/9).toFixed(0)}</span></div>`;
+            const w=document.getElementById('comparison-widget'); if(w) w.innerHTML=`<div class="flex justify-end border-b pb-1 mb-2 text-[11px] font-bold text-slate-500"><span>Consumido / Meta</span></div><div class="flex justify-between"><span class="text-slate-500">Calorias:</span><span class="font-bold ${dt.cal-tc>100?'text-red-500':'text-green-500'}">${dt.cal.toFixed(0)} / ${tc.toFixed(0)}</span></div><div class="flex justify-between"><span class="text-blue-500">Carboidrato:</span><span>${dt.c.toFixed(0)}g / ${(tc*(pc/100)/4).toFixed(0)}g</span></div><div class="flex justify-between"><span class="text-emerald-500">Proteína:</span><span>${dt.p.toFixed(0)}g / ${(tc*(pp/100)/4).toFixed(0)}g</span></div><div class="flex justify-between"><span class="text-yellow-500">Gordura:</span><span>${dt.f.toFixed(0)}g / ${(tc*(pf/100)/9).toFixed(0)}g</span></div>`;
         }
 
         function addToPlan() {
