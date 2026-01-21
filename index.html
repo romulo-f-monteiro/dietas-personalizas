@@ -718,8 +718,9 @@
                     <thead class="bg-slate-50 text-slate-500 font-bold text-xs sticky top-0 border-b">
                         <tr>
                             <th class="p-3">Alimento Sugerido</th>
-                            <th class="p-3 text-center w-24">Qtd Necessária</th>
+                            <th class="p-3 text-center w-24">Qtd</th>
                             <th class="p-3 text-center w-20">Dif. Kcal</th>
+                            <th class="p-3 text-center w-24">Ação</th>
                         </tr>
                     </thead>
                     <tbody id="sub-list" class="divide-y divide-slate-100 text-slate-700">
@@ -994,6 +995,8 @@
         let showGoals = true;
         let currentPatientId = null;
         let saveTimeout;
+        let currentSubMealId = null;
+        let currentSubFoodIndex = null;
 
         const themes = {
             emerald: { primary: '#059669', hover: '#047857', light: '#ecfdf5', text: '#065f46', border: '#d1fae5' },
@@ -1367,6 +1370,8 @@
         // --- SISTEMA DE SUBSTITUIÇÃO (NOVO) ---
         let currentSubSource = null;
         function openSubstitutionModal(mealId, foodIndex) {
+            currentSubMealId = mealId; // Salva contexto
+            currentSubFoodIndex = foodIndex; // Salva contexto
             const meal = dietMeals.find(m => m.id === mealId);
             if (!meal || !meal.foods[foodIndex]) return;
             const f = meal.foods[foodIndex];
@@ -1396,6 +1401,37 @@
         
         function closeSubModal() { document.getElementById('substitution-modal').classList.add('hidden'); }
         
+        function confirmSubstitution(newId, newQty) {
+            const m = dietMeals.find(x => x.id === currentSubMealId);
+            if(!m || !m.foods[currentSubFoodIndex]) return;
+
+            const oldFood = m.foods[currentSubFoodIndex];
+            const newFoodDb = foodDatabase.find(f => f.id === newId);
+
+            if(!newFoodDb) return;
+
+            const fac = newQty / 100;
+
+            // Construct new food object with calculated macros
+            const newFoodObj = {
+                ...newFoodDb, // id, name, cal (base), carb (base), etc.
+                qty: newQty,
+                option: oldFood.option, // Keep original option (A, B, C)
+                totalCal: newFoodDb.cal * fac,
+                totalCarb: newFoodDb.carb * fac,
+                totalProt: newFoodDb.prot * fac,
+                totalFat: newFoodDb.fat * fac
+            };
+
+            // Replace in array
+            m.foods[currentSubFoodIndex] = newFoodObj;
+
+            renderDiet();
+            triggerAutoSave();
+            closeSubModal();
+            showToast("Alimento substituído com sucesso!");
+        }
+
         function filterSubstitutes(macro) {
             const tbody = document.getElementById('sub-list');
             tbody.innerHTML = '';
@@ -1410,7 +1446,7 @@
             const targetVal = currentSubSource[macro];
             
             if (targetVal <= 0.5) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">O alimento base tem quase 0g deste nutriente.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">O alimento base tem quase 0g deste nutriente.</td></tr>`;
                 return;
             }
 
@@ -1429,6 +1465,7 @@
                 const calDiff = resultingCal - currentSubSource.cal;
                 
                 return {
+                    id: f.id,
                     name: f.name,
                     qty: neededQty,
                     calDiff: calDiff
@@ -1449,6 +1486,11 @@
                     <td class="p-3 font-medium">${c.name}</td>
                     <td class="p-3 text-center font-bold text-blue-600">${c.qty.toFixed(0)}g</td>
                     <td class="p-3 text-center text-xs ${diffClass}">${sign}${c.calDiff.toFixed(0)}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="confirmSubstitution(${c.id}, ${c.qty})" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-bold px-3 py-1 rounded transition">
+                            Trocar
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
