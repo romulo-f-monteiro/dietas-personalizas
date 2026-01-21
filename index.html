@@ -689,9 +689,9 @@
         </main>
     </div>
 
-    <!-- MODAL DE SUBSTITUIÇÃO -->
+    <!-- MODAL DE SUBSTITUIÇÃO (ATUALIZADO) -->
     <div id="substitution-modal" class="fixed inset-0 modal-overlay z-[60] hidden flex items-center justify-center backdrop-blur-sm p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh]">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh]">
             <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
                 <h3 class="font-bold text-lg"><i class="fa-solid fa-exchange-alt"></i> Encontrar Substituto</h3>
                 <button onclick="closeSubModal()" class="text-indigo-200 hover:text-white"><i class="fa-solid fa-times"></i></button>
@@ -715,12 +715,15 @@
 
             <div class="flex-1 overflow-y-auto custom-scroll p-0">
                 <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-50 text-slate-500 font-bold text-xs sticky top-0 border-b">
+                    <thead class="bg-slate-50 text-slate-500 font-bold text-xs sticky top-0 border-b bg-white z-10 shadow-sm">
                         <tr>
                             <th class="p-3">Alimento Sugerido</th>
-                            <th class="p-3 text-center w-24">Qtd</th>
-                            <th class="p-3 text-center w-20">Dif. Kcal</th>
-                            <th class="p-3 text-center w-24">Ação</th>
+                            <th class="p-3 text-center w-16">Qtd</th>
+                            <th class="p-3 text-center w-14 text-[10px]">Dif. Kcal</th>
+                            <th class="p-3 text-center w-14 text-[10px]">Dif. Carb</th>
+                            <th class="p-3 text-center w-14 text-[10px]">Dif. Prot</th>
+                            <th class="p-3 text-center w-14 text-[10px]">Dif. Gord</th>
+                            <th class="p-3 text-center w-20">Ação</th>
                         </tr>
                     </thead>
                     <tbody id="sub-list" class="divide-y divide-slate-100 text-slate-700">
@@ -1446,9 +1449,20 @@
             const targetVal = currentSubSource[macro];
             
             if (targetVal <= 0.5) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">O alimento base tem quase 0g deste nutriente.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">O alimento base tem quase 0g deste nutriente.</td></tr>`;
                 return;
             }
+
+            // Helper for diff styling
+            const formatDiff = (val) => {
+                const v = Math.round(val);
+                const sign = v > 0 ? '+' : '';
+                // Simple color logic for diffs
+                let color = 'text-slate-400';
+                if(v > 2) color = 'text-red-500 font-bold'; 
+                else if(v < -2) color = 'text-emerald-600 font-bold';
+                return `<span class="${color} text-[10px] font-mono whitespace-nowrap">${sign}${v}</span>`;
+            };
 
             // Find candidates
             const candidates = foodDatabase.map(f => {
@@ -1460,34 +1474,49 @@
                 // Qty needed to match targetVal
                 const neededQty = targetVal / contentPerGram;
                 
-                // Calculate resulting Calories of this substitute portion
+                // Calculate resulting Macros of this substitute portion
                 const resultingCal = (f.cal / 100) * neededQty;
-                const calDiff = resultingCal - currentSubSource.cal;
+                const resultingCarb = (f.carb / 100) * neededQty;
+                const resultingProt = (f.prot / 100) * neededQty;
+                const resultingFat = (f.fat / 100) * neededQty;
+
+                const diffs = {
+                    cal: resultingCal - currentSubSource.cal,
+                    carb: resultingCarb - currentSubSource.carb,
+                    prot: resultingProt - currentSubSource.prot,
+                    fat: resultingFat - currentSubSource.fat
+                };
                 
                 return {
                     id: f.id,
                     name: f.name,
                     qty: neededQty,
-                    calDiff: calDiff
+                    diffs: diffs,
+                    // Use Calorie diff as sorting metric (keep diet balanced)
+                    sortMetric: Math.abs(diffs.cal)
                 };
             }).filter(x => x !== null);
             
             // Sort by lowest Calorie Difference to keep diet balanced
-            candidates.sort((a,b) => Math.abs(a.calDiff) - Math.abs(b.calDiff));
+            candidates.sort((a,b) => a.sortMetric - b.sortMetric);
             
             // Show top 20
             candidates.slice(0, 20).forEach(c => {
                 const tr = document.createElement('tr');
-                const diffClass = c.calDiff > 0 ? 'text-red-500' : 'text-emerald-500';
-                const sign = c.calDiff > 0 ? '+' : '';
-                
                 tr.className = "hover:bg-slate-50 border-b border-slate-50";
+                
+                // CORREÇÃO: Arredondar a quantidade para inteiro antes de usar
+                const roundedQty = Math.round(c.qty);
+
                 tr.innerHTML = `
-                    <td class="p-3 font-medium">${c.name}</td>
-                    <td class="p-3 text-center font-bold text-blue-600">${c.qty.toFixed(0)}g</td>
-                    <td class="p-3 text-center text-xs ${diffClass}">${sign}${c.calDiff.toFixed(0)}</td>
+                    <td class="p-3 font-medium text-sm truncate max-w-[200px]" title="${c.name}">${c.name}</td>
+                    <td class="p-3 text-center font-bold text-blue-600 text-xs">${roundedQty}g</td>
+                    <td class="p-3 text-center">${formatDiff(c.diffs.cal)}</td>
+                    <td class="p-3 text-center">${formatDiff(c.diffs.carb)}</td>
+                    <td class="p-3 text-center">${formatDiff(c.diffs.prot)}</td>
+                    <td class="p-3 text-center">${formatDiff(c.diffs.fat)}</td>
                     <td class="p-3 text-center">
-                        <button onclick="confirmSubstitution(${c.id}, ${c.qty})" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-bold px-3 py-1 rounded transition">
+                        <button onclick="confirmSubstitution(${c.id}, ${roundedQty})" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-bold px-3 py-1 rounded transition">
                             Trocar
                         </button>
                     </td>
