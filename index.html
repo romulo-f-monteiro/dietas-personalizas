@@ -421,6 +421,12 @@
                                 <input type="number" id="target-cal" class="w-full border border-slate-300 rounded p-2 text-center font-bold text-slate-700 focus:ring-2 focus:ring-blue-200 outline-none" value="2000" onkeyup="renderDiet(); triggerAutoSave();">
                             </div>
 
+                             <!-- NOVO: META DE FIBRAS -->
+                             <div>
+                                <label class="text-xs font-bold text-slate-500">Meta de Fibras (g)</label>
+                                <input type="number" id="target-fiber" class="w-full border border-slate-300 rounded p-2 text-center font-bold text-slate-700 focus:ring-2 focus:ring-emerald-200 outline-none" value="25" onkeyup="renderDiet(); triggerAutoSave();" placeholder="Ex: 25">
+                            </div>
+
                             <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
                                 <div class="flex justify-between text-[10px] text-slate-400 uppercase font-bold mb-1">
                                     <span>Carbo</span>
@@ -566,6 +572,11 @@
                                 <div>
                                     <label class="text-[10px] text-slate-400 font-bold ml-1">Gordura</label>
                                     <input type="number" id="new-fat" placeholder="Gord (g)" class="w-full p-2 text-sm border rounded">
+                                </div>
+                                <!-- NOVO CAMPO FIBRAS -->
+                                <div class="col-span-2">
+                                    <label class="text-[10px] text-slate-400 font-bold ml-1">Fibras</label>
+                                    <input type="number" id="new-fiber" placeholder="Fibras (g)" class="w-full p-2 text-sm border rounded">
                                 </div>
                             </div>
                             <button onclick="createCustomFood()" class="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 py-2 rounded-lg text-sm font-semibold transition border border-blue-200 mt-2">
@@ -723,6 +734,7 @@
                             <th class="p-3 text-center w-14 text-[10px]">Dif. Carb</th>
                             <th class="p-3 text-center w-14 text-[10px]">Dif. Prot</th>
                             <th class="p-3 text-center w-14 text-[10px]">Dif. Gord</th>
+                            <th class="p-3 text-center w-14 text-[10px]">Dif. Fibras</th> <!-- Nova Coluna Fibras -->
                             <th class="p-3 text-center w-20">Ação</th>
                         </tr>
                     </thead>
@@ -800,187 +812,188 @@
 
         // --- DADOS DA TABELA TACO (200+ Alimentos) ---
         // Valores por 100g de parte comestível
+        // ATUALIZAÇÃO: Campo 'fiber' (Fibras) adicionado
         let foodDatabase = [
             // === CEREAIS, LEGUMINOSAS E DERIVADOS ===
-            { id: 101, name: "Arroz Integral, Cozido", cal: 124, carb: 25.8, prot: 2.6, fat: 1.0 },
-            { id: 102, name: "Arroz Tipo 1, Cozido", cal: 128, carb: 28.1, prot: 2.5, fat: 0.2 },
-            { id: 103, name: "Arroz Tipo 2, Cozido", cal: 130, carb: 28.2, prot: 2.6, fat: 0.4 },
-            { id: 104, name: "Aveia, Flocos Crus", cal: 394, carb: 66.6, prot: 13.9, fat: 8.5 },
-            { id: 105, name: "Biscoito, Cream Cracker", cal: 432, carb: 68.7, prot: 10.1, fat: 14.4 },
-            { id: 106, name: "Biscoito, Maria", cal: 436, carb: 75.2, prot: 7.9, fat: 12.5 },
-            { id: 107, name: "Biscoito, Recheado, Chocolate", cal: 472, carb: 70.5, prot: 6.4, fat: 19.6 },
-            { id: 108, name: "Bolo, Mistura p/ Preparo, Chocolate", cal: 398, carb: 80.4, prot: 6.2, fat: 5.7 },
-            { id: 109, name: "Canjica Branca, Crua", cal: 358, carb: 78.6, prot: 7.2, fat: 1.1 },
-            { id: 110, name: "Cereal Matinal, Milho", cal: 377, carb: 83.8, prot: 7.2, fat: 1.2 },
-            { id: 111, name: "Creme de Milho, Pó", cal: 337, carb: 80.1, prot: 4.8, fat: 0.8 },
-            { id: 112, name: "Curau, Milho Verde", cal: 78, carb: 12.8, prot: 2.3, fat: 2.3 },
-            { id: 113, name: "Farinha de Aveia", cal: 404, carb: 69.1, prot: 13.5, fat: 9.1 },
-            { id: 114, name: "Farinha de Mandioca, Crua", cal: 361, carb: 87.9, prot: 1.6, fat: 0.3 },
-            { id: 115, name: "Farinha de Milho, Amarela", cal: 370, carb: 79.1, prot: 7.2, fat: 1.5 },
-            { id: 116, name: "Farinha de Rosca", cal: 371, carb: 75.8, prot: 11.2, fat: 1.5 },
-            { id: 117, name: "Farinha de Trigo", cal: 360, carb: 75.1, prot: 9.8, fat: 1.4 },
-            { id: 118, name: "Feijão Carioca, Cozido (50% Caldo)", cal: 76, carb: 13.6, prot: 4.8, fat: 0.5 },
-            { id: 119, name: "Feijão Fradinho, Cozido", cal: 78, carb: 13.7, prot: 5.1, fat: 0.6 },
-            { id: 120, name: "Feijão Preto, Cozido", cal: 77, carb: 14.0, prot: 4.5, fat: 0.5 },
-            { id: 121, name: "Grão de Bico, Cozido", cal: 164, carb: 27.4, prot: 8.9, fat: 2.6 },
-            { id: 122, name: "Lentilha, Cozida", cal: 93, carb: 16.3, prot: 6.3, fat: 0.5 },
-            { id: 123, name: "Macarrão, Trigo, Cozido", cal: 157, carb: 30.9, prot: 5.8, fat: 0.9 },
-            { id: 124, name: "Macarrão Instantâneo (Miojo)", cal: 436, carb: 60.1, prot: 8.8, fat: 17.2 },
-            { id: 125, name: "Milho Verde, Enlatado, Drenado", cal: 138, carb: 28.6, prot: 3.2, fat: 2.4 },
-            { id: 126, name: "Pão de Forma, Integral", cal: 253, carb: 49.9, prot: 9.4, fat: 3.7 },
-            { id: 127, name: "Pão de Forma, Tradicional", cal: 269, carb: 53.6, prot: 8.2, fat: 3.3 },
-            { id: 128, name: "Pão de Queijo, Assado", cal: 363, carb: 34.0, prot: 5.1, fat: 24.6 },
-            { id: 129, name: "Pão Francês", cal: 300, carb: 58.6, prot: 8.0, fat: 3.1 },
-            { id: 130, name: "Pipoca, Com Sal e Óleo", cal: 448, carb: 57.1, prot: 9.9, fat: 19.4 },
-            { id: 131, name: "Polenta, Cozida", cal: 92, carb: 20.9, prot: 2.2, fat: 0.3 },
-            { id: 132, name: "Soja, Cozida", cal: 173, carb: 9.9, prot: 16.6, fat: 8.9 },
-            { id: 133, name: "Tapioca, Goma Hidratada", cal: 236, carb: 54.8, prot: 0.0, fat: 0.0 },
-            { id: 134, name: "Torrada, Pão Francês", cal: 377, carb: 74.6, prot: 10.5, fat: 3.6 },
-            { id: 135, name: "Trigo para Kibe, Cru", cal: 342, carb: 72.9, prot: 11.2, fat: 1.5 },
+            { id: 101, name: "Arroz Integral, Cozido", cal: 124, carb: 25.8, prot: 2.6, fat: 1.0, fiber: 2.7 },
+            { id: 102, name: "Arroz Tipo 1, Cozido", cal: 128, carb: 28.1, prot: 2.5, fat: 0.2, fiber: 1.6 },
+            { id: 103, name: "Arroz Tipo 2, Cozido", cal: 130, carb: 28.2, prot: 2.6, fat: 0.4, fiber: 1.1 },
+            { id: 104, name: "Aveia, Flocos Crus", cal: 394, carb: 66.6, prot: 13.9, fat: 8.5, fiber: 9.1 },
+            { id: 105, name: "Biscoito, Cream Cracker", cal: 432, carb: 68.7, prot: 10.1, fat: 14.4, fiber: 3.5 },
+            { id: 106, name: "Biscoito, Maria", cal: 436, carb: 75.2, prot: 7.9, fat: 12.5, fiber: 2.2 },
+            { id: 107, name: "Biscoito, Recheado, Chocolate", cal: 472, carb: 70.5, prot: 6.4, fat: 19.6, fiber: 2.0 },
+            { id: 108, name: "Bolo, Mistura p/ Preparo, Chocolate", cal: 398, carb: 80.4, prot: 6.2, fat: 5.7, fiber: 2.0 },
+            { id: 109, name: "Canjica Branca, Crua", cal: 358, carb: 78.6, prot: 7.2, fat: 1.1, fiber: 4.8 },
+            { id: 110, name: "Cereal Matinal, Milho", cal: 377, carb: 83.8, prot: 7.2, fat: 1.2, fiber: 4.1 },
+            { id: 111, name: "Creme de Milho, Pó", cal: 337, carb: 80.1, prot: 4.8, fat: 0.8, fiber: 1.0 },
+            { id: 112, name: "Curau, Milho Verde", cal: 78, carb: 12.8, prot: 2.3, fat: 2.3, fiber: 0.5 },
+            { id: 113, name: "Farinha de Aveia", cal: 404, carb: 69.1, prot: 13.5, fat: 9.1, fiber: 9.0 },
+            { id: 114, name: "Farinha de Mandioca, Crua", cal: 361, carb: 87.9, prot: 1.6, fat: 0.3, fiber: 6.4 },
+            { id: 115, name: "Farinha de Milho, Amarela", cal: 370, carb: 79.1, prot: 7.2, fat: 1.5, fiber: 5.5 },
+            { id: 116, name: "Farinha de Rosca", cal: 371, carb: 75.8, prot: 11.2, fat: 1.5, fiber: 4.8 },
+            { id: 117, name: "Farinha de Trigo", cal: 360, carb: 75.1, prot: 9.8, fat: 1.4, fiber: 2.3 },
+            { id: 118, name: "Feijão Carioca, Cozido (50% Caldo)", cal: 76, carb: 13.6, prot: 4.8, fat: 0.5, fiber: 8.5 },
+            { id: 119, name: "Feijão Fradinho, Cozido", cal: 78, carb: 13.7, prot: 5.1, fat: 0.6, fiber: 7.2 },
+            { id: 120, name: "Feijão Preto, Cozido", cal: 77, carb: 14.0, prot: 4.5, fat: 0.5, fiber: 8.4 },
+            { id: 121, name: "Grão de Bico, Cozido", cal: 164, carb: 27.4, prot: 8.9, fat: 2.6, fiber: 7.6 },
+            { id: 122, name: "Lentilha, Cozida", cal: 93, carb: 16.3, prot: 6.3, fat: 0.5, fiber: 7.9 },
+            { id: 123, name: "Macarrão, Trigo, Cozido", cal: 157, carb: 30.9, prot: 5.8, fat: 0.9, fiber: 1.8 },
+            { id: 124, name: "Macarrão Instantâneo (Miojo)", cal: 436, carb: 60.1, prot: 8.8, fat: 17.2, fiber: 2.8 },
+            { id: 125, name: "Milho Verde, Enlatado, Drenado", cal: 138, carb: 28.6, prot: 3.2, fat: 2.4, fiber: 4.6 },
+            { id: 126, name: "Pão de Forma, Integral", cal: 253, carb: 49.9, prot: 9.4, fat: 3.7, fiber: 6.9 },
+            { id: 127, name: "Pão de Forma, Tradicional", cal: 269, carb: 53.6, prot: 8.2, fat: 3.3, fiber: 2.5 },
+            { id: 128, name: "Pão de Queijo, Assado", cal: 363, carb: 34.0, prot: 5.1, fat: 24.6, fiber: 0.6 },
+            { id: 129, name: "Pão Francês", cal: 300, carb: 58.6, prot: 8.0, fat: 3.1, fiber: 2.3 },
+            { id: 130, name: "Pipoca, Com Sal e Óleo", cal: 448, carb: 57.1, prot: 9.9, fat: 19.4, fiber: 14.3 },
+            { id: 131, name: "Polenta, Cozida", cal: 92, carb: 20.9, prot: 2.2, fat: 0.3, fiber: 1.5 },
+            { id: 132, name: "Soja, Cozida", cal: 173, carb: 9.9, prot: 16.6, fat: 8.9, fiber: 6.1 },
+            { id: 133, name: "Tapioca, Goma Hidratada", cal: 236, carb: 54.8, prot: 0.0, fat: 0.0, fiber: 0.2 },
+            { id: 134, name: "Torrada, Pão Francês", cal: 377, carb: 74.6, prot: 10.5, fat: 3.6, fiber: 3.0 },
+            { id: 135, name: "Trigo para Kibe, Cru", cal: 342, carb: 72.9, prot: 11.2, fat: 1.5, fiber: 12.2 },
 
             // === VERDURAS, LEGUMES E TUBÉRCULOS ===
-            { id: 201, name: "Abóbora, Cabotian, Cozida", cal: 48, carb: 10.8, prot: 1.4, fat: 0.7 },
-            { id: 202, name: "Abobrinha, Italiana, Cozida", cal: 15, carb: 3.0, prot: 1.1, fat: 0.1 },
-            { id: 203, name: "Acelga, Crua", cal: 21, carb: 4.6, prot: 1.4, fat: 0.1 },
-            { id: 204, name: "Agrião, Cru", cal: 17, carb: 2.3, prot: 2.7, fat: 0.2 },
-            { id: 205, name: "Aipim / Mandioca, Cozida", cal: 125, carb: 30.1, prot: 0.6, fat: 0.3 },
-            { id: 206, name: "Aipim, Frito", cal: 300, carb: 50.3, prot: 1.4, fat: 11.2 },
-            { id: 207, name: "Alface, Crespa, Crua", cal: 11, carb: 1.7, prot: 1.3, fat: 0.2 },
-            { id: 208, name: "Alho, Cru", cal: 113, carb: 23.9, prot: 7.0, fat: 0.2 },
-            { id: 209, name: "Batata Doce, Cozida", cal: 77, carb: 18.4, prot: 0.6, fat: 0.1 },
-            { id: 210, name: "Batata Inglesa, Cozida", cal: 52, carb: 11.9, prot: 1.2, fat: 0.0 },
-            { id: 211, name: "Batata Inglesa, Frita", cal: 267, carb: 35.6, prot: 5.0, fat: 13.1 },
-            { id: 212, name: "Berinjela, Cozida", cal: 19, carb: 4.5, prot: 0.7, fat: 0.1 },
-            { id: 213, name: "Beterraba, Cozida", cal: 32, carb: 7.2, prot: 1.3, fat: 0.1 },
-            { id: 214, name: "Beterraba, Crua", cal: 48, carb: 11.1, prot: 1.6, fat: 0.1 },
-            { id: 215, name: "Brócolis, Cozido", cal: 25, carb: 4.4, prot: 2.1, fat: 0.5 },
-            { id: 216, name: "Cebola, Crua", cal: 39, carb: 8.9, prot: 1.7, fat: 0.1 },
-            { id: 217, name: "Cenoura, Cozida", cal: 30, carb: 6.7, prot: 0.8, fat: 0.2 },
-            { id: 218, name: "Cenoura, Crua", cal: 34, carb: 7.7, prot: 1.3, fat: 0.2 },
-            { id: 219, name: "Chuchu, Cozido", cal: 19, carb: 4.8, prot: 0.4, fat: 0.0 },
-            { id: 220, name: "Couve, Refogada", cal: 90, carb: 8.7, prot: 2.9, fat: 5.7 },
-            { id: 221, name: "Couve-Flor, Cozida", cal: 19, carb: 3.9, prot: 1.2, fat: 0.3 },
-            { id: 222, name: "Espinafre, Refogado", cal: 67, carb: 4.2, prot: 2.7, fat: 5.4 },
-            { id: 223, name: "Inhame, Cozido", cal: 76, carb: 18.1, prot: 1.8, fat: 0.1 },
-            { id: 224, name: "Pepino, Cru", cal: 10, carb: 2.0, prot: 0.9, fat: 0.0 },
-            { id: 225, name: "Pimentão, Verde, Cru", cal: 21, carb: 4.9, prot: 1.1, fat: 0.2 },
-            { id: 226, name: "Quiabo, Cozido", cal: 22, carb: 4.7, prot: 1.4, fat: 0.2 },
-            { id: 227, name: "Repolho, Branco, Cru", cal: 17, carb: 3.9, prot: 0.9, fat: 0.1 },
-            { id: 228, name: "Rúcula, Crua", cal: 13, carb: 2.2, prot: 1.8, fat: 0.1 },
-            { id: 229, name: "Tomate, Salada", cal: 15, carb: 3.1, prot: 1.1, fat: 0.2 },
-            { id: 230, name: "Vagem, Cozida", cal: 25, carb: 5.3, prot: 1.8, fat: 0.2 },
+            { id: 201, name: "Abóbora, Cabotian, Cozida", cal: 48, carb: 10.8, prot: 1.4, fat: 0.7, fiber: 2.5 },
+            { id: 202, name: "Abobrinha, Italiana, Cozida", cal: 15, carb: 3.0, prot: 1.1, fat: 0.1, fiber: 1.6 },
+            { id: 203, name: "Acelga, Crua", cal: 21, carb: 4.6, prot: 1.4, fat: 0.1, fiber: 1.1 },
+            { id: 204, name: "Agrião, Cru", cal: 17, carb: 2.3, prot: 2.7, fat: 0.2, fiber: 2.1 },
+            { id: 205, name: "Aipim / Mandioca, Cozida", cal: 125, carb: 30.1, prot: 0.6, fat: 0.3, fiber: 1.6 },
+            { id: 206, name: "Aipim, Frito", cal: 300, carb: 50.3, prot: 1.4, fat: 11.2, fiber: 1.9 },
+            { id: 207, name: "Alface, Crespa, Crua", cal: 11, carb: 1.7, prot: 1.3, fat: 0.2, fiber: 1.8 },
+            { id: 208, name: "Alho, Cru", cal: 113, carb: 23.9, prot: 7.0, fat: 0.2, fiber: 4.3 },
+            { id: 209, name: "Batata Doce, Cozida", cal: 77, carb: 18.4, prot: 0.6, fat: 0.1, fiber: 2.2 },
+            { id: 210, name: "Batata Inglesa, Cozida", cal: 52, carb: 11.9, prot: 1.2, fat: 0.0, fiber: 1.3 },
+            { id: 211, name: "Batata Inglesa, Frita", cal: 267, carb: 35.6, prot: 5.0, fat: 13.1, fiber: 3.5 },
+            { id: 212, name: "Berinjela, Cozida", cal: 19, carb: 4.5, prot: 0.7, fat: 0.1, fiber: 2.5 },
+            { id: 213, name: "Beterraba, Cozida", cal: 32, carb: 7.2, prot: 1.3, fat: 0.1, fiber: 1.9 },
+            { id: 214, name: "Beterraba, Crua", cal: 48, carb: 11.1, prot: 1.6, fat: 0.1, fiber: 3.4 },
+            { id: 215, name: "Brócolis, Cozido", cal: 25, carb: 4.4, prot: 2.1, fat: 0.5, fiber: 3.4 },
+            { id: 216, name: "Cebola, Crua", cal: 39, carb: 8.9, prot: 1.7, fat: 0.1, fiber: 2.2 },
+            { id: 217, name: "Cenoura, Cozida", cal: 30, carb: 6.7, prot: 0.8, fat: 0.2, fiber: 2.6 },
+            { id: 218, name: "Cenoura, Crua", cal: 34, carb: 7.7, prot: 1.3, fat: 0.2, fiber: 3.2 },
+            { id: 219, name: "Chuchu, Cozido", cal: 19, carb: 4.8, prot: 0.4, fat: 0.0, fiber: 1.2 },
+            { id: 220, name: "Couve, Refogada", cal: 90, carb: 8.7, prot: 2.9, fat: 5.7, fiber: 5.7 },
+            { id: 221, name: "Couve-Flor, Cozida", cal: 19, carb: 3.9, prot: 1.2, fat: 0.3, fiber: 2.1 },
+            { id: 222, name: "Espinafre, Refogado", cal: 67, carb: 4.2, prot: 2.7, fat: 5.4, fiber: 2.5 },
+            { id: 223, name: "Inhame, Cozido", cal: 76, carb: 18.1, prot: 1.8, fat: 0.1, fiber: 1.7 },
+            { id: 224, name: "Pepino, Cru", cal: 10, carb: 2.0, prot: 0.9, fat: 0.0, fiber: 1.1 },
+            { id: 225, name: "Pimentão, Verde, Cru", cal: 21, carb: 4.9, prot: 1.1, fat: 0.2, fiber: 2.6 },
+            { id: 226, name: "Quiabo, Cozido", cal: 22, carb: 4.7, prot: 1.4, fat: 0.2, fiber: 1.8 },
+            { id: 227, name: "Repolho, Branco, Cru", cal: 17, carb: 3.9, prot: 0.9, fat: 0.1, fiber: 1.9 },
+            { id: 228, name: "Rúcula, Crua", cal: 13, carb: 2.2, prot: 1.8, fat: 0.1, fiber: 1.7 },
+            { id: 229, name: "Tomate, Salada", cal: 15, carb: 3.1, prot: 1.1, fat: 0.2, fiber: 1.2 },
+            { id: 230, name: "Vagem, Cozida", cal: 25, carb: 5.3, prot: 1.8, fat: 0.2, fiber: 1.2 },
 
             // === FRUTAS ===
-            { id: 301, name: "Abacate, Cru", cal: 96, carb: 6.0, prot: 1.2, fat: 8.4 },
-            { id: 302, name: "Abacaxi, Cru", cal: 48, carb: 12.3, prot: 0.9, fat: 0.1 },
-            { id: 303, name: "Acerola, Crua", cal: 33, carb: 8.0, prot: 0.9, fat: 0.2 },
-            { id: 304, name: "Ameixa, Preta, Crua", cal: 53, carb: 13.9, prot: 0.8, fat: 0.0 },
-            { id: 305, name: "Banana, Maçã, Crua", cal: 87, carb: 22.3, prot: 1.8, fat: 0.1 },
-            { id: 306, name: "Banana, Nanica, Crua", cal: 92, carb: 23.8, prot: 1.4, fat: 0.1 },
-            { id: 307, name: "Banana, Prata, Crua", cal: 98, carb: 26.0, prot: 1.3, fat: 0.1 },
-            { id: 308, name: "Caju, Cru", cal: 43, carb: 10.3, prot: 1.0, fat: 0.3 },
-            { id: 309, name: "Caqui, Chocolate, Cru", cal: 71, carb: 19.3, prot: 0.4, fat: 0.1 },
-            { id: 310, name: "Coco, Água de", cal: 22, carb: 5.3, prot: 0.0, fat: 0.0 },
-            { id: 311, name: "Coco, Cru", cal: 406, carb: 10.4, prot: 3.7, fat: 42.0 },
-            { id: 312, name: "Figo, Cru", cal: 41, carb: 10.2, prot: 1.0, fat: 0.2 },
-            { id: 313, name: "Goiaba, Branca, Crua", cal: 52, carb: 12.4, prot: 0.9, fat: 0.5 },
-            { id: 314, name: "Goiaba, Vermelha, Crua", cal: 54, carb: 13.0, prot: 1.1, fat: 0.4 },
-            { id: 315, name: "Kiwi, Cru", cal: 51, carb: 11.5, prot: 1.3, fat: 0.6 },
-            { id: 316, name: "Laranja, Lima, Crua", cal: 39, carb: 9.2, prot: 1.1, fat: 0.1 },
-            { id: 317, name: "Laranja, Pera, Crua", cal: 37, carb: 8.9, prot: 1.0, fat: 0.1 },
-            { id: 318, name: "Limão, Suco", cal: 29, carb: 11.1, prot: 1.1, fat: 0.0 },
-            { id: 319, name: "Maçã, Fuji, Com Casca", cal: 56, carb: 15.2, prot: 0.3, fat: 0.2 },
-            { id: 320, name: "Mamão, Formosa, Cru", cal: 45, carb: 11.6, prot: 0.8, fat: 0.1 },
-            { id: 321, name: "Mamão, Papaia, Cru", cal: 40, carb: 10.4, prot: 0.5, fat: 0.1 },
-            { id: 322, name: "Manga, Palmer, Crua", cal: 72, carb: 19.4, prot: 0.4, fat: 0.2 },
-            { id: 323, name: "Maracujá, Polpa, Crua", cal: 68, carb: 12.3, prot: 2.0, fat: 2.1 },
-            { id: 324, name: "Melancia, Crua", cal: 33, carb: 8.1, prot: 0.9, fat: 0.0 },
-            { id: 325, name: "Melão, Cru", cal: 29, carb: 7.5, prot: 0.7, fat: 0.0 },
-            { id: 326, name: "Morango, Cru", cal: 30, carb: 6.8, prot: 0.9, fat: 0.3 },
-            { id: 327, name: "Pera, Williams, Crua", cal: 53, carb: 14.0, prot: 0.6, fat: 0.1 },
-            { id: 328, name: "Pêssego, Cru", cal: 36, carb: 9.3, prot: 0.8, fat: 0.0 },
-            { id: 329, name: "Tangerina/Mexerica, Crua", cal: 38, carb: 9.3, prot: 0.7, fat: 0.1 },
-            { id: 330, name: "Uva, Itália, Crua", cal: 53, carb: 13.6, prot: 0.9, fat: 0.2 },
+            { id: 301, name: "Abacate, Cru", cal: 96, carb: 6.0, prot: 1.2, fat: 8.4, fiber: 6.3 },
+            { id: 302, name: "Abacaxi, Cru", cal: 48, carb: 12.3, prot: 0.9, fat: 0.1, fiber: 1.0 },
+            { id: 303, name: "Acerola, Crua", cal: 33, carb: 8.0, prot: 0.9, fat: 0.2, fiber: 1.5 },
+            { id: 304, name: "Ameixa, Preta, Crua", cal: 53, carb: 13.9, prot: 0.8, fat: 0.0, fiber: 2.4 },
+            { id: 305, name: "Banana, Maçã, Crua", cal: 87, carb: 22.3, prot: 1.8, fat: 0.1, fiber: 2.6 },
+            { id: 306, name: "Banana, Nanica, Crua", cal: 92, carb: 23.8, prot: 1.4, fat: 0.1, fiber: 1.9 },
+            { id: 307, name: "Banana, Prata, Crua", cal: 98, carb: 26.0, prot: 1.3, fat: 0.1, fiber: 2.0 },
+            { id: 308, name: "Caju, Cru", cal: 43, carb: 10.3, prot: 1.0, fat: 0.3, fiber: 1.7 },
+            { id: 309, name: "Caqui, Chocolate, Cru", cal: 71, carb: 19.3, prot: 0.4, fat: 0.1, fiber: 6.5 },
+            { id: 310, name: "Coco, Água de", cal: 22, carb: 5.3, prot: 0.0, fat: 0.0, fiber: 0.1 },
+            { id: 311, name: "Coco, Cru", cal: 406, carb: 10.4, prot: 3.7, fat: 42.0, fiber: 5.4 },
+            { id: 312, name: "Figo, Cru", cal: 41, carb: 10.2, prot: 1.0, fat: 0.2, fiber: 1.8 },
+            { id: 313, name: "Goiaba, Branca, Crua", cal: 52, carb: 12.4, prot: 0.9, fat: 0.5, fiber: 6.3 },
+            { id: 314, name: "Goiaba, Vermelha, Crua", cal: 54, carb: 13.0, prot: 1.1, fat: 0.4, fiber: 6.2 },
+            { id: 315, name: "Kiwi, Cru", cal: 51, carb: 11.5, prot: 1.3, fat: 0.6, fiber: 2.7 },
+            { id: 316, name: "Laranja, Lima, Crua", cal: 39, carb: 9.2, prot: 1.1, fat: 0.1, fiber: 1.8 },
+            { id: 317, name: "Laranja, Pera, Crua", cal: 37, carb: 8.9, prot: 1.0, fat: 0.1, fiber: 1.8 },
+            { id: 318, name: "Limão, Suco", cal: 29, carb: 11.1, prot: 1.1, fat: 0.0, fiber: 0.0 },
+            { id: 319, name: "Maçã, Fuji, Com Casca", cal: 56, carb: 15.2, prot: 0.3, fat: 0.2, fiber: 1.3 },
+            { id: 320, name: "Mamão, Formosa, Cru", cal: 45, carb: 11.6, prot: 0.8, fat: 0.1, fiber: 1.8 },
+            { id: 321, name: "Mamão, Papaia, Cru", cal: 40, carb: 10.4, prot: 0.5, fat: 0.1, fiber: 1.0 },
+            { id: 322, name: "Manga, Palmer, Crua", cal: 72, carb: 19.4, prot: 0.4, fat: 0.2, fiber: 1.6 },
+            { id: 323, name: "Maracujá, Polpa, Crua", cal: 68, carb: 12.3, prot: 2.0, fat: 2.1, fiber: 1.1 },
+            { id: 324, name: "Melancia, Crua", cal: 33, carb: 8.1, prot: 0.9, fat: 0.0, fiber: 0.1 },
+            { id: 325, name: "Melão, Cru", cal: 29, carb: 7.5, prot: 0.7, fat: 0.0, fiber: 0.3 },
+            { id: 326, name: "Morango, Cru", cal: 30, carb: 6.8, prot: 0.9, fat: 0.3, fiber: 1.7 },
+            { id: 327, name: "Pera, Williams, Crua", cal: 53, carb: 14.0, prot: 0.6, fat: 0.1, fiber: 3.0 },
+            { id: 328, name: "Pêssego, Cru", cal: 36, carb: 9.3, prot: 0.8, fat: 0.0, fiber: 1.4 },
+            { id: 329, name: "Tangerina/Mexerica, Crua", cal: 38, carb: 9.3, prot: 0.7, fat: 0.1, fiber: 2.7 },
+            { id: 330, name: "Uva, Itália, Crua", cal: 53, carb: 13.6, prot: 0.9, fat: 0.2, fiber: 0.9 },
 
-            // === CARNES, PESCADOS E OVOS ===
-            { id: 401, name: "Boi, Acém, Moído, Cozido", cal: 212, carb: 0.0, prot: 26.7, fat: 10.9 },
-            { id: 402, name: "Boi, Alcatra, Grelhada", cal: 241, carb: 0.0, prot: 31.9, fat: 11.6 },
-            { id: 403, name: "Boi, Contrafilé, Grelhado", cal: 278, carb: 0.0, prot: 32.4, fat: 15.5 },
-            { id: 404, name: "Boi, Costela, Assada", cal: 373, carb: 0.0, prot: 28.8, fat: 27.7 },
-            { id: 405, name: "Boi, Coxão Mole, Cozido", cal: 219, carb: 0.0, prot: 32.4, fat: 8.9 },
-            { id: 406, name: "Boi, Filé Mignon, Grelhado", cal: 220, carb: 0.0, prot: 32.8, fat: 8.8 },
-            { id: 407, name: "Boi, Fígado, Grelhado", cal: 225, carb: 4.2, prot: 29.9, fat: 9.0 },
-            { id: 408, name: "Boi, Músculo, Cozido", cal: 194, carb: 0.0, prot: 31.2, fat: 6.7 },
-            { id: 409, name: "Boi, Patinho, Grelhado", cal: 219, carb: 0.0, prot: 35.9, fat: 7.3 },
-            { id: 410, name: "Boi, Picanha, Grelhada", cal: 289, carb: 0.0, prot: 26.4, fat: 19.5 },
-            { id: 411, name: "Frango, Coração, Assado", cal: 207, carb: 0.6, prot: 25.6, fat: 10.9 },
-            { id: 412, name: "Frango, Coxa, Assada (com pele)", cal: 215, carb: 0.1, prot: 27.0, fat: 11.1 },
-            { id: 413, name: "Frango, Peito, Grelhado", cal: 159, carb: 0.0, prot: 32.0, fat: 2.5 },
-            { id: 414, name: "Frango, Sobrecoxa, Assada", cal: 260, carb: 0.0, prot: 23.0, fat: 18.0 },
-            { id: 415, name: "Linguiça, Calabresa, Frita", cal: 380, carb: 1.5, prot: 19.3, fat: 32.5 },
-            { id: 416, name: "Linguiça, Frango, Assada", cal: 236, carb: 1.7, prot: 21.0, fat: 16.0 },
-            { id: 417, name: "Ovo de Codorna, Inteiro", cal: 177, carb: 1.6, prot: 13.7, fat: 12.6 },
-            { id: 418, name: "Ovo de Galinha, Cozido", cal: 146, carb: 0.6, prot: 13.3, fat: 9.5 },
-            { id: 419, name: "Ovo de Galinha, Frito", cal: 240, carb: 1.2, prot: 15.6, fat: 18.6 },
-            { id: 420, name: "Peixe, Atum, Conserva Óleo", cal: 166, carb: 0.0, prot: 26.2, fat: 6.0 },
-            { id: 421, name: "Peixe, Bacalhau, Assado", cal: 110, carb: 0.0, prot: 24.0, fat: 1.2 },
-            { id: 422, name: "Peixe, Cação, Cozido", cal: 116, carb: 0.0, prot: 25.6, fat: 0.7 },
-            { id: 423, name: "Peixe, Merluza, Filé, Assado", cal: 122, carb: 0.0, prot: 26.6, fat: 0.9 },
-            { id: 424, name: "Peixe, Salmão, Grelhado", cal: 229, carb: 0.0, prot: 24.0, fat: 14.0 },
-            { id: 425, name: "Peixe, Sardinha, Assada", cal: 164, carb: 0.0, prot: 32.2, fat: 3.0 },
-            { id: 426, name: "Peixe, Tilápia, Grelhada", cal: 128, carb: 0.0, prot: 26.1, fat: 2.7 },
-            { id: 427, name: "Porco, Bisteca, Grelhada", cal: 280, carb: 0.0, prot: 28.6, fat: 17.4 },
-            { id: 428, name: "Porco, Lombo, Assado", cal: 210, carb: 0.0, prot: 35.7, fat: 6.4 },
-            { id: 429, name: "Presunto, Cozido", cal: 120, carb: 1.0, prot: 16.5, fat: 5.5 },
-            { id: 430, name: "Salsicha, Cozida", cal: 246, carb: 2.0, prot: 13.0, fat: 21.0 },
+            // === CARNES, PESCADOS E OVOS (Geralmente 0 fibra) ===
+            { id: 401, name: "Boi, Acém, Moído, Cozido", cal: 212, carb: 0.0, prot: 26.7, fat: 10.9, fiber: 0 },
+            { id: 402, name: "Boi, Alcatra, Grelhada", cal: 241, carb: 0.0, prot: 31.9, fat: 11.6, fiber: 0 },
+            { id: 403, name: "Boi, Contrafilé, Grelhado", cal: 278, carb: 0.0, prot: 32.4, fat: 15.5, fiber: 0 },
+            { id: 404, name: "Boi, Costela, Assada", cal: 373, carb: 0.0, prot: 28.8, fat: 27.7, fiber: 0 },
+            { id: 405, name: "Boi, Coxão Mole, Cozido", cal: 219, carb: 0.0, prot: 32.4, fat: 8.9, fiber: 0 },
+            { id: 406, name: "Boi, Filé Mignon, Grelhado", cal: 220, carb: 0.0, prot: 32.8, fat: 8.8, fiber: 0 },
+            { id: 407, name: "Boi, Fígado, Grelhado", cal: 225, carb: 4.2, prot: 29.9, fat: 9.0, fiber: 0 },
+            { id: 408, name: "Boi, Músculo, Cozido", cal: 194, carb: 0.0, prot: 31.2, fat: 6.7, fiber: 0 },
+            { id: 409, name: "Boi, Patinho, Grelhado", cal: 219, carb: 0.0, prot: 35.9, fat: 7.3, fiber: 0 },
+            { id: 410, name: "Boi, Picanha, Grelhada", cal: 289, carb: 0.0, prot: 26.4, fat: 19.5, fiber: 0 },
+            { id: 411, name: "Frango, Coração, Assado", cal: 207, carb: 0.6, prot: 25.6, fat: 10.9, fiber: 0 },
+            { id: 412, name: "Frango, Coxa, Assada (com pele)", cal: 215, carb: 0.1, prot: 27.0, fat: 11.1, fiber: 0 },
+            { id: 413, name: "Frango, Peito, Grelhado", cal: 159, carb: 0.0, prot: 32.0, fat: 2.5, fiber: 0 },
+            { id: 414, name: "Frango, Sobrecoxa, Assada", cal: 260, carb: 0.0, prot: 23.0, fat: 18.0, fiber: 0 },
+            { id: 415, name: "Linguiça, Calabresa, Frita", cal: 380, carb: 1.5, prot: 19.3, fat: 32.5, fiber: 0 },
+            { id: 416, name: "Linguiça, Frango, Assada", cal: 236, carb: 1.7, prot: 21.0, fat: 16.0, fiber: 0 },
+            { id: 417, name: "Ovo de Codorna, Inteiro", cal: 177, carb: 1.6, prot: 13.7, fat: 12.6, fiber: 0 },
+            { id: 418, name: "Ovo de Galinha, Cozido", cal: 146, carb: 0.6, prot: 13.3, fat: 9.5, fiber: 0 },
+            { id: 419, name: "Ovo de Galinha, Frito", cal: 240, carb: 1.2, prot: 15.6, fat: 18.6, fiber: 0 },
+            { id: 420, name: "Peixe, Atum, Conserva Óleo", cal: 166, carb: 0.0, prot: 26.2, fat: 6.0, fiber: 0 },
+            { id: 421, name: "Peixe, Bacalhau, Assado", cal: 110, carb: 0.0, prot: 24.0, fat: 1.2, fiber: 0 },
+            { id: 422, name: "Peixe, Cação, Cozido", cal: 116, carb: 0.0, prot: 25.6, fat: 0.7, fiber: 0 },
+            { id: 423, name: "Peixe, Merluza, Filé, Assado", cal: 122, carb: 0.0, prot: 26.6, fat: 0.9, fiber: 0 },
+            { id: 424, name: "Peixe, Salmão, Grelhado", cal: 229, carb: 0.0, prot: 24.0, fat: 14.0, fiber: 0 },
+            { id: 425, name: "Peixe, Sardinha, Assada", cal: 164, carb: 0.0, prot: 32.2, fat: 3.0, fiber: 0 },
+            { id: 426, name: "Peixe, Tilápia, Grelhada", cal: 128, carb: 0.0, prot: 26.1, fat: 2.7, fiber: 0 },
+            { id: 427, name: "Porco, Bisteca, Grelhada", cal: 280, carb: 0.0, prot: 28.6, fat: 17.4, fiber: 0 },
+            { id: 428, name: "Porco, Lombo, Assado", cal: 210, carb: 0.0, prot: 35.7, fat: 6.4, fiber: 0 },
+            { id: 429, name: "Presunto, Cozido", cal: 120, carb: 1.0, prot: 16.5, fat: 5.5, fiber: 0 },
+            { id: 430, name: "Salsicha, Cozida", cal: 246, carb: 2.0, prot: 13.0, fat: 21.0, fiber: 0 },
 
-            // === LEITE E DERIVADOS ===
-            { id: 501, name: "Creme de Leite", cal: 221, carb: 4.5, prot: 1.5, fat: 22.0 },
-            { id: 502, name: "Iogurte, Natural", cal: 51, carb: 5.3, prot: 4.1, fat: 3.0 },
-            { id: 503, name: "Iogurte, Natural, Desnatado", cal: 41, carb: 6.8, prot: 3.8, fat: 0.1 },
-            { id: 504, name: "Iogurte, Sabor Morango", cal: 70, carb: 12.5, prot: 2.7, fat: 1.2 },
-            { id: 505, name: "Leite, Condensado", cal: 313, carb: 57.0, prot: 7.7, fat: 6.0 },
-            { id: 506, name: "Leite, Fermentado (Yakult)", cal: 72, carb: 15.0, prot: 2.0, fat: 0.0 },
-            { id: 507, name: "Leite, Vaca, Desnatado", cal: 35, carb: 4.7, prot: 3.1, fat: 0.5 },
-            { id: 508, name: "Leite, Vaca, Desnatado, Pó", cal: 362, carb: 51.6, prot: 34.7, fat: 0.9 },
-            { id: 509, name: "Leite, Vaca, Integral", cal: 60, carb: 4.5, prot: 3.2, fat: 3.0 },
-            { id: 510, name: "Leite, Vaca, Integral, Pó", cal: 497, carb: 39.2, prot: 25.4, fat: 26.7 },
-            { id: 511, name: "Manteiga, Com Sal", cal: 726, carb: 0.1, prot: 0.4, fat: 82.0 },
-            { id: 512, name: "Queijo, Minas, Frescal", cal: 264, carb: 3.2, prot: 17.4, fat: 20.2 },
-            { id: 513, name: "Queijo, Mussarela", cal: 328, carb: 3.0, prot: 22.6, fat: 25.2 },
-            { id: 514, name: "Queijo, Parmesão", cal: 453, carb: 1.7, prot: 35.6, fat: 33.5 },
-            { id: 515, name: "Queijo, Prato", cal: 360, carb: 1.9, prot: 22.7, fat: 29.1 },
-            { id: 516, name: "Queijo, Ricota", cal: 140, carb: 3.8, prot: 12.6, fat: 8.1 },
-            { id: 517, name: "Requeijão, Cremoso", cal: 308, carb: 2.4, prot: 9.6, fat: 28.9 },
+            // === LEITE E DERIVADOS (Geralmente 0 fibra) ===
+            { id: 501, name: "Creme de Leite", cal: 221, carb: 4.5, prot: 1.5, fat: 22.0, fiber: 0 },
+            { id: 502, name: "Iogurte, Natural", cal: 51, carb: 5.3, prot: 4.1, fat: 3.0, fiber: 0 },
+            { id: 503, name: "Iogurte, Natural, Desnatado", cal: 41, carb: 6.8, prot: 3.8, fat: 0.1, fiber: 0 },
+            { id: 504, name: "Iogurte, Sabor Morango", cal: 70, carb: 12.5, prot: 2.7, fat: 1.2, fiber: 0 },
+            { id: 505, name: "Leite, Condensado", cal: 313, carb: 57.0, prot: 7.7, fat: 6.0, fiber: 0 },
+            { id: 506, name: "Leite, Fermentado (Yakult)", cal: 72, carb: 15.0, prot: 2.0, fat: 0.0, fiber: 0 },
+            { id: 507, name: "Leite, Vaca, Desnatado", cal: 35, carb: 4.7, prot: 3.1, fat: 0.5, fiber: 0 },
+            { id: 508, name: "Leite, Vaca, Desnatado, Pó", cal: 362, carb: 51.6, prot: 34.7, fat: 0.9, fiber: 0 },
+            { id: 509, name: "Leite, Vaca, Integral", cal: 60, carb: 4.5, prot: 3.2, fat: 3.0, fiber: 0 },
+            { id: 510, name: "Leite, Vaca, Integral, Pó", cal: 497, carb: 39.2, prot: 25.4, fat: 26.7, fiber: 0 },
+            { id: 511, name: "Manteiga, Com Sal", cal: 726, carb: 0.1, prot: 0.4, fat: 82.0, fiber: 0 },
+            { id: 512, name: "Queijo, Minas, Frescal", cal: 264, carb: 3.2, prot: 17.4, fat: 20.2, fiber: 0 },
+            { id: 513, name: "Queijo, Mussarela", cal: 328, carb: 3.0, prot: 22.6, fat: 25.2, fiber: 0 },
+            { id: 514, name: "Queijo, Parmesão", cal: 453, carb: 1.7, prot: 35.6, fat: 33.5, fiber: 0 },
+            { id: 515, name: "Queijo, Prato", cal: 360, carb: 1.9, prot: 22.7, fat: 29.1, fiber: 0 },
+            { id: 516, name: "Queijo, Ricota", cal: 140, carb: 3.8, prot: 12.6, fat: 8.1, fiber: 0 },
+            { id: 517, name: "Requeijão, Cremoso", cal: 308, carb: 2.4, prot: 9.6, fat: 28.9, fiber: 0 },
 
             // === ÓLEOS, GORDURAS E OLEAGINOSAS ===
-            { id: 601, name: "Amendoim, Torrado", cal: 606, carb: 18.7, prot: 22.5, fat: 54.0 },
-            { id: 602, name: "Azeite de Dendê", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0 },
-            { id: 603, name: "Azeite de Oliva, Extra Virgem", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0 },
-            { id: 604, name: "Bacon, Frito", cal: 697, carb: 0.0, prot: 33.0, fat: 60.3 },
-            { id: 605, name: "Castanha de Caju, Torrada", cal: 570, carb: 32.9, prot: 18.5, fat: 46.3 },
-            { id: 606, name: "Castanha do Brasil (Pará)", cal: 643, carb: 15.1, prot: 14.5, fat: 63.5 },
-            { id: 607, name: "Margarina, Com Sal", cal: 723, carb: 0.0, prot: 0.0, fat: 81.7 },
-            { id: 608, name: "Maionese, Industrializada", cal: 302, carb: 7.6, prot: 0.6, fat: 30.5 },
-            { id: 609, name: "Noz, Crua", cal: 620, carb: 18.4, prot: 14.0, fat: 59.4 },
-            { id: 610, name: "Óleo de Milho", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0 },
-            { id: 611, name: "Óleo de Soja", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0 },
-            { id: 701, name: "Achocolatado, Pó", cal: 401, carb: 90.0, prot: 2.0, fat: 2.3 },
-            { id: 702, name: "Açúcar, Mascavo", cal: 369, carb: 95.5, prot: 0.8, fat: 0.0 },
-            { id: 703, name: "Açúcar, Refinado", cal: 387, carb: 99.5, prot: 0.3, fat: 0.0 },
-            { id: 704, name: "Café, Infusão (Sem açúcar)", cal: 2, carb: 0.3, prot: 0.3, fat: 0.1 },
-            { id: 705, name: "Chocolate, Ao Leite", cal: 540, carb: 59.6, prot: 7.2, fat: 29.7 },
-            { id: 706, name: "Chocolate, Meio Amargo", cal: 475, carb: 55.0, prot: 5.0, fat: 30.0 },
-            { id: 707, name: "Cocada, Branca", cal: 440, carb: 65.0, prot: 2.0, fat: 18.0 },
-            { id: 708, name: "Doce de Leite", cal: 306, carb: 55.0, prot: 6.0, fat: 7.0 },
-            { id: 709, name: "Geleia, Mocotó", cal: 176, carb: 36.6, prot: 6.4, fat: 0.1 },
-            { id: 710, name: "Goiabada", cal: 294, carb: 74.0, prot: 0.5, fat: 0.1 },
-            { id: 711, name: "Mel de Abelha", cal: 309, carb: 84.0, prot: 0.3, fat: 0.0 },
-            { id: 712, name: "Refrigerante, Coca-Cola", cal: 42, carb: 10.5, prot: 0.0, fat: 0.0 },
-            { id: 713, name: "Refrigerante, Guaraná", cal: 40, carb: 10.0, prot: 0.0, fat: 0.0 },
-            { id: 714, name: "Suco de Laranja, Natural", cal: 45, carb: 10.5, prot: 0.7, fat: 0.2 },
-            { id: 715, name: "Suco de Uva, Concentrado", cal: 58, carb: 14.7, prot: 0.0, fat: 0.0 },
-            { id: 716, name: "Vinho, Tinto", cal: 65, carb: 0.2, prot: 0.0, fat: 0.0 }
+            { id: 601, name: "Amendoim, Torrado", cal: 606, carb: 18.7, prot: 22.5, fat: 54.0, fiber: 8.0 },
+            { id: 602, name: "Azeite de Dendê", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0, fiber: 0 },
+            { id: 603, name: "Azeite de Oliva, Extra Virgem", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0, fiber: 0 },
+            { id: 604, name: "Bacon, Frito", cal: 697, carb: 0.0, prot: 33.0, fat: 60.3, fiber: 0 },
+            { id: 605, name: "Castanha de Caju, Torrada", cal: 570, carb: 32.9, prot: 18.5, fat: 46.3, fiber: 3.7 },
+            { id: 606, name: "Castanha do Brasil (Pará)", cal: 643, carb: 15.1, prot: 14.5, fat: 63.5, fiber: 7.9 },
+            { id: 607, name: "Margarina, Com Sal", cal: 723, carb: 0.0, prot: 0.0, fat: 81.7, fiber: 0 },
+            { id: 608, name: "Maionese, Industrializada", cal: 302, carb: 7.6, prot: 0.6, fat: 30.5, fiber: 0 },
+            { id: 609, name: "Noz, Crua", cal: 620, carb: 18.4, prot: 14.0, fat: 59.4, fiber: 7.2 },
+            { id: 610, name: "Óleo de Milho", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0, fiber: 0 },
+            { id: 611, name: "Óleo de Soja", cal: 884, carb: 0.0, prot: 0.0, fat: 100.0, fiber: 0 },
+            { id: 701, name: "Achocolatado, Pó", cal: 401, carb: 90.0, prot: 2.0, fat: 2.3, fiber: 2.5 },
+            { id: 702, name: "Açúcar, Mascavo", cal: 369, carb: 95.5, prot: 0.8, fat: 0.0, fiber: 0 },
+            { id: 703, name: "Açúcar, Refinado", cal: 387, carb: 99.5, prot: 0.3, fat: 0.0, fiber: 0 },
+            { id: 704, name: "Café, Infusão (Sem açúcar)", cal: 2, carb: 0.3, prot: 0.3, fat: 0.1, fiber: 0 },
+            { id: 705, name: "Chocolate, Ao Leite", cal: 540, carb: 59.6, prot: 7.2, fat: 29.7, fiber: 1.0 },
+            { id: 706, name: "Chocolate, Meio Amargo", cal: 475, carb: 55.0, prot: 5.0, fat: 30.0, fiber: 5.0 },
+            { id: 707, name: "Cocada, Branca", cal: 440, carb: 65.0, prot: 2.0, fat: 18.0, fiber: 4.0 },
+            { id: 708, name: "Doce de Leite", cal: 306, carb: 55.0, prot: 6.0, fat: 7.0, fiber: 0 },
+            { id: 709, name: "Geleia, Mocotó", cal: 176, carb: 36.6, prot: 6.4, fat: 0.1, fiber: 0 },
+            { id: 710, name: "Goiabada", cal: 294, carb: 74.0, prot: 0.5, fat: 0.1, fiber: 0.6 },
+            { id: 711, name: "Mel de Abelha", cal: 309, carb: 84.0, prot: 0.3, fat: 0.0, fiber: 0 },
+            { id: 712, name: "Refrigerante, Coca-Cola", cal: 42, carb: 10.5, prot: 0.0, fat: 0.0, fiber: 0 },
+            { id: 713, name: "Refrigerante, Guaraná", cal: 40, carb: 10.0, prot: 0.0, fat: 0.0, fiber: 0 },
+            { id: 714, name: "Suco de Laranja, Natural", cal: 45, carb: 10.5, prot: 0.7, fat: 0.2, fiber: 0.1 },
+            { id: 715, name: "Suco de Uva, Concentrado", cal: 58, carb: 14.7, prot: 0.0, fat: 0.0, fiber: 0.2 },
+            { id: 716, name: "Vinho, Tinto", cal: 65, carb: 0.2, prot: 0.0, fat: 0.0, fiber: 0 }
         ];
 
         // Default Meals Structure
@@ -1053,6 +1066,7 @@
             if (type === 'carb') food.totalCarb = val;
             if (type === 'prot') food.totalProt = val;
             if (type === 'fat') food.totalFat = val;
+            // NOTE: Fibra não editável inline na tabela de refeições, apenas via customização
 
             // --- LÓGICA DE INTELIGÊNCIA ---
             // Se o usuário mudou o total manualmente, devemos atualizar a BASE (kcal por 100g)
@@ -1200,6 +1214,7 @@
             document.getElementById('logo-img-footer').classList.add('hidden');
             document.getElementById('logo-placeholder-footer').classList.remove('hidden');
             document.getElementById('target-cal').value = 2000;
+            document.getElementById('target-fiber').value = 25; // Reset default fiber
             document.getElementById('calc-weight').value = "";
             document.getElementById('calc-height').value = "";
             document.getElementById('calc-age').value = "";
@@ -1236,7 +1251,8 @@
                 
                 currentTheme = data.theme || 'emerald';
                 
-                const fields = ['patient-name','patient-goal','diet-date','prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct'];
+                // Added target-fiber to fields
+                const fields = ['patient-name','patient-goal','diet-date','prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber'];
                 fields.forEach(f => { if(document.getElementById(f) && data.inputs[f]!==undefined) document.getElementById(f).value = data.inputs[f]; });
                 
                 if(data.selects) {
@@ -1272,7 +1288,8 @@
         function saveCurrentPatientState() {
             if (!currentPatientId) return;
             const inputs = {};
-            ['patient-name','patient-goal','diet-date','prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct'].forEach(f => inputs[f] = document.getElementById(f).value);
+            // Added target-fiber
+            ['patient-name','patient-goal','diet-date','prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber'].forEach(f => inputs[f] = document.getElementById(f).value);
             
             const history = [];
             document.querySelectorAll('#history-table tbody tr').forEach(r => {
@@ -1360,7 +1377,9 @@
             const m=dietMeals.find(x=>x.id===mid); if(!m||!m.foods[fid]) return;
             const q=parseFloat(v); if(isNaN(q)||q<=0) return;
             const f=m.foods[fid], fac=q/100;
-            f.qty=q; f.totalCal=f.cal*fac; f.totalCarb=f.carb*fac; f.totalProt=f.prot*fac; f.totalFat=f.fat*fac;
+            f.qty=q; f.totalCal=f.cal*fac; f.totalCarb=f.carb*fac; f.totalProt=f.prot*fac; f.totalFat=f.fat*fac; 
+            // Update Fiber too
+            f.totalFiber=(f.fiber||0)*fac;
             renderDiet(); triggerAutoSave();
         }
         function moveFood(mid, fid, d) {
@@ -1384,16 +1403,18 @@
                 cal: f.totalCal,
                 carb: f.totalCarb,
                 prot: f.totalProt,
-                fat: f.totalFat
+                fat: f.totalFat,
+                fiber: f.totalFiber || 0 // Incluindo Fibra
             };
             
             document.getElementById('sub-source-info').innerHTML = `
                 Alimento Base: <span class="text-black font-bold">${f.name}</span> (${f.qty}g)<br>
-                <div class="grid grid-cols-4 gap-2 mt-1 text-xs text-slate-500">
+                <div class="grid grid-cols-5 gap-2 mt-1 text-xs text-slate-500">
                     <span>Kcal: ${f.totalCal.toFixed(0)}</span>
                     <span>C: ${f.totalCarb.toFixed(1)}g</span>
                     <span>P: ${f.totalProt.toFixed(1)}g</span>
                     <span>G: ${f.totalFat.toFixed(1)}g</span>
+                    <span>F: ${(f.totalFiber||0).toFixed(1)}g</span>
                 </div>
             `;
             
@@ -1423,7 +1444,8 @@
                 totalCal: newFoodDb.cal * fac,
                 totalCarb: newFoodDb.carb * fac,
                 totalProt: newFoodDb.prot * fac,
-                totalFat: newFoodDb.fat * fac
+                totalFat: newFoodDb.fat * fac,
+                totalFiber: (newFoodDb.fiber||0) * fac
             };
 
             // Replace in array
@@ -1449,7 +1471,7 @@
             const targetVal = currentSubSource[macro];
             
             if (targetVal <= 0.5) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">O alimento base tem quase 0g deste nutriente.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">O alimento base tem quase 0g deste nutriente.</td></tr>`;
                 return;
             }
 
@@ -1479,12 +1501,14 @@
                 const resultingCarb = (f.carb / 100) * neededQty;
                 const resultingProt = (f.prot / 100) * neededQty;
                 const resultingFat = (f.fat / 100) * neededQty;
+                const resultingFiber = ((f.fiber||0) / 100) * neededQty;
 
                 const diffs = {
                     cal: resultingCal - currentSubSource.cal,
                     carb: resultingCarb - currentSubSource.carb,
                     prot: resultingProt - currentSubSource.prot,
-                    fat: resultingFat - currentSubSource.fat
+                    fat: resultingFat - currentSubSource.fat,
+                    fiber: resultingFiber - currentSubSource.fiber
                 };
                 
                 return {
@@ -1515,6 +1539,7 @@
                     <td class="p-3 text-center">${formatDiff(c.diffs.carb)}</td>
                     <td class="p-3 text-center">${formatDiff(c.diffs.prot)}</td>
                     <td class="p-3 text-center">${formatDiff(c.diffs.fat)}</td>
+                    <td class="p-3 text-center">${formatDiff(c.diffs.fiber)}</td> <!-- Coluna Fibra -->
                     <td class="p-3 text-center">
                         <button onclick="confirmSubstitution(${c.id}, ${roundedQty})" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-bold px-3 py-1 rounded transition">
                             Trocar
@@ -1527,18 +1552,19 @@
 
         function renderDiet() {
             const c = document.getElementById('diet-container'); c.innerHTML='';
-            let dt = {cal:0, c:0, p:0, f:0};
+            let dt = {cal:0, c:0, p:0, f:0, fib:0}; // Added fib
             const tc = parseFloat(document.getElementById('target-cal').value)||2000;
+            const tfiber = parseFloat(document.getElementById('target-fiber').value)||25; // Target fiber
             const pc = parseFloat(document.getElementById('target-carb-pct').value)||50;
             const pp = parseFloat(document.getElementById('target-prot-pct').value)||30;
             const pf = parseFloat(document.getElementById('target-fat-pct').value)||20;
             document.getElementById('total-pct-display').innerText = (pc+pp+pf);
 
             dietMeals.forEach((m, idx) => {
-                let mc={cal:0, c:0, p:0, f:0};
+                let mc={cal:0, c:0, p:0, f:0, fib:0};
                 m.foods.forEach(f => {
-                    mc.cal+=f.totalCal; mc.c+=f.totalCarb; mc.p+=f.totalProt; mc.f+=f.totalFat;
-                    if(f.option==='A'){ dt.cal+=f.totalCal; dt.c+=f.totalCarb; dt.p+=f.totalProt; dt.f+=f.totalFat; }
+                    mc.cal+=f.totalCal; mc.c+=f.totalCarb; mc.p+=f.totalProt; mc.f+=f.totalFat; mc.fib+=(f.totalFiber||0);
+                    if(f.option==='A'){ dt.cal+=f.totalCal; dt.c+=f.totalCarb; dt.p+=f.totalProt; dt.f+=f.totalFat; dt.fib+=(f.totalFiber||0); }
                 });
 
                 let html = '';
@@ -1556,6 +1582,7 @@
                                 <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'carb',this.innerText)" title="Clique para editar">C: ${f.totalCarb.toFixed(0)}</td>
                                 <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'prot',this.innerText)" title="Clique para editar">P: ${f.totalProt.toFixed(0)}</td>
                                 <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'fat',this.innerText)" title="Clique para editar">G: ${f.totalFat.toFixed(0)}</td>
+                                <!-- FIBRAS NÃO SÃO EXIBIDAS AQUI CONFORME SOLICITADO -->
                                 <td class="p-3 text-center w-28 col-actions no-print">
                                     <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100">
                                         <button onclick="openSubstitutionModal(${m.id}, ${originalIndex})" class="text-indigo-400 hover:text-indigo-600 px-1" title="Encontrar Substituto"><i class="fa-solid fa-exchange-alt"></i></button>
@@ -1581,10 +1608,10 @@
                 </div>`;
             });
 
-            // CARD: INGESTÃO DIÁRIA (DARK) - Atualizado com nomes completos e emoji 🍎
-            c.innerHTML += `<div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 break-inside-avoid mt-6"><div class="p-4 border-b border-slate-700 flex justify-between"><h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-chart-pie text-emerald-400"></i> 🍎 Ingestão Diária</h3><span class="text-xs text-slate-400">(Opções A)</span></div><div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center"><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calorias</div><div class="text-3xl font-bold">${dt.cal.toFixed(0)}</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Carboidrato</div><div class="text-2xl font-bold text-blue-400">${dt.c.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Proteína</div><div class="text-2xl font-bold text-emerald-400">${dt.p.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Gordura</div><div class="text-2xl font-bold text-yellow-400">${dt.f.toFixed(0)}g</div></div></div></div>`;
+            // CARD: INGESTÃO DIÁRIA (DARK) - Atualizado com FIBRAS
+            c.innerHTML += `<div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 break-inside-avoid mt-6"><div class="p-4 border-b border-slate-700 flex justify-between"><h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-chart-pie text-emerald-400"></i> 🍎 Ingestão Diária</h3><span class="text-xs text-slate-400">(Opções A)</span></div><div class="p-6 grid grid-cols-2 md:grid-cols-5 gap-6 text-center"><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calorias</div><div class="text-3xl font-bold">${dt.cal.toFixed(0)}</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Carboidrato</div><div class="text-2xl font-bold text-blue-400">${dt.c.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Proteína</div><div class="text-2xl font-bold text-emerald-400">${dt.p.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Gordura</div><div class="text-2xl font-bold text-yellow-400">${dt.f.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Fibras</div><div class="text-2xl font-bold text-orange-400">${dt.fib.toFixed(0)}g</div></div></div></div>`;
 
-            // CARD: META DIÁRIA (AGORA DARK TAMBÉM) - Atualizado com nomes completos
+            // CARD: META DIÁRIA (AGORA DARK TAMBÉM) - Atualizado
             if(showGoals) {
                 c.innerHTML += `<div class="card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 break-inside-avoid mt-4 relative group">
                     <button onclick="removeGoals()" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition no-print opacity-0 group-hover:opacity-100" title="Ocultar Metas"><i class="fa-solid fa-xmark"></i></button>
@@ -1593,35 +1620,52 @@
                             <i class="fa-solid fa-flag-checkered text-emerald-400"></i> Meta Diária
                         </h3>
                     </div>
-                    <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div class="p-6 grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
                         <div>
                             <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Kcal</div>
                             <div class="text-3xl font-bold text-white">${tc.toFixed(0)}</div>
                         </div>
                         <div>
-                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Carboidrato</div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Carbo</div>
                             <div class="text-2xl font-bold text-blue-400">${(tc*(pc/100)/4).toFixed(0)}g <span class="text-xs text-slate-500 font-normal">(${pc}%)</span></div>
                         </div>
                         <div>
-                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Proteína</div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Prot</div>
                             <div class="text-2xl font-bold text-emerald-400">${(tc*(pp/100)/4).toFixed(0)}g <span class="text-xs text-slate-500 font-normal">(${pp}%)</span></div>
                         </div>
                         <div>
-                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Gordura</div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Gord</div>
                             <div class="text-2xl font-bold text-yellow-400">${(tc*(pf/100)/9).toFixed(0)}g <span class="text-xs text-slate-500 font-normal">(${pf}%)</span></div>
+                        </div>
+                         <div>
+                            <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Fibras</div>
+                            <div class="text-2xl font-bold text-orange-400">${tfiber}g</div>
                         </div>
                     </div>
                 </div>`;
             }
-            // Widget Comparison - Atualizado com alinhamento à direita e nomes completos
-            const w=document.getElementById('comparison-widget'); if(w) w.innerHTML=`<div class="flex justify-end border-b pb-1 mb-2 text-[11px] font-bold text-slate-500"><span>Consumido / Meta</span></div><div class="flex justify-between"><span class="text-slate-500">Calorias:</span><span class="font-bold ${dt.cal-tc>100?'text-red-500':'text-green-500'}">${dt.cal.toFixed(0)} / ${tc.toFixed(0)}</span></div><div class="flex justify-between"><span class="text-blue-500">Carboidrato:</span><span>${dt.c.toFixed(0)}g / ${(tc*(pc/100)/4).toFixed(0)}g</span></div><div class="flex justify-between"><span class="text-emerald-500">Proteína:</span><span>${dt.p.toFixed(0)}g / ${(tc*(pp/100)/4).toFixed(0)}g</span></div><div class="flex justify-between"><span class="text-yellow-500">Gordura:</span><span>${dt.f.toFixed(0)}g / ${(tc*(pf/100)/9).toFixed(0)}g</span></div>`;
+            // Widget Comparison - Atualizado com FIBRAS
+            const w=document.getElementById('comparison-widget'); if(w) w.innerHTML=`<div class="flex justify-end border-b pb-1 mb-2 text-[11px] font-bold text-slate-500"><span>Consumido / Meta</span></div><div class="flex justify-between"><span class="text-slate-500">Calorias:</span><span class="font-bold ${dt.cal-tc>100?'text-red-500':'text-green-500'}">${dt.cal.toFixed(0)} / ${tc.toFixed(0)}</span></div><div class="flex justify-between"><span class="text-blue-500">Carboidrato:</span><span>${dt.c.toFixed(0)}g / ${(tc*(pc/100)/4).toFixed(0)}g</span></div><div class="flex justify-between"><span class="text-emerald-500">Proteína:</span><span>${dt.p.toFixed(0)}g / ${(tc*(pp/100)/4).toFixed(0)}g</span></div><div class="flex justify-between"><span class="text-yellow-500">Gordura:</span><span>${dt.f.toFixed(0)}g / ${(tc*(pf/100)/9).toFixed(0)}g</span></div><div class="flex justify-between"><span class="text-orange-500">Fibras:</span><span>${dt.fib.toFixed(0)}g / ${tfiber}g</span></div>`;
         }
 
         function addToPlan() {
             const mid=parseInt(document.getElementById('select-meal').value), fid=parseInt(document.getElementById('select-food').value), q=parseFloat(document.getElementById('input-qty').value), opt=document.querySelector('input[name="meal-option"]:checked').value;
             if(isNaN(mid)||!q||q<=0) return showToast("Erro nos dados","error");
             const f=foodDatabase.find(x=>x.id===fid), m=dietMeals.find(x=>x.id===mid);
-            if(f&&m) { const fac=q/100; m.foods.push({...f, qty:q, option:opt, totalCal:f.cal*fac, totalCarb:f.carb*fac, totalProt:f.prot*fac, totalFat:f.fat*fac}); renderDiet(); showToast("Adicionado!"); triggerAutoSave(); }
+            if(f&&m) { 
+                const fac=q/100; 
+                m.foods.push({
+                    ...f, 
+                    qty:q, 
+                    option:opt, 
+                    totalCal:f.cal*fac, 
+                    totalCarb:f.carb*fac, 
+                    totalProt:f.prot*fac, 
+                    totalFat:f.fat*fac,
+                    totalFiber:(f.fiber||0)*fac // Add Fiber
+                }); 
+                renderDiet(); showToast("Adicionado!"); triggerAutoSave(); 
+            }
         }
 
         // Custom Food Logic
@@ -1630,8 +1674,11 @@
         function clearCustomFoods() { if(confirm("Limpar alimentos?")) { localStorage.removeItem('dietCustomFoods'); location.reload(); } }
         function createCustomFood() {
             const n=document.getElementById('new-name').value, s=parseFloat(document.getElementById('new-serving').value), c=parseFloat(document.getElementById('new-cal').value);
+            // new fiber
+            const fib = parseFloat(document.getElementById('new-fiber').value)||0;
+
             if(!n||!s||isNaN(c)) return showToast("Preencha tudo","error");
-            const fac=100/s, nf={id:Date.now(), name:n, cal:c*fac, carb:(parseFloat(document.getElementById('new-carb').value)||0)*fac, prot:(parseFloat(document.getElementById('new-prot').value)||0)*fac, fat:(parseFloat(document.getElementById('new-fat').value)||0)*fac, isCustom:true};
+            const fac=100/s, nf={id:Date.now(), name:n, cal:c*fac, carb:(parseFloat(document.getElementById('new-carb').value)||0)*fac, prot:(parseFloat(document.getElementById('new-prot').value)||0)*fac, fat:(parseFloat(document.getElementById('new-fat').value)||0)*fac, fiber:fib*fac, isCustom:true};
             foodDatabase.push(nf); saveCustomFoodToStorage(nf); renderFoodSelect(); document.getElementById('select-food').value=nf.id; toggleCustomForm(); showToast("Criado!");
         }
         function toggleCustomForm() { document.getElementById('custom-food-form').classList.toggle('hidden'); }
