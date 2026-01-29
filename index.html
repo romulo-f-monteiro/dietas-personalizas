@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <!-- Chart.js para o Gráfico -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- LZ-String para compressão de URL -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
     
     <style>
         :root {
@@ -58,32 +60,44 @@
             @page { margin: 0; size: auto; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-shadow: none !important; text-shadow: none !important; }
             body { background-color: white; padding: 10mm 5mm 15mm 5mm !important; margin: 0 !important; }
-            .no-print, .hide-on-view { display: none !important; }
+            
+            /* Ocultar elementos específicos na impressão */
+            .no-print, #toast, #splash-screen, .hide-in-print { display: none !important; }
+            
+            /* Garantir visibilidade */
             .print-only { display: block !important; }
-            #toast, #splash-screen { display: none !important; }
             .container, #document-area { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; display: block !important; }
+            
             main.grid { display: block !important; }
             .lg\:col-span-8 { width: 100% !important; }
+            
             table { width: 100% !important; table-layout: fixed !important; }
             .col-name { width: 42% !important; }
             .col-qty { width: 11% !important; text-align: center !important; } 
             .col-cal { width: 9% !important; text-align: center !important; }
             .col-macro { width: 8% !important; text-align: center !important; font-size: 9px !important; }
             .col-actions { display: none !important; width: 0 !important; }
+            
             .meal-card { break-inside: auto !important; page-break-inside: auto !important; border: 1px solid #ddd; margin-bottom: 20px !important; display: block !important; box-shadow: none !important; border-radius: 8px !important; }
             .meal-header { break-after: avoid; page-break-after: avoid; background-color: #f8fafc !important; border-bottom: 1px solid #e2e8f0 !important; }
             tr { break-inside: avoid; }
             .totals-footer { break-before: avoid; page-break-before: avoid; background-color: #f1f5f9 !important; }
+            
             .summary-card { padding: 15px 20px !important; background-color: #1e293b !important; color: white !important; border-radius: 12px !important; margin-top: 20px !important; border: 1px solid #334155 !important; break-inside: avoid !important; page-break-inside: avoid !important; display: block !important; }
             .summary-card h3 { font-size: 16px !important; margin-bottom: 10px !important; padding-bottom: 8px !important; border-bottom: 1px solid #334155 !important; }
             .summary-card .grid { display: flex !important; justify-content: space-between !important; gap: 15px !important; padding: 5px !important; }
             .summary-card .text-3xl { font-size: 20px !important; margin-top: 5px !important; }
             .summary-card .text-2xl { font-size: 18px !important; margin-top: 5px !important; }
-            .summary-card .text-xs { font-size: 10px !important; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; }
+            
             #btn-add-row { display: none !important; }
             .col-history-action { display: none !important; width: 0 !important; }
             #chart-container { break-inside: avoid; page-break-inside: avoid; height: 280px !important; width: 100% !important; margin: 20px auto !important; }
+            
             #page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 30px; text-align: center; font-size: 10px; color: #94a3b8; font-weight: 500; background-color: white; display: flex !important; align-items: center; justify-content: center; border-top: 1px dashed #e2e8f0; z-index: 9999; margin-bottom: 0 !important; padding-bottom: 5px; }
+            
+            /* Correção Logo na Impressão */
+            #logo-container-wrapper { display: block !important; }
+            .upload-ui-controls { display: none !important; } /* Esconde o texto "Adicionar Logo" na impressão */
         }
 
         .editable-div {
@@ -145,8 +159,11 @@
         
         .emoji-btn:hover { transform: scale(1.2); }
 
-        /* --- MODO PACIENTE (VIEW MODE) --- */
-        body.view-mode .hide-on-view { display: none !important; }
+        /* --- MODO PACIENTE (VIEW MODE) - CSS --- */
+        /* Oculta controles exclusivos do nutricionista */
+        body.view-mode .nutritionist-only { display: none !important; }
+        
+        /* Bloqueia edição de textos e inputs */
         body.view-mode [contenteditable] { 
             pointer-events: none; 
             border: none; 
@@ -160,11 +177,12 @@
             background: transparent !important;
             appearance: none;
         }
-        body.view-mode .qty-input { font-weight: bold; }
+        /* Ajustes visuais para o modo leitura */
+        body.view-mode .qty-input { font-weight: bold; border-bottom: none; }
         body.view-mode .measure-cell { border-color: #e2e8f0; }
-        body.view-mode #nutritionist-area { display: none !important; }
         body.view-mode .col-actions { display: none !important; }
         body.view-mode .theme-ring { box-shadow: none !important; }
+        body.view-mode .upload-ui-controls { display: none !important; } /* Esconde controle de upload no modo view */
         
     </style>
 </head>
@@ -217,16 +235,17 @@
             </div>
             
             <div class="flex gap-2">
-                <!-- Botão Gerenciar Pacientes -->
-                <button onclick="openPatientModal()" class="hide-on-view bg-slate-900/30 hover:bg-slate-900/50 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-white/20">
+                <!-- Botão Gerenciar Pacientes (Oculto no modo view) -->
+                <button onclick="openPatientModal()" class="nutritionist-only bg-slate-900/30 hover:bg-slate-900/50 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-white/20">
                     <i class="fa-solid fa-users"></i> <span id="current-patient-label">Pacientes</span>
                 </button>
 
-                <!-- NOVO BOTÃO DE COMPARTILHAR -->
-                <button onclick="shareLink()" class="hide-on-view bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-blue-400">
+                <!-- NOVO BOTÃO DE COMPARTILHAR (Oculto no modo view) -->
+                <button onclick="shareLink()" class="nutritionist-only bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-blue-400">
                     <i class="fa-solid fa-share-nodes"></i> Compartilhar Link
                 </button>
 
+                <!-- Botão de impressão visível para todos -->
                 <button onclick="printDiet()" class="bg-white text-slate-700 hover:bg-slate-100 px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2">
                     <i class="fa-solid fa-print text-slate-600"></i> Imprimir PDF
                 </button>
@@ -242,13 +261,16 @@
             <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center text-center gap-2 w-full break-inside-avoid">
                 
                 <!-- Logo Topo -->
-                <div class="mb-4 relative group cursor-pointer hide-on-view" onclick="document.getElementById('logo-upload').click()">
+                <div id="logo-container-wrapper" class="mb-4 relative group cursor-pointer">
                     <img id="logo-img-main" src="" class="h-24 object-contain hidden mx-auto">
-                    <div id="logo-placeholder" class="w-24 h-24 bg-slate-50 rounded-full border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 mx-auto">
+                    
+                    <!-- Interface de Upload (Oculta na impressão e no modo view via CSS) -->
+                    <div id="logo-placeholder" class="upload-ui-controls w-24 h-24 bg-slate-50 rounded-full border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 mx-auto" onclick="document.getElementById('logo-upload').click()">
                         <i class="fa-solid fa-camera text-2xl mb-1"></i>
                         <span class="text-[10px]">Add Logo</span>
                     </div>
-                    <span class="text-xs text-blue-500 hover:underline mt-1 block no-print">Alterar Logo (Max 2MB)</span>
+                    <span class="upload-ui-controls text-xs text-blue-500 hover:underline mt-1 block no-print" onclick="document.getElementById('logo-upload').click()">Alterar Logo (Max 2MB)</span>
+                    
                     <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo-img-main', 'logo-placeholder'); triggerAutoSave();">
                 </div>
 
@@ -266,8 +288,8 @@
 
         <main class="flex-grow container mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- COLUNA DA ESQUERDA: Controles (Oculto no PDF) -->
-            <div class="lg:col-span-4 no-print hide-on-view">
+            <!-- COLUNA DA ESQUERDA: Controles (Oculto no PDF e no Modo View) -->
+            <div class="lg:col-span-4 no-print nutritionist-only">
                 
                 <!-- CONTAINER STICKY PARA O MENU LATERAL -->
                 <div class="sticky top-4 space-y-6 max-h-[calc(100vh-2rem)] overflow-y-auto custom-scroll pr-1 pb-4">
@@ -289,8 +311,8 @@
                         </div>
                     </div>
 
-                    <!-- 2. NOVA CALCULADORA DO PROFISSIONAL (ID ADICIONADO PARA ESCONDER NO MODO VIEW) -->
-                    <div id="nutritionist-area" class="bg-slate-800 text-white p-5 rounded-xl shadow-lg border border-slate-700 relative overflow-hidden">
+                    <!-- 2. NOVA CALCULADORA DO PROFISSIONAL (Oculto no Modo View) -->
+                    <div id="nutritionist-calculator" class="bg-slate-800 text-white p-5 rounded-xl shadow-lg border border-slate-700 relative overflow-hidden">
                         <div class="absolute top-0 right-0 p-2 opacity-10">
                             <i class="fa-solid fa-calculator text-6xl"></i>
                         </div>
@@ -496,7 +518,7 @@
                     </div>
 
                     <!-- 6. Adicionar Novos Alimentos -->
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 hide-on-view">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 nutrition-only">
                         <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700 cursor-pointer" onclick="toggleCustomForm()">
                             <i class="fa-solid fa-pen-to-square text-blue-500"></i> Adicionar Novos Alimentos
                             <i class="fa-solid fa-chevron-down ml-auto text-xs text-slate-400"></i>
@@ -579,7 +601,7 @@
 
                 <!-- Metas (AGORA COM BOTÃO DE FECHAR) -->
                 <div id="goals-card" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mt-8 break-inside-avoid relative group">
-                    <button onclick="hideSection('goals-card')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition no-print hide-on-view opacity-0 group-hover:opacity-100" title="Remover Seção"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="hideSection('goals-card')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition no-print nutritionist-only opacity-0 group-hover:opacity-100" title="Remover Seção"><i class="fa-solid fa-xmark"></i></button>
                     <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-lg">
                         <i class="fa-solid fa-bullseye theme-text"></i> Orientações e Recomendações
                     </h3>
@@ -588,7 +610,7 @@
 
                 <!-- Histórico da composição corporal (AGORA COM BOTÃO DE FECHAR E EXCLUIR LINHA) -->
                 <div id="history-card" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mt-6 break-inside-avoid w-full overflow-hidden relative group">
-                    <button onclick="hideSection('history-card')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition no-print hide-on-view opacity-0 group-hover:opacity-100" title="Remover Seção"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="hideSection('history-card')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition no-print nutritionist-only opacity-0 group-hover:opacity-100" title="Remover Seção"><i class="fa-solid fa-xmark"></i></button>
                     <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-lg">
                         <i class="fa-solid fa-weight-scale theme-text"></i> Histórico da composição corporal
                     </h3>
@@ -603,7 +625,7 @@
                                     <th class="measure-cell">Quadril</th>
                                     <th class="measure-cell">Braço(D/E)</th>
                                     <th class="measure-cell">Perna(D/E)</th>
-                                    <th class="w-8 no-print col-history-action hide-on-view"></th> <!-- Coluna de Ação (Lixeira) -->
+                                    <th class="w-8 no-print col-history-action nutritionist-only"></th> <!-- Coluna de Ação (Lixeira) -->
                                 </tr>
                             </thead>
                             <tbody class="text-slate-700">
@@ -613,7 +635,7 @@
                         
                         <!-- BOTÃO DE ADICIONAR LINHA -->
                         <div class="mt-2 text-right">
-                             <button id="btn-add-row" onclick="addHistoryRow()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1 rounded text-xs font-bold transition border border-slate-300">
+                             <button id="btn-add-row" onclick="addHistoryRow()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1 rounded text-xs font-bold transition border border-slate-300 hide-in-print">
                                 <i class="fa-solid fa-plus"></i> Adicionar Linha
                              </button>
                         </div>
@@ -652,11 +674,11 @@
                     <div class="w-full md:w-1/2 flex flex-col items-center md:items-end">
                         <div class="relative group cursor-pointer" onclick="document.getElementById('logo-upload-footer').click()">
                             <img id="logo-img-footer" src="" class="h-24 object-contain hidden">
-                            <div id="logo-placeholder-footer" class="w-32 h-24 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
+                            <div id="logo-placeholder-footer" class="upload-ui-controls w-32 h-24 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
                                 <i class="fa-solid fa-image text-xl mb-1"></i>
                                 <span class="text-[10px]">Logo/Assinatura</span>
                             </div>
-                            <span class="text-xs text-blue-500 hover:underline mt-1 block text-center md:text-right no-print hide-on-view">Adicionar Imagem</span>
+                            <span class="upload-ui-controls text-xs text-blue-500 hover:underline mt-1 block text-center md:text-right no-print">Adicionar Imagem</span>
                             <input type="file" id="logo-upload-footer" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'logo-img-footer', 'logo-placeholder-footer'); triggerAutoSave();">
                         </div>
                     </div>
@@ -1064,8 +1086,13 @@
         
         function updateInitials() {
             const name = document.getElementById('prof-name').value || "RFM";
-            const initials = name.split(" ").map((n)=>n[0]).join("").toUpperCase().substring(0,3);
-            document.getElementById('header-initials').innerText = initials || "RFM";
+            // Pega as duas primeiras iniciais
+            const parts = name.trim().split(" ");
+            let initials = "";
+            if (parts.length > 0) initials += parts[0][0];
+            if (parts.length > 1) initials += parts[parts.length-1][0];
+            
+            document.getElementById('header-initials').innerText = initials.toUpperCase() || "RFM";
         }
 
         function shareLink() {
@@ -1090,16 +1117,15 @@
                 goalsText: document.getElementById('goals-area').innerText
             };
 
-            // Codificar para Base64 (Simples, para evitar bibliotecas externas)
+            // COMPRESSÃO COM LZ-STRING
             const jsonStr = JSON.stringify(shareData);
-            // Utf8 safe btoa
-            const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+            const compressed = LZString.compressToEncodedURIComponent(jsonStr);
             
-            const url = window.location.href.split('?')[0] + '?d=' + encoded;
+            const url = window.location.href.split('?')[0] + '?d=' + compressed;
 
             // Copiar para clipboard
             navigator.clipboard.writeText(url).then(() => {
-                showToast("Link copiado para a área de transferência!", "success");
+                showToast("Link copiado! (Compactado)", "success");
             }).catch(err => {
                 prompt("Copie o link abaixo:", url);
             });
@@ -1111,8 +1137,17 @@
             
             if (data) {
                 try {
-                    // Decode
-                    const jsonStr = decodeURIComponent(escape(atob(data)));
+                    // DESCOMPRESSÃO COM LZ-STRING
+                    // Tenta descomprimir. Se falhar (link antigo), tenta fallback para base64 antigo
+                    let jsonStr = LZString.decompressFromEncodedURIComponent(data);
+                    
+                    if (!jsonStr) {
+                        // Fallback para versão anterior (Base64 puro) caso alguém tenha link antigo
+                        try { jsonStr = decodeURIComponent(escape(atob(data))); } catch(e) {}
+                    }
+
+                    if (!jsonStr) throw new Error("Dados inválidos");
+
                     const content = JSON.parse(jsonStr);
                     
                     // Carregar Dados
@@ -1132,7 +1167,7 @@
                     setTheme(currentTheme);
                     renderDiet();
                     updateDateDisplay();
-                    updateInitials();
+                    updateInitials(); // Força atualização das iniciais baseada no nome do prof carregado
 
                     // Renderizar Histórico
                     const tbody = document.querySelector('#history-table tbody');
@@ -1148,7 +1183,7 @@
                             });
                              // Empty action cell to match header structure
                             const tdAction = document.createElement('td');
-                            tdAction.className = "hide-on-view";
+                            tdAction.className = "nutritionist-only";
                             tr.appendChild(tdAction);
                             tbody.appendChild(tr);
                         });
@@ -1162,9 +1197,13 @@
                     document.body.classList.add('view-mode');
                     document.getElementById('splash-screen').style.display = 'none'; // Pula splash
                     
+                    // Garante que o container de controles exclusão do nutricionista suma
+                    document.querySelectorAll('.nutritionist-only').forEach(el => el.style.display = 'none');
+
                     return true; // Parar init normal
                 } catch (e) {
                     console.error("Erro ao carregar link compartilhado", e);
+                    alert("Erro ao abrir link: O link pode estar incompleto ou corrompido.");
                     return false;
                 }
             }
@@ -1248,7 +1287,7 @@
             }
             // Cria célula de ação (excluir)
             const tdAction = document.createElement('td');
-            tdAction.className = "p-1 text-center no-print col-history-action hide-on-view";
+            tdAction.className = "p-1 text-center no-print col-history-action nutritionist-only";
             tdAction.innerHTML = '<button onclick="deleteHistoryRow(this)" class="text-slate-300 hover:text-red-500 p-1 transition"><i class="fa-solid fa-trash-can"></i></button>';
             tr.appendChild(tdAction);
 
@@ -1595,7 +1634,7 @@
                         
                         // Adicionar a coluna de ação que não foi salva
                         const tdAction = document.createElement('td');
-                        tdAction.className = "p-1 text-center no-print col-history-action hide-on-view";
+                        tdAction.className = "p-1 text-center no-print col-history-action nutritionist-only";
                         tdAction.innerHTML = '<button onclick="deleteHistoryRow(this)" class="text-slate-300 hover:text-red-500 p-1 transition"><i class="fa-solid fa-trash-can"></i></button>';
                         tr.appendChild(tdAction);
 
@@ -1932,14 +1971,14 @@
                         
                         if(opt === 'A') {
                             swapControls = `
-                                <div class="flex gap-2 no-print group/header hide-on-view">
+                                <div class="flex gap-2 no-print group/header nutritionist-only">
                                     <button onclick="swapMealOptions(${m.id}, 'A', 'B')" class="text-[10px] bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded text-slate-600 font-normal" title="Trocar com Opção B">⬇ B</button>
                                     <button onclick="swapMealOptions(${m.id}, 'A', 'C')" class="text-[10px] bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded text-slate-600 font-normal" title="Trocar com Opção C">⬇ C</button>
                                 </div>
                             `;
                         } else {
                             swapControls = `
-                                <div class="no-print group/header hide-on-view">
+                                <div class="no-print group/header nutritionist-only">
                                     <button onclick="swapMealOptions(${m.id}, 'A', '${opt}')" class="text-[10px] bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-2 py-0.5 rounded font-bold border border-emerald-200 flex items-center gap-1">
                                         <i class="fa-solid fa-arrow-up"></i> Tornar Principal
                                     </button>
@@ -1966,7 +2005,7 @@
                                 <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'prot',this.innerText)" title="Clique para editar">P: ${f.totalProt.toFixed(0)}</td>
                                 <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'fat',this.innerText)" title="Clique para editar">G: ${f.totalFat.toFixed(0)}</td>
                                 <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded" contenteditable="true" onblur="updateFoodMacro(${m.id},${originalIndex},'fiber',this.innerText)" title="Clique para editar">F: ${(f.totalFiber||0).toFixed(1)}</td>
-                                <td class="p-3 text-center w-28 col-actions no-print">
+                                <td class="p-3 text-center w-28 col-actions no-print nutritionist-only">
                                     <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100">
                                         <button onclick="openSubstitutionModal(${m.id}, ${originalIndex})" class="text-indigo-400 hover:text-indigo-600 px-1" title="Encontrar Substituto"><i class="fa-solid fa-exchange-alt"></i></button>
                                         <button onclick="moveFood(${m.id},${originalIndex},-1)" class="text-slate-400 hover:text-blue-500 px-1"><i class="fa-solid fa-chevron-up"></i></button>
@@ -1980,14 +2019,14 @@
                     }
                 });
                 
-                if(m.foods.length===0) html=`<div class="p-6 text-center text-slate-400 text-sm italic no-print hide-on-view">Nenhum alimento.</div>`;
+                if(m.foods.length===0) html=`<div class="p-6 text-center text-slate-400 text-sm italic no-print nutritionist-only">Nenhum alimento.</div>`;
 
                 c.innerHTML += `<div class="card meal-card bg-white rounded-xl shadow-sm theme-border border overflow-hidden relative group mt-4">
-                    <div class="absolute top-4 right-4 flex gap-2 no-print opacity-0 group-hover:opacity-100 z-10 hide-on-view"><button onclick="duplicateMeal(${m.id})" class="text-slate-300 hover:text-blue-500"><i class="fa-regular fa-copy"></i></button><button onclick="deleteMeal(${m.id})" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button></div>
-                    <div class="meal-header theme-bg-light p-4 border-b theme-border flex justify-between items-center"><div class="flex items-center gap-3"><div class="flex flex-col gap-1 no-print hide-on-view"><button onclick="moveMeal(${idx},-1)"><i class="fa-solid fa-chevron-up text-slate-400 text-[10px]"></i></button><button onclick="moveMeal(${idx},1)"><i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i></button></div><h3 class="font-bold text-slate-700 cursor-text" contenteditable="true" onblur="updateMealTitle(${m.id},this.innerText)">${m.title}</h3><button onclick="toggleEmojiPicker(${m.id}, event)" class="text-slate-400 hover:text-yellow-500 no-print emoji-trigger"><i class="fa-solid fa-face-smile"></i></button></div></div>
+                    <div class="absolute top-4 right-4 flex gap-2 no-print opacity-0 group-hover:opacity-100 z-10 nutritionist-only"><button onclick="duplicateMeal(${m.id})" class="text-slate-300 hover:text-blue-500"><i class="fa-regular fa-copy"></i></button><button onclick="deleteMeal(${m.id})" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button></div>
+                    <div class="meal-header theme-bg-light p-4 border-b theme-border flex justify-between items-center"><div class="flex items-center gap-3"><div class="flex flex-col gap-1 no-print nutritionist-only"><button onclick="moveMeal(${idx},-1)"><i class="fa-solid fa-chevron-up text-slate-400 text-[10px]"></i></button><button onclick="moveMeal(${idx},1)"><i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i></button></div><h3 class="font-bold text-slate-700 cursor-text" contenteditable="true" onblur="updateMealTitle(${m.id},this.innerText)">${m.title}</h3><button onclick="toggleEmojiPicker(${m.id}, event)" class="text-slate-400 hover:text-yellow-500 no-print emoji-trigger nutritionist-only"><i class="fa-solid fa-face-smile"></i></button></div></div>
                     <div>${html}</div>
                     <div class="totals-footer p-3 bg-slate-50 border-t border-slate-100 flex justify-end gap-4 text-xs font-bold text-slate-600"><span>Total (Principal):</span><span>${mc.cal.toFixed(0)} kcal</span><span class="text-blue-600">C: ${mc.c.toFixed(0)}g</span><span class="text-emerald-600">P: ${mc.p.toFixed(0)}g</span><span class="text-yellow-600">G: ${mc.f.toFixed(0)}g</span><span class="text-orange-600">F: ${mc.fib.toFixed(1)}g</span></div>
-                    <div class="px-4 pb-4 pt-2 border-t border-slate-100 relative group/obs"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-slate-400 uppercase">Observações</span><button onclick="clearMealObservation(${m.id})" class="no-print opacity-0 group-hover/obs:opacity-100 text-slate-300 hover:text-red-500 hide-on-view"><i class="fa-solid fa-xmark"></i></button></div><div class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm text-slate-600 outline-none" contenteditable="true" onblur="updateMealObservation(${m.id},this.innerText)">${m.observation||''}</div></div>
+                    <div class="px-4 pb-4 pt-2 border-t border-slate-100 relative group/obs"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-slate-400 uppercase">Observações</span><button onclick="clearMealObservation(${m.id})" class="no-print opacity-0 group-hover/obs:opacity-100 text-slate-300 hover:text-red-500 nutritionist-only"><i class="fa-solid fa-xmark"></i></button></div><div class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm text-slate-600 outline-none" contenteditable="true" onblur="updateMealObservation(${m.id},this.innerText)">${m.observation||''}</div></div>
                 </div>`;
             });
 
@@ -1997,7 +2036,7 @@
             // CARD: META DIÁRIA (AGORA DARK TAMBÉM) - Atualizado
             if(showGoals) {
                 c.innerHTML += `<div class="card summary-card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 mt-4 relative group">
-                    <button onclick="removeGoals()" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition no-print opacity-0 group-hover:opacity-100 hide-on-view" title="Ocultar Metas"><i class="fa-solid fa-xmark"></i></button>
+                    <button onclick="removeGoals()" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition no-print nutritionist-only opacity-0 group-hover:opacity-100" title="Ocultar Metas"><i class="fa-solid fa-xmark"></i></button>
                     <div class="p-4 border-b border-slate-700 flex justify-between items-center">
                         <h3 class="font-bold text-lg flex items-center gap-2">
                             <i class="fa-solid fa-flag-checkered text-emerald-400"></i> Meta Diária
