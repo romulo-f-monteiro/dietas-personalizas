@@ -296,7 +296,7 @@
                 <button onclick="openPatientModal()" class="nutritionist-only bg-slate-900/30 hover:bg-slate-900/50 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-white/20">
                     <i class="fa-solid fa-users"></i> <span id="current-patient-label">Pacientes</span>
                 </button>
-                <button onclick="shareLink()" class="nutritionist-only bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-blue-400">
+                <button onclick="openShareModal()" class="nutritionist-only bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-blue-400">
                     <i class="fa-solid fa-share-nodes"></i> Compartilhar Link
                 </button>
                 <button onclick="printDiet()" class="bg-white text-slate-700 hover:bg-slate-100 px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2">
@@ -309,6 +309,20 @@
     <!-- Área de Conteúdo -->
     <div id="document-area" class="bg-white md:bg-transparent w-full max-w-[1600px] mx-auto transition-all"> 
         
+        <!-- MENSAGEM DE BOAS VINDAS (VISÍVEL APENAS NO MODO PACIENTE/VIEW) -->
+        <div id="welcome-banner" class="hidden bg-emerald-50 border-l-4 border-emerald-500 p-6 mx-4 mt-6 rounded-r shadow-sm mb-6 max-w-4xl mx-auto">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fa-solid fa-heart-pulse text-emerald-500 text-3xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-lg font-bold text-emerald-800">Seja muito bem-vindo(a) à sua jornada de cuidados.</p>
+                    <p class="text-emerald-700 mt-1">Fique à vontade e conte comigo sempre que precisar.</p>
+                    <p class="text-sm font-semibold text-emerald-600 mt-2">Abs, Nutri</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Cabeçalho do Documento -->
         <div class="container mx-auto px-4 mt-6 mb-2">
             <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center text-center gap-2 w-full break-inside-avoid">
@@ -590,6 +604,36 @@
         </div>
     </div>
 
+    <!-- MODAL INFORMATIVO DE COMPARTILHAMENTO -->
+    <div id="share-info-modal" class="fixed inset-0 modal-overlay z-[70] hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
+            <div class="bg-blue-600 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-share-nodes"></i> Compartilhar Link</h3>
+                <button onclick="closeShareModal()" class="text-blue-200 hover:text-white"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+                    Nesta seção, você pode salvar o link para envio ao paciente. Vale lembrar que o link é extenso, portanto recomenda-se utilizar sites de encurtamento de links. 
+                    <br><br>
+                    Caso prefira, você também pode salvar o arquivo em PDF para maior comodidade.
+                </p>
+                
+                <div class="flex gap-3 mb-6">
+                    <a href="https://tinyurl.com/" target="_blank" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-bold text-center border border-slate-300 transition">
+                        <i class="fa-solid fa-link"></i> TinyURL
+                    </a>
+                    <a href="https://l8.nu/?utm_source=chatgpt.com" target="_blank" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg text-xs font-bold text-center border border-slate-300 transition">
+                        <i class="fa-solid fa-link"></i> L8.nu
+                    </a>
+                </div>
+
+                <button onclick="generateAndCopyLink()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                    <i class="fa-regular fa-copy"></i> Copiar Link Gerado
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PACIENTES -->
     <div id="patient-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center backdrop-blur-sm p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
@@ -668,8 +712,14 @@
             const name = document.getElementById('prof-name').value || "RFM";
             const parts = name.trim().split(" ");
             let initials = "";
-            if (parts.length > 0) initials += parts[0][0];
-            if (parts.length > 1) initials += parts[parts.length-1][0];
+            // Lógica Atualizada: Pegar 1ª letra das 3 primeiras partes do nome
+            if (parts.length === 1) {
+                initials = parts[0].substring(0, 3);
+            } else {
+                initials = parts[0][0];
+                if (parts.length >= 2) initials += parts[1][0];
+                if (parts.length >= 3) initials += parts[2][0];
+            }
             document.getElementById('header-initials').innerText = initials.toUpperCase() || "RFM";
         }
 
@@ -705,7 +755,16 @@
             return meals;
         }
 
-        function shareLink() {
+        // Funções do Modal de Compartilhamento
+        function openShareModal() {
+            document.getElementById('share-info-modal').classList.remove('hidden');
+        }
+        
+        function closeShareModal() {
+            document.getElementById('share-info-modal').classList.add('hidden');
+        }
+
+        function generateAndCopyLink() {
             const inputs = {};
             ['patient-name','patient-goal','diet-date','prof-name','prof-crn','prof-phone','prof-insta','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber'].forEach(f => inputs[f] = document.getElementById(f).value);
 
@@ -726,7 +785,15 @@
             const safeName = encodeURIComponent(patientName).replace(/%20/g, '+');
             const url = window.location.href.split('?')[0] + '?nome=' + safeName + '&d=' + compressed;
 
-            navigator.clipboard.writeText(url).then(() => showToast("Link copiado! (Encurtado)", "success")).catch(err => prompt("Copie:", url));
+            navigator.clipboard.writeText(url).then(() => {
+                showToast("Link copiado para área de transferência!", "success");
+                closeShareModal();
+            }).catch(err => prompt("Copie:", url));
+        }
+        
+        // Mantém função antiga para compatibilidade se chamada diretamente, mas redireciona para modal
+        function shareLink() {
+            openShareModal();
         }
 
         function checkShareMode() {
@@ -785,6 +852,9 @@
 
                     initChart();
                     updateChartData();
+
+                    // SHOW WELCOME BANNER
+                    document.getElementById('welcome-banner').classList.remove('hidden');
 
                     document.body.classList.add('view-mode');
                     document.getElementById('splash-screen').style.display = 'none';
