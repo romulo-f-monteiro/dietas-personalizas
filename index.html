@@ -121,7 +121,15 @@
             
             #btn-add-row { display: none !important; }
             .col-history-action { display: none !important; width: 0 !important; }
-            #chart-container { break-inside: avoid; page-break-inside: avoid; height: 350px !important; width: 100% !important; margin: 20px auto !important; }
+            
+            /* AJUSTE DO GRÁFICO NO PDF (Para não cortar a direita) */
+            #chart-container { 
+                break-inside: avoid; 
+                page-break-inside: avoid; 
+                height: 350px !important; 
+                width: 95% !important; /* Reduzido para evitar corte */
+                margin: 20px auto !important; 
+            }
             
             #page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 30px; text-align: center; font-size: 10px; color: #94a3b8; font-weight: 500; background-color: white; display: flex !important; align-items: center; justify-content: center; border-top: 1px dashed #e2e8f0; z-index: 9999; margin-bottom: 0 !important; padding-bottom: 5px; }
             
@@ -202,6 +210,17 @@
         body.view-mode .lg\:col-span-9 { 
             grid-column: span 12 / span 12 !important; 
             width: 100% !important;
+        }
+        
+        /* AJUSTE DE ESTÉTICA DESKTOP NO LINK COMPARTILHADO */
+        @media (min-width: 1024px) {
+            /* Descola os alimentos da borda esquerda no modo visualização */
+            body.view-mode .col-name {
+                padding-left: 2rem !important; 
+            }
+            body.view-mode .meal-header {
+                padding-left: 1.5rem !important;
+            }
         }
         
         /* Container centralizado e limitado no Desktop para não ficar "esticado" demais */
@@ -875,10 +894,10 @@
                                 <td class="p-3 font-medium col-name" contenteditable="true" onblur="updateFoodName(${m.id},${i},this.innerText)">${f.name}</td>
                                 <td class="p-3 col-qty whitespace-nowrap"><div class="flex items-center justify-center"><input type="number" class="qty-input" value="${f.qty}" onchange="updateFoodQty(${m.id},${i},this.value)"><span class="ml-1">g</span></div></td>
                                 <td class="p-3 text-center text-xs col-cal cursor-text hover:bg-slate-100 rounded whitespace-nowrap" contenteditable="true" onblur="updateFoodMacro(${m.id},${i},'cal',this.innerText)">${f.totalCal.toFixed(0)} kcal</td>
-                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded whitespace-nowrap" contenteditable="true" onblur="updateFoodMacro(${m.id},${i},'carb',this.innerText)">C: ${f.totalCarb.toFixed(0)}</td>
-                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded whitespace-nowrap" contenteditable="true" onblur="updateFoodMacro(${m.id},${i},'prot',this.innerText)">P: ${f.totalProt.toFixed(0)}</td>
-                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded whitespace-nowrap" contenteditable="true" onblur="updateFoodMacro(${m.id},${i},'fat',this.innerText)">G: ${f.totalFat.toFixed(0)}</td>
-                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded whitespace-nowrap" contenteditable="true" onblur="updateFoodMacro(${m.id},${i},'fiber',this.innerText)">F: ${(f.totalFiber||0).toFixed(1)}</td>
+                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded whitespace-nowrap hide-macros" contenteditable="true" onblur="updateFoodMacro(${m.id},${i},'carb',this.innerText)">C: ${f.totalCarb.toFixed(0)}</td>
+                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded whitespace-nowrap hide-macros" contenteditable="true" onblur="updateFoodMacro(${m.id},${i},'prot',this.innerText)">P: ${f.totalProt.toFixed(0)}</td>
+                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded whitespace-nowrap hide-macros" contenteditable="true" onblur="updateFoodMacro(${m.id},${i},'fat',this.innerText)">G: ${f.totalFat.toFixed(0)}</td>
+                                <td class="p-3 text-center text-[10px] col-macro cursor-text hover:bg-slate-100 rounded whitespace-nowrap hide-macros" contenteditable="true" onblur="updateFoodMacro(${m.id},${i},'fiber',this.innerText)">F: ${(f.totalFiber||0).toFixed(1)}</td>
                                 <td class="p-3 text-center w-28 col-actions no-print nutritionist-only"><div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100"><button onclick="openSubstitutionModal(${m.id},${i})" class="text-indigo-400 px-1"><i class="fa-solid fa-exchange-alt"></i></button><button onclick="removeFood(${m.id},${i})" class="text-red-400 px-1"><i class="fa-solid fa-times"></i></button></div></td>
                             </tr>`;
                         });
@@ -892,7 +911,7 @@
                                 <div class="font-medium text-sm leading-tight" contenteditable="true" onblur="updateFoodName(${m.id},${i},this.innerText)">${f.name}</div>
                                 <div class="text-sm font-bold whitespace-nowrap flex items-center bg-slate-50 rounded px-2"><input type="number" class="qty-input w-10 bg-transparent" value="${f.qty}" onchange="updateFoodQty(${m.id},${i},this.value)"> g</div>
                                 <div class="text-xs font-bold text-slate-500 whitespace-nowrap">${f.totalCal.toFixed(0)} kcal</div>
-                                <div class="meal-table-macros">
+                                <div class="meal-table-macros hide-macros">
                                     <span class="text-blue-600">C:${f.totalCarb.toFixed(0)}</span>
                                     <span class="text-emerald-600">P:${f.totalProt.toFixed(0)}</span>
                                     <span class="text-yellow-600">G:${f.totalFat.toFixed(0)}</span>
