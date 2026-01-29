@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plano Alimentar – Dietas Personalizadas</title>
+    <title>RFM Plano Alimentar - Dietas Personalizadas</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -62,7 +62,7 @@
             body { background-color: white; padding: 10mm 5mm 15mm 5mm !important; margin: 0 !important; }
             
             /* Ocultar elementos específicos na impressão */
-            .no-print, #toast, #splash-screen, .hide-in-print { display: none !important; }
+            .no-print, #toast, #splash-screen, .hide-in-print, .nutritionist-only { display: none !important; }
             
             /* Garantir visibilidade */
             .print-only { display: block !important; }
@@ -71,6 +71,7 @@
             main.grid { display: block !important; }
             .lg\:col-span-8 { width: 100% !important; }
             
+            /* Ajuste de tabela para não quebrar no print */
             table { width: 100% !important; table-layout: fixed !important; }
             .col-name { width: 42% !important; }
             .col-qty { width: 11% !important; text-align: center !important; } 
@@ -91,7 +92,7 @@
             
             #btn-add-row { display: none !important; }
             .col-history-action { display: none !important; width: 0 !important; }
-            #chart-container { break-inside: avoid; page-break-inside: avoid; height: 280px !important; width: 100% !important; margin: 20px auto !important; }
+            #chart-container { break-inside: avoid; page-break-inside: avoid; height: 350px !important; width: 100% !important; margin: 20px auto !important; }
             
             #page-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 30px; text-align: center; font-size: 10px; color: #94a3b8; font-weight: 500; background-color: white; display: flex !important; align-items: center; justify-content: center; border-top: 1px dashed #e2e8f0; z-index: 9999; margin-bottom: 0 !important; padding-bottom: 5px; }
             
@@ -184,6 +185,13 @@
         body.view-mode .theme-ring { box-shadow: none !important; }
         body.view-mode .upload-ui-controls { display: none !important; } /* Esconde controle de upload no modo view */
         
+        /* Ajuste do Header do Paciente no modo View */
+        body.view-mode .clean-input { 
+            white-space: normal; 
+            text-overflow: clip; 
+            overflow: visible;
+        }
+        
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
@@ -229,7 +237,7 @@
                     <span id="header-initials" class="text-xl font-black tracking-tighter">RFM</span>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">Plano Alimentar</h1>
+                    <h1 class="text-xl font-bold">RFM Plano Alimentar</h1>
                     <p class="text-xs opacity-90">Dietas Personalizadas</p>
                 </div>
             </div>
@@ -275,11 +283,18 @@
                 </div>
 
                 <!-- Dados do Paciente -->
-                <div class="w-full max-w-2xl space-y-1">
-                    <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300" placeholder="Nome do Paciente" value="Paciente Exemplo" onkeyup="triggerAutoSave()">
-                    <input type="text" id="patient-goal" class="clean-input text-md font-medium text-slate-600 placeholder-slate-300" placeholder="Objetivo" value="Objetivo: Hipertrofia" onkeyup="triggerAutoSave()">
-                    <div class="relative">
-                        <input type="date" id="diet-date" class="clean-input text-sm text-slate-500 font-medium no-print" onchange="updateDateDisplay(); triggerAutoSave();">
+                <div class="w-full max-w-2xl space-y-2 flex flex-col items-center">
+                    <!-- IDs mantidos para JS, mas visualmente ajustados no View Mode -->
+                    <div id="patient-name-container" class="w-full">
+                        <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300 w-full" placeholder="Nome do Paciente" value="Paciente Exemplo" onkeyup="triggerAutoSave()">
+                    </div>
+                    
+                    <div id="patient-goal-container" class="w-full">
+                        <input type="text" id="patient-goal" class="clean-input text-md font-medium text-slate-600 placeholder-slate-300 w-full" placeholder="Objetivo" value="Objetivo: Hipertrofia" onkeyup="triggerAutoSave()">
+                    </div>
+                    
+                    <div class="relative w-full">
+                        <input type="date" id="diet-date" class="clean-input text-sm text-slate-500 font-medium no-print w-full" onchange="updateDateDisplay(); triggerAutoSave();">
                         <span id="date-display" class="hidden print-only text-sm text-slate-500 font-medium w-full text-center block"></span>
                     </div>
                 </div>
@@ -615,10 +630,10 @@
                         <i class="fa-solid fa-weight-scale theme-text"></i> Histórico da composição corporal
                     </h3>
                     <div class="w-full">
-                        <table id="history-table" class="w-full text-xs text-center border-collapse border border-slate-300 table-fixed">
+                        <table id="history-table" class="w-full text-xs text-center border-collapse border border-slate-300">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-700 font-bold">
-                                    <th class="measure-cell w-20">Data</th>
+                                    <th class="measure-cell">Data</th>
                                     <th class="measure-cell">Peso</th>
                                     <th class="measure-cell">Cintura</th>
                                     <th class="measure-cell">Abdômen</th>
@@ -634,14 +649,14 @@
                         </table>
                         
                         <!-- BOTÃO DE ADICIONAR LINHA -->
-                        <div class="mt-2 text-right">
+                        <div class="mt-2 text-right nutritionist-only">
                              <button id="btn-add-row" onclick="addHistoryRow()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1 rounded text-xs font-bold transition border border-slate-300 hide-in-print">
                                 <i class="fa-solid fa-plus"></i> Adicionar Linha
                              </button>
                         </div>
 
                         <!-- GRÁFICO VISUAL (CANVAS) -->
-                        <div id="chart-container" class="mt-6 h-64 w-full">
+                        <div id="chart-container" class="mt-6 h-80 w-full"> <!-- Aumentado para h-80 (320px) -->
                             <canvas id="evolutionChart"></canvas>
                         </div>
                     </div>
@@ -652,6 +667,7 @@
                     
                     <!-- Dados Profissional (Esquerda - Vertical) -->
                     <div class="w-full md:w-1/2 flex flex-col gap-3 text-left">
+                        <p class="text-xs font-bold text-slate-500 uppercase mb-[-5px]">Nutricionista</p>
                         <input type="text" id="prof-name" class="clean-input text-left font-bold text-lg placeholder-slate-400" placeholder="Nome do Profissional" onkeyup="triggerAutoSave(); updateInitials();">
                         
                         <div class="flex items-center gap-2">
@@ -1121,7 +1137,11 @@
             const jsonStr = JSON.stringify(shareData);
             const compressed = LZString.compressToEncodedURIComponent(jsonStr);
             
-            const url = window.location.href.split('?')[0] + '?d=' + compressed;
+            const patientName = document.getElementById('patient-name').value.trim();
+            const safeName = encodeURIComponent(patientName);
+            
+            // Link agora inclui o nome
+            const url = window.location.href.split('?')[0] + '?nome=' + safeName + '&d=' + compressed;
 
             // Copiar para clipboard
             navigator.clipboard.writeText(url).then(() => {
@@ -1162,6 +1182,18 @@
                         }
                     }
                     if(content.goalsText) document.getElementById('goals-area').innerText = content.goalsText;
+
+                    // SUBSTITUIR INPUTS POR TEXTO ESTÁTICO (VISUALIZAÇÃO MELHOR)
+                    const pNameInput = document.getElementById('patient-name');
+                    if(pNameInput) {
+                        const val = pNameInput.value;
+                        pNameInput.outerHTML = `<h1 class="text-3xl font-black text-slate-800 text-center leading-tight mb-1">${val}</h1>`;
+                    }
+                    const pGoalInput = document.getElementById('patient-goal');
+                    if(pGoalInput) {
+                        const val = pGoalInput.value;
+                        pGoalInput.outerHTML = `<p class="text-lg font-medium text-slate-600 text-center mb-2">${val}</p>`;
+                    }
 
                     // Renderizar
                     setTheme(currentTheme);
@@ -2025,7 +2057,14 @@
                     <div class="absolute top-4 right-4 flex gap-2 no-print opacity-0 group-hover:opacity-100 z-10 nutritionist-only"><button onclick="duplicateMeal(${m.id})" class="text-slate-300 hover:text-blue-500"><i class="fa-regular fa-copy"></i></button><button onclick="deleteMeal(${m.id})" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button></div>
                     <div class="meal-header theme-bg-light p-4 border-b theme-border flex justify-between items-center"><div class="flex items-center gap-3"><div class="flex flex-col gap-1 no-print nutritionist-only"><button onclick="moveMeal(${idx},-1)"><i class="fa-solid fa-chevron-up text-slate-400 text-[10px]"></i></button><button onclick="moveMeal(${idx},1)"><i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i></button></div><h3 class="font-bold text-slate-700 cursor-text" contenteditable="true" onblur="updateMealTitle(${m.id},this.innerText)">${m.title}</h3><button onclick="toggleEmojiPicker(${m.id}, event)" class="text-slate-400 hover:text-yellow-500 no-print emoji-trigger nutritionist-only"><i class="fa-solid fa-face-smile"></i></button></div></div>
                     <div>${html}</div>
-                    <div class="totals-footer p-3 bg-slate-50 border-t border-slate-100 flex justify-end gap-4 text-xs font-bold text-slate-600"><span>Total (Principal):</span><span>${mc.cal.toFixed(0)} kcal</span><span class="text-blue-600">C: ${mc.c.toFixed(0)}g</span><span class="text-emerald-600">P: ${mc.p.toFixed(0)}g</span><span class="text-yellow-600">G: ${mc.f.toFixed(0)}g</span><span class="text-orange-600">F: ${mc.fib.toFixed(1)}g</span></div>
+                    <div class="totals-footer p-3 bg-slate-50 border-t border-slate-100 flex flex-wrap justify-end gap-x-4 gap-y-2 text-xs font-bold text-slate-600">
+                        <span>Total (Principal):</span>
+                        <span>${mc.cal.toFixed(0)} kcal</span>
+                        <span class="text-blue-600">C: ${mc.c.toFixed(0)}g</span>
+                        <span class="text-emerald-600">P: ${mc.p.toFixed(0)}g</span>
+                        <span class="text-yellow-600">G: ${mc.f.toFixed(0)}g</span>
+                        <span class="text-orange-600">F: ${mc.fib.toFixed(1)}g</span>
+                    </div>
                     <div class="px-4 pb-4 pt-2 border-t border-slate-100 relative group/obs"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-slate-400 uppercase">Observações</span><button onclick="clearMealObservation(${m.id})" class="no-print opacity-0 group-hover/obs:opacity-100 text-slate-300 hover:text-red-500 nutritionist-only"><i class="fa-solid fa-xmark"></i></button></div><div class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm text-slate-600 outline-none" contenteditable="true" onblur="updateMealObservation(${m.id},this.innerText)">${m.observation||''}</div></div>
                 </div>`;
             });
