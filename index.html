@@ -1139,7 +1139,7 @@
                 </div>`;
             });
 
-            c.innerHTML += `<div class="card summary-card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 mt-6"><div class="p-4 border-b border-slate-700 flex justify-between"><h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-chart-pie text-emerald-400"></i> 🍎 Ingestão Diária</h3><span class="text-xs text-slate-400">(Opções A)</span></div><div class="p-6 pt-2 pb-6"><div class="grid grid-cols-2 md:grid-cols-5 gap-6 text-center"><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calorias</div><div class="text-3xl font-bold">${dt.cal.toFixed(0)}</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Carboidrato</div><div class="text-2xl font-bold text-blue-400">${dt.c.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Proteína</div><div class="text-2xl font-bold text-emerald-400">${dt.p.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Gordura</div><div class="text-2xl font-bold text-yellow-400">${dt.f.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Fibras</div><div class="text-2xl font-bold text-orange-400">${dt.fib.toFixed(0)}g</div></div></div><p class="text-xs text-slate-400 mt-6 font-light">Aqui está a soma de todas as opções principais de alimentos que compõem sua dieta. É importante destacar que nem sempre é fácil atingir a meta diária.</p></div></div>`;
+            c.innerHTML += `<div class="card summary-card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 mt-6"><div class="p-4 border-b border-slate-700 flex justify-between"><h3 class="font-bold flex items-center gap-2"><i class="fa-solid fa-chart-pie text-emerald-400"></i> 🍎 Ingestão Diária</h3><span class="text-xs text-slate-400"></span></div><div class="p-6 pt-2 pb-6"><div class="grid grid-cols-2 md:grid-cols-5 gap-6 text-center"><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Calorias</div><div class="text-3xl font-bold">${dt.cal.toFixed(0)}</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Carboidrato</div><div class="text-2xl font-bold text-blue-400">${dt.c.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Proteína</div><div class="text-2xl font-bold text-emerald-400">${dt.p.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Gordura</div><div class="text-2xl font-bold text-yellow-400">${dt.f.toFixed(0)}g</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Fibras</div><div class="text-2xl font-bold text-orange-400">${dt.fib.toFixed(0)}g</div></div></div><p class="text-xs text-slate-400 mt-6 font-light">Aqui está a soma de todas as opções principais de alimentos que compõem sua dieta. É importante destacar que nem sempre é fácil atingir a meta diária.</p></div></div>`;
 
             if(showGoals) c.innerHTML += `<div class="card summary-card bg-slate-800 text-white rounded-xl shadow-md border border-slate-700 mt-4 relative group"><button onclick="removeGoals()" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition no-print nutritionist-only opacity-0 group-hover:opacity-100"><i class="fa-solid fa-trash-can"></i></button><div class="p-4 border-b border-slate-700 flex justify-between items-center"><h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-flag-checkered text-emerald-400"></i> Meta diária de ingestão</h3></div><div class="p-6 pt-2 pb-6"><div class="grid grid-cols-2 md:grid-cols-5 gap-6 text-center"><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Kcal</div><div class="text-3xl font-bold text-white">${tc.toFixed(0)}</div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Carbo</div><div class="text-2xl font-bold text-blue-400">${(tc*(pc/100)/4).toFixed(0)}g <span class="text-xs text-slate-500 font-normal">(${pc}%)</span></div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Prot</div><div class="text-2xl font-bold text-emerald-400">${(tc*(pp/100)/4).toFixed(0)}g <span class="text-xs text-slate-500 font-normal">(${pp}%)</span></div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Gord</div><div class="text-2xl font-bold text-yellow-400">${(tc*(pf/100)/9).toFixed(0)}g <span class="text-xs text-slate-500 font-normal">(${pf}%)</span></div></div><div><div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Meta Fibras</div><div class="text-2xl font-bold text-orange-400">${tf.toFixed(0)}g</div></div></div><p class="text-xs text-slate-400 mt-6 font-light">Essa meta diária é definida de acordo com seu objetivo, peso, altura, idade, entre outros fatores.</p></div></div>`;
             
@@ -1157,7 +1157,7 @@
             customGoals.forEach((goal, index) => {
                 const daysHtml = goal.days.map((checked, dayIndex) => 
                     `<div class="habit-check ${checked ? 'checked' : 'bg-slate-100'}" 
-                          onclick="toggleHabitDay(${index}, ${dayIndex})"></div>`
+                           onclick="toggleHabitDay(${index}, ${dayIndex})"></div>`
                 ).join('');
 
                 // Opções de ícones para o select
@@ -1185,8 +1185,9 @@
                         <div class="habit-grid">
                             ${daysHtml}
                         </div>
-                        <div class="text-[10px] text-slate-400 text-right mt-2 font-medium">
-                            ${goal.days.filter(d => d).length}/30 dias
+                        <div class="flex justify-between items-center mt-2">
+                             <span class="text-[10px] text-slate-300 italic">Marque aqui</span>
+                             <span class="text-[10px] text-slate-400 font-medium">${goal.days.filter(d => d).length}/30 dias</span>
                         </div>
                     </div>
                 `;
@@ -1330,6 +1331,29 @@
             showToast("Alimento adicionado!");
         }
 
+        // --- Recalcular Macros ao editar quantidade ---
+        function updateFoodQty(mid, fid, val) {
+            const m = dietMeals.find(x => x.id === mid);
+            if (!m) return;
+            const f = m.foods[fid];
+            let qty = parseFloat(val);
+            if (isNaN(qty) || qty < 0) qty = 0; // Permite 0, mas evita NaN
+            
+            f.qty = qty;
+            const fac = qty / 100;
+            
+            // Recalcula totais com base nos valores por 100g (que já estão em f.cal, f.carb, etc do objeto original ou minificado)
+            // Se o app usa f.cal como base 100g:
+            f.totalCal = f.cal * fac;
+            f.totalCarb = f.carb * fac;
+            f.totalProt = f.prot * fac;
+            f.totalFat = f.fat * fac;
+            f.totalFiber = (f.fiber || 0) * fac;
+            
+            renderDiet();
+            triggerAutoSave();
+        }
+
 
         // Functions below unchanged but re-declared for scope safety in one file
         function updateFoodName(mid, fid, v) { const m=dietMeals.find(x=>x.id===mid); if(m&&m.foods[fid]) { m.foods[fid].name=v.trim(); triggerAutoSave(); } }
@@ -1380,7 +1404,7 @@
         let currentSubMealId = null, currentSubFoodIndex = null, currentSubMacro = 'carb', currentSubSource = null;
         function openSubstitutionModal(mid, fid) { currentSubMealId = mid; currentSubFoodIndex = fid; const m = dietMeals.find(x => x.id === mid); if (!m || !m.foods[fid]) return; const f = m.foods[fid]; if(document.getElementById('sub-search-input')) document.getElementById('sub-search-input').value = ''; currentSubSource = { name: f.name, cal: f.totalCal, carb: f.totalCarb, prot: f.totalProt, fat: f.totalFat, fiber: f.totalFiber || 0 }; document.getElementById('sub-source-info').innerHTML = `Base: <b>${f.name}</b> (${f.qty}g)<br><span class='text-xs text-slate-500'>Kcal:${f.totalCal.toFixed(0)} C:${f.totalCarb.toFixed(1)} P:${f.totalProt.toFixed(1)} G:${f.totalFat.toFixed(1)} F:${(f.totalFiber||0).toFixed(1)}</span>`; filterSubstitutes('carb'); document.getElementById('substitution-modal').classList.remove('hidden'); }
         function closeSubModal() { document.getElementById('substitution-modal').classList.add('hidden'); }
-        function filterSubstitutes(mac) { const tb = document.getElementById('sub-list'); tb.innerHTML = ''; if (mac) currentSubMacro = mac; else mac = currentSubMacro; ['carb','prot','fat'].forEach(m => { const b = document.getElementById('btn-sub-'+m); if(m === mac) b.classList.add('ring-2', 'ring-offset-1'); else b.classList.remove('ring-2', 'ring-offset-1'); }); const tv = currentSubSource[mac]; if (tv <= 0.5) { tb.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Sem quantidade significativa.</td></tr>`; return; } const fd = (v) => { const r = Math.round(v); let c = 'text-slate-400'; if(r > 2) c = 'text-red-500 font-bold'; else if(r < -2) c = 'text-emerald-600 font-bold'; return `<span class="${c} text-[10px] font-mono whitespace-nowrap">${r>0?'+':''}${r}</span>`; }; let cands = foodDatabase.map(f => { const cpg = f[mac] / 100; if (cpg <= 0) return null; const nq = tv / cpg; const rc = (f.cal/100)*nq; const dif = rc - currentSubSource.cal; return { id: f.id, name: f.name, qty: nq, d: dif, s: Math.abs(dif) }; }).filter(x => x !== null); const st = document.getElementById('sub-search-input').value.toLowerCase().trim(); if (st.length > 0) cands = cands.filter(c => c.name.toLowerCase().includes(st)); cands.sort((a,b) => a.s - b.s); cands.slice(0, 20).forEach(c => { const rq = Math.round(c.qty); const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 border-b border-slate-50"; tr.innerHTML = `<td class="p-3 font-medium text-sm truncate max-w-[200px]" title="${c.name}">${c.name}</td><td class="p-3 text-center font-bold text-blue-600 text-xs">${rq}g</td><td class="p-3 text-center">${fd(c.d)}</td><td class="p-3 text-center"><button onclick="confirmSubstitution(${c.id}, ${rq})" class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded">Trocar</button></td>`; tb.appendChild(tr); }); if (cands.length === 0) tb.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Nada encontrado.</td></tr>`; }
+        function filterSubstitutes(mac) { const tb = document.getElementById('sub-list'); tb.innerHTML = ''; if (mac) currentSubMacro = mac; else mac = currentSubMacro; ['carb','prot','fat'].forEach(m => { const b = document.getElementById('btn-sub-'+m); if(m === mac) b.classList.add('ring-2', 'ring-offset-1'); else b.classList.remove('ring-2', 'ring-offset-1'); }); const tv = currentSubSource[mac]; if (tv <= 0.5) { tb.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Sem quantidade significativa.</td></tr>`; return; } const fd = (v) => { const r = Math.round(v); let c = 'text-slate-400'; if(r > 2) c = 'text-red-500 font-bold'; else if(r < -2) c = 'text-emerald-600 font-bold'; return `<span class="${c} text-[10px] font-mono whitespace-nowrap">${r>0?'+':''}${r}</span>`; }; let cands = foodDatabase.map(f => { const cpg = f[mac] / 100; if (cpg <= 0) return null; const nq = tv / cpg; const rc = (f.cal/100)*nq; const dif = rc - currentSubSource.cal; return { id: f.id, name: f.name, qty: nq, d: dif, s: Math.abs(dif), raw: f }; }).filter(x => x !== null); const st = document.getElementById('sub-search-input').value.toLowerCase().trim(); if (st.length > 0) cands = cands.filter(c => c.name.toLowerCase().includes(st)); cands.sort((a,b) => a.s - b.s); cands.slice(0, 20).forEach(c => { const rq = Math.round(c.qty); const fac = rq / 100; const det = `Kcal:${(c.raw.cal*fac).toFixed(0)} C:${(c.raw.carb*fac).toFixed(1)} P:${(c.raw.prot*fac).toFixed(1)} G:${(c.raw.fat*fac).toFixed(1)}`; const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 border-b border-slate-50"; tr.innerHTML = `<td class="p-3 font-medium text-sm truncate max-w-[200px]" title="${c.name}">${c.name}<div class="text-[10px] text-slate-400 font-normal">${det}</div></td><td class="p-3 text-center font-bold text-blue-600 text-xs">${rq}g</td><td class="p-3 text-center">${fd(c.d)}</td><td class="p-3 text-center"><button onclick="confirmSubstitution(${c.id}, ${rq})" class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded">Trocar</button></td>`; tb.appendChild(tr); }); if (cands.length === 0) tb.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Nada encontrado.</td></tr>`; }
         function confirmSubstitution(nid, nq) { const m = dietMeals.find(x => x.id === currentSubMealId); if(!m || !m.foods[currentSubFoodIndex]) return; const of = m.foods[currentSubFoodIndex]; const db = foodDatabase.find(f => f.id === nid); if(!db) return; const fac = nq / 100; const no = { ...db, qty: nq, option: of.option, totalCal: db.cal*fac, totalCarb: db.carb*fac, totalProt: db.prot*fac, totalFat: db.fat*fac, totalFiber: (db.fiber||0)*fac }; m.foods[currentSubFoodIndex] = no; renderDiet(); triggerAutoSave(); closeSubModal(); showToast("Substituído!"); }
 
         init();
