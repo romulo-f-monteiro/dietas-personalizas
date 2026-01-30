@@ -171,7 +171,8 @@
             overflow: hidden;
             outline: none;
         }
-        .editable-div:empty:before {
+        /* Atualizado para funcionar em qualquer campo editável (como nas atividades) */
+        [contenteditable]:empty:before {
             content: attr(placeholder);
             color: #94a3b8;
         }
@@ -1254,15 +1255,17 @@
                          </div>
                          
                          <div class="ml-10">
-                            <input type="text" class="text-sm text-slate-500 bg-transparent w-full outline-none placeholder-slate-300 mb-2" 
-                                   value="${act.desc}" placeholder="Descreva a prática atual (ex: 3x semana, 30min)..." 
-                                   onblur="updateActivityDesc(${idx}, this.value)">
+                            <div class="text-sm text-slate-500 bg-transparent w-full outline-none mb-2 whitespace-pre-wrap break-words cursor-text" 
+                                 contenteditable="true" 
+                                 placeholder="Descreva a prática atual (ex: 3x semana, 30min)..." 
+                                 onblur="updateActivityDesc(${idx}, this.innerText)">${act.desc}</div>
                             
-                            <div class="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100">
-                                <span class="text-xs font-bold text-emerald-600 uppercase w-24 shrink-0">Recomendação:</span>
-                                <input type="text" class="text-sm font-medium text-slate-700 bg-transparent w-full outline-none placeholder-emerald-200/50" 
-                                       value="${act.rec || ''}" placeholder="Digite a meta recomendada..." 
-                                       onblur="updateActivityRec(${idx}, this.value)">
+                            <div class="flex items-start gap-2 mt-2 pt-2 border-t border-slate-100">
+                                <span class="text-xs font-bold text-emerald-600 uppercase w-24 shrink-0 mt-0.5">Recomendação:</span>
+                                <div class="text-sm font-medium text-slate-700 bg-transparent w-full outline-none whitespace-pre-wrap break-words cursor-text" 
+                                       contenteditable="true" 
+                                       placeholder="Digite a meta recomendada..." 
+                                       onblur="updateActivityRec(${idx}, this.innerText)">${act.rec || ''}</div>
                             </div>
                          </div>
                     </div>
