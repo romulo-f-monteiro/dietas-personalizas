@@ -607,15 +607,10 @@
                         </div>
                     </div>
                     
-                    <div id="activity-list" class="space-y-3 mb-6"></div>
+                    <div id="activity-list" class="space-y-4 mb-6"></div>
                     
                     <div class="flex justify-center mb-6 nutritionist-only">
                         <button onclick="addActivityRow()" class="bg-slate-50 hover:bg-slate-100 text-slate-600 px-3 py-1 rounded text-xs font-bold transition border border-slate-200"><i class="fa-solid fa-plus"></i> Adicionar nova atividade</button>
-                    </div>
-
-                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 mb-4">
-                        <label class="text-xs font-bold text-slate-500 uppercase block mb-2">Meta de Atividade Física Recomendada</label>
-                        <input type="text" id="activity-goal-input" class="w-full bg-transparent border-b border-slate-300 focus:border-blue-500 outline-none py-1 text-slate-700 font-medium" placeholder="Ex: Realizar 150min de atividade moderada por semana..." onkeyup="updateActivityGoal(this.value)">
                     </div>
 
                     <div class="text-[10px] text-slate-400 text-center italic mt-4 border-t border-slate-100 pt-3">
@@ -787,15 +782,14 @@
         ];
         
         const defaultActivities = [
-             { id: 1, name: "Caminhada", desc: "Leve, 3x semana, 30min" },
-             { id: 2, name: "Musculação", desc: "4x semana, foco hipertrofia" },
-             { id: 3, name: "Deslocamento Ativo", desc: "Ir a pé para o trabalho" }
+             { id: 1, name: "Caminhada - Atual", desc: "Leve, 3x semana, 30min", rec: "Aumentar para 45min" },
+             { id: 2, name: "Musculação - Atual", desc: "4x semana, foco hipertrofia", rec: "Manter intensidade" },
+             { id: 3, name: "Deslocamento Ativo - Atual", desc: "Ir a pé para o trabalho", rec: "" }
         ];
 
         let dietMeals = JSON.parse(JSON.stringify(defaultMeals));
         let customGoals = []; // ARRAY PARA AS NOVAS METAS
         let physicalActivities = JSON.parse(JSON.stringify(defaultActivities)); // Array para Atividades
-        let activityGoalText = "";
         let currentTheme = 'emerald';
         let showGoals = true;
         let currentPatientId = null;
@@ -903,7 +897,7 @@
 
 
             // Adicionando customGoals ao shareData
-            const shareData = { v: 2, i: inputs, m: minifiedMeals, h: history, t: currentTheme, g: document.getElementById('goals-area').innerText, cg: customGoals, pa: physicalActivities, ag: activityGoalText, hs: hiddenSections };
+            const shareData = { v: 2, i: inputs, m: minifiedMeals, h: history, t: currentTheme, g: document.getElementById('goals-area').innerText, cg: customGoals, pa: physicalActivities, hs: hiddenSections };
             const jsonStr = JSON.stringify(shareData);
             const compressed = LZString.compressToEncodedURIComponent(jsonStr);
             const patientName = document.getElementById('patient-name').value.trim();
@@ -939,7 +933,6 @@
                         if(c.g) document.getElementById('goals-area').innerText = c.g;
                         customGoals = c.cg || []; // Carrega as metas de hábito
                         physicalActivities = c.pa || []; // Carrega atividades
-                        activityGoalText = c.ag || "";
                         if(c.hs) c.hs.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
 
                     } else {
@@ -958,8 +951,6 @@
                     const pGoal = document.getElementById('patient-goal');
                     if(pGoal) pGoal.outerHTML = `<p class="text-lg font-medium text-slate-600 text-center mb-2 break-words">${pGoal.value}</p>`;
                     
-                    document.getElementById('activity-goal-input').value = activityGoalText;
-
                     setTheme(currentTheme);
                     renderDiet();
                     renderCustomGoals(); // Renderiza as metas no modo view
@@ -1248,28 +1239,39 @@
             
             physicalActivities.forEach((act, idx) => {
                 const html = `
-                    <div class="flex flex-col md:flex-row gap-2 items-start md:items-center p-3 bg-slate-50 border border-slate-100 rounded-lg group hover:border-slate-200 transition">
-                         <div class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-person-running"></i>
+                    <div class="flex flex-col gap-2 p-4 bg-slate-50 border border-slate-100 rounded-lg group hover:border-slate-200 transition">
+                         <div class="flex gap-2 items-center">
+                             <div class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-person-running"></i>
+                             </div>
+                             <div class="flex-1 w-full">
+                                <input type="text" class="font-bold text-slate-700 bg-transparent w-full outline-none placeholder-slate-400 text-sm" 
+                                       value="${act.name}" placeholder="Nome da Atividade" 
+                                       onblur="updateActivityName(${idx}, this.value)">
+                             </div>
+                             <button onclick="deleteActivity(${idx})" class="nutritionist-only text-slate-300 hover:text-red-500 px-2 opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash-can"></i></button>
                          </div>
-                         <div class="flex-1 w-full">
-                            <input type="text" class="font-bold text-slate-700 bg-transparent w-full outline-none placeholder-slate-400 text-sm mb-1" 
-                                   value="${act.name}" placeholder="Nome da Atividade" 
-                                   onblur="updateActivityName(${idx}, this.value)">
-                            <input type="text" class="text-sm text-slate-500 bg-transparent w-full outline-none placeholder-slate-300" 
-                                   value="${act.desc}" placeholder="Descrição (ex: 3x semana, 30min)" 
+                         
+                         <div class="ml-10">
+                            <input type="text" class="text-sm text-slate-500 bg-transparent w-full outline-none placeholder-slate-300 mb-2" 
+                                   value="${act.desc}" placeholder="Descreva a prática atual (ex: 3x semana, 30min)..." 
                                    onblur="updateActivityDesc(${idx}, this.value)">
+                            
+                            <div class="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100">
+                                <span class="text-xs font-bold text-emerald-600 uppercase w-24 shrink-0">Recomendação:</span>
+                                <input type="text" class="text-sm font-medium text-slate-700 bg-transparent w-full outline-none placeholder-emerald-200/50" 
+                                       value="${act.rec || ''}" placeholder="Digite a meta recomendada..." 
+                                       onblur="updateActivityRec(${idx}, this.value)">
+                            </div>
                          </div>
-                         <button onclick="deleteActivity(${idx})" class="nutritionist-only text-slate-300 hover:text-red-500 px-2 opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 `;
                 list.innerHTML += html;
             });
-             document.getElementById('activity-goal-input').value = activityGoalText;
         }
 
         function addActivityRow() {
-            physicalActivities.push({ id: Date.now(), name: "", desc: "" });
+            physicalActivities.push({ id: Date.now(), name: "Nova Atividade - Atual", desc: "", rec: "" });
             renderActivities();
             triggerAutoSave();
         }
@@ -1292,9 +1294,40 @@
             triggerAutoSave();
         }
         
-        function updateActivityGoal(val) {
-            activityGoalText = val;
+        function updateActivityRec(idx, val) {
+            physicalActivities[idx].rec = val;
             triggerAutoSave();
+        }
+
+        function addToPlan() {
+            const mid = parseInt(document.getElementById('select-meal').value);
+            const fid = parseInt(document.getElementById('select-food').value);
+            const qty = parseFloat(document.getElementById('input-qty').value);
+            const opt = document.querySelector('input[name="meal-option"]:checked').value;
+
+            if(!mid || !fid || isNaN(qty) || qty <= 0) return showToast("Dados inválidos", "error");
+
+            const meal = dietMeals.find(m => m.id === mid);
+            const food = foodDatabase.find(f => f.id === fid);
+
+            if(!meal || !food) return;
+
+            const fac = qty / 100;
+            const newFood = {
+                ...food,
+                qty: qty,
+                option: opt,
+                totalCal: food.cal * fac,
+                totalCarb: food.carb * fac,
+                totalProt: food.prot * fac,
+                totalFat: food.fat * fac,
+                totalFiber: (food.fiber || 0) * fac
+            };
+
+            meal.foods.push(newFood);
+            renderDiet();
+            triggerAutoSave();
+            showToast("Alimento adicionado!");
         }
 
 
