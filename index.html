@@ -7,7 +7,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Adicionando Great Vibes para a assinatura -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Great+Vibes&display=swap" rel="stylesheet">
     <!-- Chart.js para o Gráfico -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- LZ-String para compressão de URL -->
@@ -27,8 +28,9 @@
             -webkit-font-smoothing: antialiased;
         }
         
+        /* Fonte estilo Assinatura */
         .signature-font {
-            font-family: 'Dancing Script', cursive;
+            font-family: 'Great Vibes', cursive;
         }
 
         .theme-bg { background-color: var(--primary) !important; }
@@ -193,7 +195,6 @@
         .clean-input {
             background: transparent;
             border: none;
-            text-align: center;
             width: 100%;
             outline: none;
         }
@@ -446,21 +447,30 @@
 
                 <div class="w-full max-w-2xl space-y-2 flex flex-col items-center">
                     
-                    <!-- NOVO: Assinatura do Profissional no Cabeçalho -->
-                    <div class="w-full mb-2">
-                        <input type="text" id="header-prof-name" class="clean-input signature-font text-3xl text-emerald-700 placeholder-slate-200 w-full text-center" placeholder="Seu Nome Aqui" onkeyup="triggerAutoSave()">
+                    <div id="patient-name-container" class="w-full flex items-center gap-2">
+                        <span class="text-xl font-semibold text-slate-500 whitespace-nowrap">Paciente:</span>
+                        <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300 w-full text-left" placeholder="Nome do Paciente" value="Paciente Exemplo" onkeyup="triggerAutoSave()">
+                    </div>
+                    
+                    <div class="w-full flex items-center gap-2 mb-2">
+                        <span class="text-sm font-semibold text-slate-500 whitespace-nowrap">Nutricionista:</span>
+                        <input type="text" id="header-prof-name-input" class="clean-input text-md font-medium text-slate-700 placeholder-slate-300 w-full text-left" placeholder="Seu Nome" value="" onkeyup="triggerAutoSave(); updateSignatureDisplay();">
                     </div>
 
-                    <div id="patient-name-container" class="w-full">
-                        <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300 w-full" placeholder="Nome do Paciente" value="Paciente Exemplo" onkeyup="triggerAutoSave()">
-                    </div>
                     <div id="patient-goal-container" class="w-full">
                         <input type="text" id="patient-goal" class="clean-input text-md font-medium text-slate-600 placeholder-slate-300 w-full" placeholder="Objetivo" value="Objetivo: Hipertrofia" onkeyup="triggerAutoSave()">
                     </div>
+                    
                     <div class="relative w-full">
                         <input type="date" id="diet-date" class="clean-input text-sm text-slate-500 font-medium no-print w-full" onchange="updateDateDisplay(); triggerAutoSave();">
                         <span id="date-display" class="hidden print-only text-sm text-slate-500 font-medium w-full text-center block"></span>
                     </div>
+
+                    <!-- Assinatura Abaixo da Data -->
+                    <div class="w-full mt-2">
+                        <div id="header-signature-display" class="signature-font text-2xl text-black text-center opacity-90 h-8"></div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -622,11 +632,11 @@
                     <div id="habit-goals-container" class="space-y-4"></div>
                 </div>
 
-                <!-- Metas (Texto Livre) - Centralizado e com quebra de linha -->
+                <!-- Metas (Texto Livre) - Justificado e com quebra de linha -->
                 <div id="goals-card" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mt-8 break-inside-avoid relative group">
                     <button onclick="hideSection('goals-card')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition no-print nutritionist-only opacity-0 group-hover:opacity-100"><i class="fa-solid fa-trash-can"></i></button>
                     <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-lg justify-center"><i class="fa-solid fa-bullseye theme-text"></i> Orientações e Recomendações</h3>
-                    <div id="goals-area" class="editable-div w-full p-2 bg-transparent text-slate-700 leading-relaxed text-center break-words" contenteditable="true" placeholder="Digite aqui..." onblur="triggerAutoSave()"></div>
+                    <div id="goals-area" class="editable-div w-full p-2 bg-transparent text-slate-700 leading-relaxed text-justify break-words" contenteditable="true" placeholder="Digite aqui..." onblur="triggerAutoSave()"></div>
                 </div>
 
                 <!-- Seção de Atividade Física -->
@@ -858,11 +868,22 @@
             document.getElementById('header-initials').innerText = initials.toUpperCase() || "RFM";
         }
 
+        // Função para atualizar a assinatura visual
+        function updateSignatureDisplay() {
+            const val = document.getElementById('header-prof-name-input').value;
+            const display = document.getElementById('header-signature-display');
+            if(display) display.innerText = val;
+        }
+
+        // Minify com limpeza extra para reduzir link
         function minifyData(meals) {
-            return meals.map(m => ({
-                id: m.id, title: m.title, observation: m.observation,
-                foods: m.foods.map(f => ({ id: f.id, name: f.name, qty: f.qty, option: f.option, cal: f.cal, carb: f.carb, prot: f.prot, fat: f.fat, fiber: f.fiber }))
-            }));
+            return meals.map(m => {
+                const cleanFoods = m.foods.map(f => ({ id: f.id, name: f.name, qty: f.qty, option: f.option, cal: f.cal, carb: f.carb, prot: f.prot, fat: f.fat, fiber: f.fiber }));
+                // Se a refeição não tem comida e não tem obs, ignoramos (opcional, mas arriscado se o user quiser refeições vazias)
+                // Vamos manter, mas limpar a obs se vazia
+                const cleanObs = m.observation ? m.observation : undefined;
+                return { id: m.id, title: m.title, ...(cleanObs && {observation: cleanObs}), foods: cleanFoods };
+            });
         }
 
         function restoreTotals(meals) {
@@ -880,20 +901,53 @@
 
         function generateAndCopyLink() {
             const inputs = {};
-            ['patient-name','patient-goal','diet-date','prof-name','header-prof-name','prof-crn','prof-phone','prof-insta','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber'].forEach(f => inputs[f] = document.getElementById(f).value);
+            // Apenas inputs essenciais e não vazios
+            ['patient-name','patient-goal','diet-date','prof-name','header-prof-name-input','prof-crn','prof-phone','prof-insta','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber'].forEach(f => {
+                const el = document.getElementById(f);
+                if(el && el.value) inputs[f] = el.value;
+            });
+
             const history = [];
             document.querySelectorAll('#history-table tbody tr').forEach(r => {
                 const row = []; 
-                r.querySelectorAll('td.measure-cell').forEach(c => row.push(c.innerText)); 
-                if(row.length > 0) history.push(row);
+                let hasData = false;
+                r.querySelectorAll('td.measure-cell').forEach(c => {
+                    const txt = c.innerText.trim();
+                    row.push(txt);
+                    if(txt) hasData = true;
+                }); 
+                if(hasData) history.push(row);
             });
-            const minifiedMeals = minifyData(dietMeals);
-            const hiddenSections = [];
-            if(document.getElementById('habit-goals-section').classList.contains('hidden')) hiddenSections.push('habit-goals-section');
-            if(document.getElementById('activity-section').classList.contains('hidden')) hiddenSections.push('activity-section');
-            if(document.getElementById('goals-card').classList.contains('hidden')) hiddenSections.push('goals-card');
 
-            const shareData = { v: 2, i: inputs, m: minifiedMeals, h: history, t: currentTheme, g: document.getElementById('goals-area').innerText, cg: customGoals, pa: physicalActivities, hs: hiddenSections };
+            const minifiedMeals = minifyData(dietMeals);
+            
+            // Limpa metas vazias
+            const cleanGoals = customGoals.filter(g => g.title).map(g => ({
+                t: g.title, i: g.icon, d: g.days.map(d => d ? 1 : 0).join('') // Bitmask string for days to save space
+            }));
+
+            // Limpa atividades vazias
+            const cleanActivities = physicalActivities.filter(a => a.name).map(a => ({
+                n: a.name, d: a.desc, r: a.rec
+            }));
+
+            const hiddenSections = [];
+            if(document.getElementById('habit-goals-section').classList.contains('hidden')) hiddenSections.push('h');
+            if(document.getElementById('activity-section').classList.contains('hidden')) hiddenSections.push('a');
+            if(document.getElementById('goals-card').classList.contains('hidden')) hiddenSections.push('g');
+
+            const shareData = { 
+                v: 3, // Version 3 optimized
+                i: inputs, 
+                m: minifiedMeals, 
+                h: history, 
+                t: currentTheme, 
+                g: document.getElementById('goals-area').innerText, 
+                cg: cleanGoals, 
+                pa: cleanActivities, 
+                hs: hiddenSections 
+            };
+
             const jsonStr = JSON.stringify(shareData);
             const compressed = LZString.compressToEncodedURIComponent(jsonStr);
             const patientName = document.getElementById('patient-name').value.trim();
@@ -913,7 +967,33 @@
                     if (!jsonStr) throw new Error("Dados inválidos");
 
                     const c = JSON.parse(jsonStr);
-                    if(c.v === 2) {
+                    
+                    // V3 Loading Logic (Optimized)
+                    if(c.v === 3) {
+                        dietMeals = restoreTotals(c.m || []);
+                        currentTheme = c.t || 'emerald';
+                        if(c.i) for(const [k, v] of Object.entries(c.i)) { const el=document.getElementById(k); if(el) el.value=v; }
+                        if(c.g) document.getElementById('goals-area').innerText = c.g;
+                        
+                        // Restore Goals
+                        customGoals = (c.cg || []).map(g => ({
+                            title: g.t, icon: g.i, 
+                            days: g.d.split('').map(x => x === '1')
+                        }));
+                        
+                        // Restore Activities
+                        physicalActivities = (c.pa || []).map(a => ({
+                            id: Date.now() + Math.random(), name: a.n, desc: a.d, rec: a.r
+                        }));
+
+                        if(c.hs) {
+                            if(c.hs.includes('h')) document.getElementById('habit-goals-section').classList.add('hidden');
+                            if(c.hs.includes('a')) document.getElementById('activity-section').classList.add('hidden');
+                            if(c.hs.includes('g')) document.getElementById('goals-card').classList.add('hidden');
+                        }
+
+                    } else if(c.v === 2) {
+                        // V2 Logic
                         dietMeals = restoreTotals(c.m || []);
                         currentTheme = c.t || 'emerald';
                         if(c.i) for(const [k, v] of Object.entries(c.i)) { const el=document.getElementById(k); if(el) el.value=v; }
@@ -922,6 +1002,7 @@
                         physicalActivities = c.pa || []; 
                         if(c.hs) c.hs.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
                     } else {
+                        // Legacy
                         dietMeals = c.meals || [];
                         currentTheme = c.theme || 'emerald';
                         if(c.inputs) for(const [k, v] of Object.entries(c.inputs)) { const el=document.getElementById(k); if(el) el.value=v; }
@@ -932,16 +1013,22 @@
                     const pName = document.getElementById('patient-name');
                     const pNameVal = pName ? pName.value : "Paciente";
                     
-                    if(pName) pName.outerHTML = `<h1 class="text-3xl font-black text-slate-800 text-center leading-tight mb-1 break-words">${pName.value}</h1>`;
+                    // Replace inputs with text for read-only view
+                    if(pName) pName.closest('div').outerHTML = `<h1 class="text-3xl font-black text-slate-800 text-center leading-tight mb-1 break-words">${pName.value}</h1>`;
+                    
+                    // Header Signature View
+                    const pHeaderNameInput = document.getElementById('header-prof-name-input');
+                    if(pHeaderNameInput && pHeaderNameInput.value) {
+                         document.getElementById('header-signature-display').innerText = pHeaderNameInput.value;
+                         pHeaderNameInput.closest('div').remove(); // Remove the input container in view mode
+                    } else {
+                        // If empty, remove the input line in view mode
+                        if(pHeaderNameInput) pHeaderNameInput.closest('div').remove();
+                    }
+
                     const pGoal = document.getElementById('patient-goal');
                     if(pGoal) pGoal.outerHTML = `<p class="text-lg font-medium text-slate-600 text-center mb-2 break-words">${pGoal.value}</p>`;
                     
-                    // HEADER SIGNATURE DISPLAY MODE
-                    const pHeaderName = document.getElementById('header-prof-name');
-                    if(pHeaderName) {
-                         pHeaderName.outerHTML = `<div class="signature-font text-3xl text-emerald-700 text-center mb-2">${pHeaderName.value}</div>`;
-                    }
-
                     setTheme(currentTheme);
                     renderDiet();
                     renderCustomGoals();
@@ -1144,7 +1231,7 @@
                             const i = m.foods.indexOf(f);
                             html+=`<div class="meal-table-row">
                                 <div class="font-medium text-sm leading-tight" contenteditable="true" onblur="updateFoodName(${m.id},${i},this.innerText)">${f.name}</div>
-                                <div class="text-sm font-bold whitespace-nowrap flex items-center bg-slate-50 rounded px-2"><input type="number" class="qty-input w-10 bg-transparent" value="${f.qty}" onchange="updateFoodQty(${m.id},${i},this.value)"> g</div>
+                                <div class="text-sm font-bold whitespace-nowrap inline-flex items-center bg-slate-50 rounded px-2 w-fit"><input type="number" class="qty-input w-10 bg-transparent text-right" value="${f.qty}" onchange="updateFoodQty(${m.id},${i},this.value)"> <span class="ml-1">g</span></div>
                                 <div class="text-xs font-bold text-slate-500 whitespace-nowrap">${f.totalCal.toFixed(0)} kcal</div>
                                 <div class="meal-table-macros hide-macros">
                                     <span class="text-blue-600">C:${f.totalCarb.toFixed(0)}</span>
@@ -1285,11 +1372,11 @@
         function savePatientsList(l) { localStorage.setItem('diet_patients_list', JSON.stringify(l)); }
         function openPatientModal() { const l = getPatientsList(); const u = document.getElementById('patient-list'); u.innerHTML = ''; if (l.length === 0) document.getElementById('empty-patients').classList.remove('hidden'); else { document.getElementById('empty-patients').classList.add('hidden'); l.forEach(p => { const a = p.id === currentPatientId; const d = new Date(p.lastModified).toLocaleDateString('pt-BR'); const li = document.createElement('li'); li.className = `p-3 flex justify-between items-center hover:bg-slate-100 transition cursor-pointer ${a ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`; li.onclick = (e) => { if(!e.target.closest('button')) loadPatient(p.id); }; li.innerHTML = `<div><div class="font-bold text-slate-800">${p.name}</div><div class="text-[10px] text-slate-400">Mod: ${d}</div></div><div class="flex gap-2">${a ? '<span class="text-xs text-blue-500 font-bold px-2 py-1 bg-blue-100 rounded">Ativo</span>' : ''}<button onclick="deletePatient('${p.id}')" class="text-slate-300 hover:text-red-500 p-2 transition"><i class="fa-solid fa-trash"></i></button></div>`; u.appendChild(li); }); } document.getElementById('patient-modal').classList.remove('hidden'); }
         function closePatientModal() { document.getElementById('patient-modal').classList.add('hidden'); }
-        function createNewPatient() { currentPatientId = 'pat_' + Date.now(); dietMeals = JSON.parse(JSON.stringify(defaultMeals)); customGoals = []; physicalActivities = JSON.parse(JSON.stringify(defaultActivities)); activityGoalText = ""; currentTheme = 'emerald'; document.getElementById('patient-name').value = "Novo Paciente"; document.getElementById('patient-goal').value = ""; document.getElementById('header-prof-name').value = ""; document.getElementById('diet-date').valueAsDate = new Date(); document.getElementById('logo-img-main').classList.add('hidden'); document.getElementById('logo-placeholder').classList.remove('hidden'); document.getElementById('logo-img-footer').classList.add('hidden'); document.getElementById('logo-placeholder-footer').classList.remove('hidden'); document.getElementById('target-cal').value = 2000; document.getElementById('target-fiber').value = 25; document.getElementById('calc-weight').value = ""; document.getElementById('calc-height').value = ""; document.getElementById('calc-age').value = ""; document.getElementById('goals-area').innerText = ""; const tb = document.querySelector('#history-table tbody'); tb.innerHTML = ''; for(let i=0; i<5; i++) addHistoryRow(); updateChartData(); saveCurrentPatientState(); renderMealSelect(); renderDiet(); renderCustomGoals(); renderActivities(); setTheme('emerald'); closePatientModal(); showToast("Criado!"); }
+        function createNewPatient() { currentPatientId = 'pat_' + Date.now(); dietMeals = JSON.parse(JSON.stringify(defaultMeals)); customGoals = []; physicalActivities = JSON.parse(JSON.stringify(defaultActivities)); activityGoalText = ""; currentTheme = 'emerald'; document.getElementById('patient-name').value = "Novo Paciente"; document.getElementById('patient-goal').value = ""; document.getElementById('header-prof-name-input').value = ""; document.getElementById('header-signature-display').innerText = ""; document.getElementById('diet-date').valueAsDate = new Date(); document.getElementById('logo-img-main').classList.add('hidden'); document.getElementById('logo-placeholder').classList.remove('hidden'); document.getElementById('logo-img-footer').classList.add('hidden'); document.getElementById('logo-placeholder-footer').classList.remove('hidden'); document.getElementById('target-cal').value = 2000; document.getElementById('target-fiber').value = 25; document.getElementById('calc-weight').value = ""; document.getElementById('calc-height').value = ""; document.getElementById('calc-age').value = ""; document.getElementById('goals-area').innerText = ""; const tb = document.querySelector('#history-table tbody'); tb.innerHTML = ''; for(let i=0; i<5; i++) addHistoryRow(); updateChartData(); saveCurrentPatientState(); renderMealSelect(); renderDiet(); renderCustomGoals(); renderActivities(); setTheme('emerald'); closePatientModal(); showToast("Criado!"); }
         function deletePatient(id) { if(!confirm("Apagar?")) return; let l = getPatientsList().filter(p => p.id !== id); savePatientsList(l); localStorage.removeItem('diet_data_' + id); if(id === currentPatientId) createNewPatient(); else openPatientModal(); }
-        function loadPatient(id) { const d = localStorage.getItem('diet_data_' + id); if (!d) return false; try { const da = JSON.parse(d); currentPatientId = id; dietMeals = (!da.meals || da.meals.length === 0) ? JSON.parse(JSON.stringify(defaultMeals)) : da.meals; currentTheme = da.theme || 'emerald'; customGoals = da.customGoals || []; physicalActivities = da.physicalActivities || JSON.parse(JSON.stringify(defaultActivities)); activityGoalText = da.activityGoalText || ""; const f = ['patient-name','patient-goal','diet-date','prof-name','header-prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber']; f.forEach(x => { if(document.getElementById(x) && da.inputs[x]!==undefined) document.getElementById(x).value = da.inputs[x]; }); if(da.selects) { document.getElementById('calc-formula').value = da.selects['calc-formula'] || 'mifflin'; document.getElementById('calc-activity').value = da.selects['calc-activity'] || '1.55'; const r = document.querySelector(`input[name="calc-sex"][value="${da.selects['calc-sex']}"]`); if(r) r.checked = true; } if(da.images) { const s = (i, p, src) => { if(src) { document.getElementById(i).src=src; document.getElementById(i).classList.remove('hidden'); document.getElementById(p).classList.add('hidden'); } else { document.getElementById(i).classList.add('hidden'); document.getElementById(p).classList.remove('hidden'); } }; s('logo-img-main', 'logo-placeholder', da.images.mainLogo); s('logo-img-footer', 'logo-placeholder-footer', da.images.footerLogo); } const tb = document.querySelector('#history-table tbody'); tb.innerHTML = ''; if(da.history && da.history.length > 0) { da.history.forEach((r) => { const tr = document.createElement('tr'); r.forEach(c => { const td = document.createElement('td'); td.className = "measure-cell"; td.contentEditable = "true"; td.innerText = c; td.onblur = function() { triggerAutoSave(); updateChartData(); }; tr.appendChild(td); }); const ta = document.createElement('td'); ta.className = "p-1 text-center no-print col-history-action nutritionist-only"; ta.innerHTML = '<button onclick="deleteHistoryRow(this)" class="text-slate-300 hover:text-red-500 p-1 transition"><i class="fa-solid fa-trash-can"></i></button>'; tr.appendChild(ta); tb.appendChild(tr); }); } else { for(let i=0; i<5; i++) addHistoryRow(); } if(da.goalsText) document.getElementById('goals-area').innerText = da.goalsText; setTheme(currentTheme); renderMealSelect(); renderDiet(); renderCustomGoals(); renderActivities(); calculateEnergy(); updateDateDisplay(); toggleBodyFatInput(); updateChartData(); updateInitials(); localStorage.setItem('diet_last_patient_id', id); closePatientModal(); showToast("Carregado!"); return true; } catch (e) { return false; } }
+        function loadPatient(id) { const d = localStorage.getItem('diet_data_' + id); if (!d) return false; try { const da = JSON.parse(d); currentPatientId = id; dietMeals = (!da.meals || da.meals.length === 0) ? JSON.parse(JSON.stringify(defaultMeals)) : da.meals; currentTheme = da.theme || 'emerald'; customGoals = da.customGoals || []; physicalActivities = da.physicalActivities || JSON.parse(JSON.stringify(defaultActivities)); activityGoalText = da.activityGoalText || ""; const f = ['patient-name','patient-goal','diet-date','prof-name','header-prof-name-input','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber']; f.forEach(x => { if(document.getElementById(x) && da.inputs[x]!==undefined) document.getElementById(x).value = da.inputs[x]; }); if(da.selects) { document.getElementById('calc-formula').value = da.selects['calc-formula'] || 'mifflin'; document.getElementById('calc-activity').value = da.selects['calc-activity'] || '1.55'; const r = document.querySelector(`input[name="calc-sex"][value="${da.selects['calc-sex']}"]`); if(r) r.checked = true; } if(da.images) { const s = (i, p, src) => { if(src) { document.getElementById(i).src=src; document.getElementById(i).classList.remove('hidden'); document.getElementById(p).classList.add('hidden'); } else { document.getElementById(i).classList.add('hidden'); document.getElementById(p).classList.remove('hidden'); } }; s('logo-img-main', 'logo-placeholder', da.images.mainLogo); s('logo-img-footer', 'logo-placeholder-footer', da.images.footerLogo); } const tb = document.querySelector('#history-table tbody'); tb.innerHTML = ''; if(da.history && da.history.length > 0) { da.history.forEach((r) => { const tr = document.createElement('tr'); r.forEach(c => { const td = document.createElement('td'); td.className = "measure-cell"; td.contentEditable = "true"; td.innerText = c; td.onblur = function() { triggerAutoSave(); updateChartData(); }; tr.appendChild(td); }); const ta = document.createElement('td'); ta.className = "p-1 text-center no-print col-history-action nutritionist-only"; ta.innerHTML = '<button onclick="deleteHistoryRow(this)" class="text-slate-300 hover:text-red-500 p-1 transition"><i class="fa-solid fa-trash-can"></i></button>'; tr.appendChild(ta); tb.appendChild(tr); }); } else { for(let i=0; i<5; i++) addHistoryRow(); } if(da.goalsText) document.getElementById('goals-area').innerText = da.goalsText; setTheme(currentTheme); renderMealSelect(); renderDiet(); renderCustomGoals(); renderActivities(); calculateEnergy(); updateDateDisplay(); toggleBodyFatInput(); updateChartData(); updateInitials(); updateSignatureDisplay(); localStorage.setItem('diet_last_patient_id', id); closePatientModal(); showToast("Carregado!"); return true; } catch (e) { return false; } }
         function triggerAutoSave() { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveCurrentPatientState, 1000); }
-        function saveCurrentPatientState() { if (!currentPatientId) return; const inp = {}; ['patient-name','patient-goal','diet-date','prof-name','header-prof-name','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber'].forEach(f => inp[f] = document.getElementById(f).value); const his = []; document.querySelectorAll('#history-table tbody tr').forEach(r => { const ro = []; r.querySelectorAll('td.measure-cell').forEach(c => ro.push(c.innerText)); his.push(ro); }); const da = { id: currentPatientId, lastModified: Date.now(), theme: currentTheme, inputs: inp, history: his, meals: dietMeals, customGoals: customGoals, physicalActivities: physicalActivities, activityGoalText: activityGoalText, goalsText: document.getElementById('goals-area').innerText, selects: { 'calc-formula': document.getElementById('calc-formula').value, 'calc-activity': document.getElementById('calc-activity').value, 'calc-sex': document.querySelector('input[name="calc-sex"]:checked').value }, images: { mainLogo: document.getElementById('logo-img-main').src.includes('data:') ? document.getElementById('logo-img-main').src : null, footerLogo: document.getElementById('logo-img-footer').src.includes('data:') ? document.getElementById('logo-img-footer').src : null } }; localStorage.setItem('diet_data_' + currentPatientId, JSON.stringify(da)); let l = getPatientsList(); const ix = l.findIndex(p => p.id === currentPatientId); const m = { id: currentPatientId, name: inp['patient-name'] || "Sem Nome", lastModified: Date.now() }; if (ix >= 0) l[ix] = m; else l.push(m); savePatientsList(l); const lb = document.getElementById('current-patient-label'); if(lb) lb.innerText = inp['patient-name'] || "Pacientes"; }
+        function saveCurrentPatientState() { if (!currentPatientId) return; const inp = {}; ['patient-name','patient-goal','diet-date','prof-name','header-prof-name-input','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber'].forEach(f => inp[f] = document.getElementById(f).value); const his = []; document.querySelectorAll('#history-table tbody tr').forEach(r => { const ro = []; r.querySelectorAll('td.measure-cell').forEach(c => ro.push(c.innerText)); his.push(ro); }); const da = { id: currentPatientId, lastModified: Date.now(), theme: currentTheme, inputs: inp, history: his, meals: dietMeals, customGoals: customGoals, physicalActivities: physicalActivities, activityGoalText: activityGoalText, goalsText: document.getElementById('goals-area').innerText, selects: { 'calc-formula': document.getElementById('calc-formula').value, 'calc-activity': document.getElementById('calc-activity').value, 'calc-sex': document.querySelector('input[name="calc-sex"]:checked').value }, images: { mainLogo: document.getElementById('logo-img-main').src.includes('data:') ? document.getElementById('logo-img-main').src : null, footerLogo: document.getElementById('logo-img-footer').src.includes('data:') ? document.getElementById('logo-img-footer').src : null } }; localStorage.setItem('diet_data_' + currentPatientId, JSON.stringify(da)); let l = getPatientsList(); const ix = l.findIndex(p => p.id === currentPatientId); const m = { id: currentPatientId, name: inp['patient-name'] || "Sem Nome", lastModified: Date.now() }; if (ix >= 0) l[ix] = m; else l.push(m); savePatientsList(l); const lb = document.getElementById('current-patient-label'); if(lb) lb.innerText = inp['patient-name'] || "Pacientes"; }
         function toggleBodyFatInput() { const f = document.getElementById('calc-formula').value; if(f==='tinsley_katch'||f==='cunningham') document.getElementById('bf-container').classList.remove('hidden'); else document.getElementById('bf-container').classList.add('hidden'); }
         function calculateEnergy() { const w = parseFloat(document.getElementById('calc-weight').value)||0, h = parseFloat(document.getElementById('calc-height').value)||0, a = parseFloat(document.getElementById('calc-age').value)||0, bf = parseFloat(document.getElementById('calc-bf').value)||0, act = parseFloat(document.getElementById('calc-activity').value)||1.2, s = document.querySelector('input[name="calc-sex"]:checked').value, f = document.getElementById('calc-formula').value; if(w>0 && h>0) document.getElementById('res-bmi').innerText = (w/((h/100)*(h/100))).toFixed(1); else document.getElementById('res-bmi').innerText = '--'; let b = 0; if(w>0) { if(f==='mifflin' && h>0 && a>0) b = (10*w) + (6.25*h) - (5*a) + (s==='m'?5:-161); else if(f==='harris' && h>0 && a>0) b = s==='m' ? 88.362+(13.397*w)+(4.799*h)-(5.677*a) : 447.593+(9.247*w)+(3.098*h)-(4.330*a); else if(f==='tinsley_ph' && h>0) b = (9.65*w) + (573*(h/100)) - (s==='m'?5.08:4.92); else if((f==='tinsley_katch'||f==='cunningham') && bf>0) { const mlg = w*(1-(bf/100)); b = f==='cunningham' ? 500+(22*mlg) : 370+(21.6*mlg); } } if(b>0) { document.getElementById('res-bmr').innerText = b.toFixed(0)+' kcal'; document.getElementById('res-tdee').innerText = (b*act).toFixed(0)+' kcal'; } else { document.getElementById('res-bmr').innerText = '--'; document.getElementById('res-tdee').innerText = '--'; } }
         function addNewMeal() { const n = document.getElementById('new-meal-name').value.trim(); if(!n) return showToast("Nome vazio","error"); dietMeals.push({ id: Date.now(), title: n, foods: [], observation: "" }); document.getElementById('new-meal-name').value=''; renderMealSelect(); renderDiet(); showToast("Criada!"); }
