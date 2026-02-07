@@ -449,7 +449,7 @@
                     
                     <!-- Campo Paciente Centralizado -->
                     <div id="patient-name-container" class="w-full flex items-center gap-2 justify-center">
-                        <span class="text-xl font-semibold text-slate-500 whitespace-nowrap">Paciente:</span>
+                        <span class="text-xl font-semibold text-slate-500 whitespace-nowrap no-print">Paciente:</span>
                         <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300 w-full text-center" placeholder="Nome do Paciente" value="Paciente Exemplo" onkeyup="triggerAutoSave()">
                     </div>
 
@@ -1032,8 +1032,8 @@
                     const pName = document.getElementById('patient-name');
                     const pNameVal = pName ? pName.value : "Paciente";
                     
-                    // Substitui o input do nome por H1 estático centralizado com prefixo "Paciente:"
-                    if(pName) pName.closest('div').outerHTML = `<h1 class="text-3xl font-black text-slate-800 text-center leading-tight mb-1 break-words"><span class="text-xl font-medium text-slate-500 align-middle mr-2">Paciente:</span>${pNameVal}</h1>`;
+                    // Substitui o input do nome por H1 estático centralizado (Removido prefixo "Paciente:")
+                    if(pName) pName.closest('div').outerHTML = `<h1 class="text-3xl font-black text-slate-800 text-center leading-tight mb-1 break-words">${pNameVal}</h1>`;
                     
                     // Header Signature View
                     const pHeaderNameInput = document.getElementById('header-prof-name-input');
