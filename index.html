@@ -413,6 +413,9 @@
                 </div>
             </div>
             <div class="flex gap-2">
+                <button onclick="openTutorialModal()" class="nutritionist-only bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-purple-400">
+                    <i class="fa-solid fa-circle-question"></i> Como usar
+                </button>
                 <button onclick="openAnamneseModal()" class="nutritionist-only bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-teal-400">
                     <i class="fa-solid fa-clipboard-list"></i> Anamnese
                 </button>
@@ -741,6 +744,24 @@
     <div id="page-footer" class="hidden print-only">RFM - Plano Alimentar - Dietas personalizadas</div>
 
     <!-- MODAIS (Substituição, Compartilhar, Anamnese, Pacientes) Mantidos -->
+    
+    <!-- Modal Tutorial -->
+    <div id="tutorial-modal" class="fixed inset-0 modal-overlay z-[80] hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all scale-100">
+            <div class="bg-purple-600 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-circle-play"></i> Como Usar a Ferramenta</h3>
+                <button onclick="closeTutorialModal()" class="text-purple-200 hover:text-white"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="aspect-video bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400">
+                    <i class="fa-brands fa-youtube text-5xl mb-3 text-slate-300"></i>
+                    <p class="font-medium">O vídeo explicativo será adicionado aqui.</p>
+                    <p class="text-xs mt-1">Cole o link/iframe do YouTube no código HTML futuramente.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="substitution-modal" class="fixed inset-0 modal-overlay z-[60] hidden flex items-center justify-center backdrop-blur-sm p-4">
         <!-- Conteúdo do Modal Mantido -->
          <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh]">
@@ -825,6 +846,10 @@
 
         function openAnamneseModal() { document.getElementById('anamnese-modal').classList.remove('hidden'); }
         function closeAnamneseModal() { document.getElementById('anamnese-modal').classList.add('hidden'); }
+        
+        // --- FUNÇÕES DO MODAL TUTORIAL ---
+        function openTutorialModal() { document.getElementById('tutorial-modal').classList.remove('hidden'); }
+        function closeTutorialModal() { document.getElementById('tutorial-modal').classList.add('hidden'); }
 
         // DADOS TACO
         let foodDatabase = [
