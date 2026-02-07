@@ -447,14 +447,9 @@
 
                 <div class="w-full max-w-2xl space-y-2 flex flex-col items-center">
                     
-                    <div id="patient-name-container" class="w-full flex items-center gap-2">
+                    <div id="patient-name-container" class="w-full flex items-center gap-2 justify-center">
                         <span class="text-xl font-semibold text-slate-500 whitespace-nowrap">Paciente:</span>
                         <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300 w-full text-left" placeholder="Nome do Paciente" value="Paciente Exemplo" onkeyup="triggerAutoSave()">
-                    </div>
-                    
-                    <div class="w-full flex items-center gap-2 mb-2">
-                        <span class="text-sm font-semibold text-slate-500 whitespace-nowrap">Nutricionista:</span>
-                        <input type="text" id="header-prof-name-input" class="clean-input text-md font-medium text-slate-700 placeholder-slate-300 w-full text-left" placeholder="Seu Nome" value="" onkeyup="triggerAutoSave(); updateSignatureDisplay();">
                     </div>
 
                     <div id="patient-goal-container" class="w-full">
@@ -467,8 +462,9 @@
                     </div>
 
                     <!-- Assinatura Abaixo da Data -->
-                    <div class="w-full mt-2">
-                        <div id="header-signature-display" class="signature-font text-2xl text-black text-center opacity-90 h-8"></div>
+                    <div class="w-full mt-4 text-center nutri-header-group">
+                        <p class="text-sm font-semibold text-slate-500 mb-0">Nutricionista:</p>
+                        <input type="text" id="header-prof-name-input" class="clean-input signature-font text-4xl text-black placeholder-slate-200 w-full text-center" placeholder="Assine aqui..." onkeyup="triggerAutoSave()">
                     </div>
 
                 </div>
@@ -611,8 +607,33 @@
                         </div>
                     </div>
                     
-                    <!-- 6. Custom Foods (sem alterações no bloco) -->
-                    <!-- ...código mantido... -->
+                    <!-- 6. Custom Foods (RESTAURADO) -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 nutrition-only">
+                        <h2 class="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-700 cursor-pointer" onclick="toggleCustomForm()">
+                            <i class="fa-solid fa-pen-to-square text-blue-500"></i> Adicionar Novos Alimentos
+                            <i class="fa-solid fa-chevron-down ml-auto text-xs text-slate-400"></i>
+                        </h2>
+                        <div id="custom-food-form" class="hidden space-y-3 pt-2 border-t border-slate-100">
+                            <input type="text" id="new-name" placeholder="Nome do Alimento" class="w-full p-2 text-sm border rounded">
+                            <div class="flex gap-2 mb-2"><input type="number" id="new-serving" placeholder="Porção (g)" value="100" class="w-1/3 p-2 text-sm border rounded bg-slate-50 text-center font-semibold"><span class="flex items-center text-xs text-slate-500">gramas (padrão)</span></div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="text-[10px] text-slate-400 font-bold ml-1">Kcal</label><input type="number" id="new-cal" placeholder="Kcal" class="w-full p-2 text-sm border rounded"></div>
+                                <div><label class="text-[10px] text-slate-400 font-bold ml-1">Carb</label><input type="number" id="new-carb" placeholder="Carb (g)" class="w-full p-2 text-sm border rounded"></div>
+                                <div><label class="text-[10px] text-slate-400 font-bold ml-1">Prot</label><input type="number" id="new-prot" placeholder="Prot (g)" class="w-full p-2 text-sm border rounded"></div>
+                                <div><label class="text-[10px] text-slate-400 font-bold ml-1">Gord</label><input type="number" id="new-fat" placeholder="Gord (g)" class="w-full p-2 text-sm border rounded"></div>
+                                <div class="col-span-2"><label class="text-[10px] text-slate-400 font-bold ml-1">Fibras</label><input type="number" id="new-fiber" placeholder="Fibras (g)" class="w-full p-2 text-sm border rounded"></div>
+                            </div>
+                            <button onclick="createCustomFood()" class="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 py-2 rounded-lg text-sm font-semibold transition border border-blue-200 mt-2">Salvar no Banco</button>
+                            <div class="mt-4 pt-4 border-t border-slate-100">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="exportFoodBackup()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 py-2 rounded text-xs font-bold transition border border-indigo-200"><i class="fa-solid fa-download"></i> Baixar Lista</button>
+                                    <button onclick="document.getElementById('food-backup-upload').click()" class="bg-slate-100 text-slate-600 hover:bg-slate-200 py-2 rounded text-xs font-bold transition border border-slate-300"><i class="fa-solid fa-upload"></i> Restaurar Lista</button>
+                                    <input type="file" id="food-backup-upload" accept=".json" class="hidden" onchange="importFoodBackup(event)">
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-slate-100"><button onclick="clearCustomFoods()" class="text-xs text-red-400 hover:text-red-600 underline w-full text-center">Limpar alimentos salvos</button></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -868,13 +889,6 @@
             document.getElementById('header-initials').innerText = initials.toUpperCase() || "RFM";
         }
 
-        // Função para atualizar a assinatura visual
-        function updateSignatureDisplay() {
-            const val = document.getElementById('header-prof-name-input').value;
-            const display = document.getElementById('header-signature-display');
-            if(display) display.innerText = val;
-        }
-
         // Minify com limpeza extra para reduzir link
         function minifyData(meals) {
             return meals.map(m => {
@@ -1019,11 +1033,18 @@
                     // Header Signature View
                     const pHeaderNameInput = document.getElementById('header-prof-name-input');
                     if(pHeaderNameInput && pHeaderNameInput.value) {
-                         document.getElementById('header-signature-display').innerText = pHeaderNameInput.value;
-                         pHeaderNameInput.closest('div').remove(); // Remove the input container in view mode
+                         // Create the signature div for view mode
+                         const sigDiv = document.createElement('div');
+                         sigDiv.className = "signature-font text-4xl text-black text-center mt-2";
+                         sigDiv.innerText = pHeaderNameInput.value;
+                         
+                         const container = pHeaderNameInput.closest('.nutri-header-group');
+                         if(container) {
+                            pHeaderNameInput.replaceWith(sigDiv);
+                         }
                     } else {
-                        // If empty, remove the input line in view mode
-                        if(pHeaderNameInput) pHeaderNameInput.closest('div').remove();
+                        // If empty, remove the section in view mode
+                        if(pHeaderNameInput) pHeaderNameInput.closest('.nutri-header-group').remove();
                     }
 
                     const pGoal = document.getElementById('patient-goal');
@@ -1372,9 +1393,9 @@
         function savePatientsList(l) { localStorage.setItem('diet_patients_list', JSON.stringify(l)); }
         function openPatientModal() { const l = getPatientsList(); const u = document.getElementById('patient-list'); u.innerHTML = ''; if (l.length === 0) document.getElementById('empty-patients').classList.remove('hidden'); else { document.getElementById('empty-patients').classList.add('hidden'); l.forEach(p => { const a = p.id === currentPatientId; const d = new Date(p.lastModified).toLocaleDateString('pt-BR'); const li = document.createElement('li'); li.className = `p-3 flex justify-between items-center hover:bg-slate-100 transition cursor-pointer ${a ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`; li.onclick = (e) => { if(!e.target.closest('button')) loadPatient(p.id); }; li.innerHTML = `<div><div class="font-bold text-slate-800">${p.name}</div><div class="text-[10px] text-slate-400">Mod: ${d}</div></div><div class="flex gap-2">${a ? '<span class="text-xs text-blue-500 font-bold px-2 py-1 bg-blue-100 rounded">Ativo</span>' : ''}<button onclick="deletePatient('${p.id}')" class="text-slate-300 hover:text-red-500 p-2 transition"><i class="fa-solid fa-trash"></i></button></div>`; u.appendChild(li); }); } document.getElementById('patient-modal').classList.remove('hidden'); }
         function closePatientModal() { document.getElementById('patient-modal').classList.add('hidden'); }
-        function createNewPatient() { currentPatientId = 'pat_' + Date.now(); dietMeals = JSON.parse(JSON.stringify(defaultMeals)); customGoals = []; physicalActivities = JSON.parse(JSON.stringify(defaultActivities)); activityGoalText = ""; currentTheme = 'emerald'; document.getElementById('patient-name').value = "Novo Paciente"; document.getElementById('patient-goal').value = ""; document.getElementById('header-prof-name-input').value = ""; document.getElementById('header-signature-display').innerText = ""; document.getElementById('diet-date').valueAsDate = new Date(); document.getElementById('logo-img-main').classList.add('hidden'); document.getElementById('logo-placeholder').classList.remove('hidden'); document.getElementById('logo-img-footer').classList.add('hidden'); document.getElementById('logo-placeholder-footer').classList.remove('hidden'); document.getElementById('target-cal').value = 2000; document.getElementById('target-fiber').value = 25; document.getElementById('calc-weight').value = ""; document.getElementById('calc-height').value = ""; document.getElementById('calc-age').value = ""; document.getElementById('goals-area').innerText = ""; const tb = document.querySelector('#history-table tbody'); tb.innerHTML = ''; for(let i=0; i<5; i++) addHistoryRow(); updateChartData(); saveCurrentPatientState(); renderMealSelect(); renderDiet(); renderCustomGoals(); renderActivities(); setTheme('emerald'); closePatientModal(); showToast("Criado!"); }
+        function createNewPatient() { currentPatientId = 'pat_' + Date.now(); dietMeals = JSON.parse(JSON.stringify(defaultMeals)); customGoals = []; physicalActivities = JSON.parse(JSON.stringify(defaultActivities)); activityGoalText = ""; currentTheme = 'emerald'; document.getElementById('patient-name').value = "Novo Paciente"; document.getElementById('patient-goal').value = ""; document.getElementById('header-prof-name-input').value = ""; document.getElementById('diet-date').valueAsDate = new Date(); document.getElementById('logo-img-main').classList.add('hidden'); document.getElementById('logo-placeholder').classList.remove('hidden'); document.getElementById('logo-img-footer').classList.add('hidden'); document.getElementById('logo-placeholder-footer').classList.remove('hidden'); document.getElementById('target-cal').value = 2000; document.getElementById('target-fiber').value = 25; document.getElementById('calc-weight').value = ""; document.getElementById('calc-height').value = ""; document.getElementById('calc-age').value = ""; document.getElementById('goals-area').innerText = ""; const tb = document.querySelector('#history-table tbody'); tb.innerHTML = ''; for(let i=0; i<5; i++) addHistoryRow(); updateChartData(); saveCurrentPatientState(); renderMealSelect(); renderDiet(); renderCustomGoals(); renderActivities(); setTheme('emerald'); closePatientModal(); showToast("Criado!"); }
         function deletePatient(id) { if(!confirm("Apagar?")) return; let l = getPatientsList().filter(p => p.id !== id); savePatientsList(l); localStorage.removeItem('diet_data_' + id); if(id === currentPatientId) createNewPatient(); else openPatientModal(); }
-        function loadPatient(id) { const d = localStorage.getItem('diet_data_' + id); if (!d) return false; try { const da = JSON.parse(d); currentPatientId = id; dietMeals = (!da.meals || da.meals.length === 0) ? JSON.parse(JSON.stringify(defaultMeals)) : da.meals; currentTheme = da.theme || 'emerald'; customGoals = da.customGoals || []; physicalActivities = da.physicalActivities || JSON.parse(JSON.stringify(defaultActivities)); activityGoalText = da.activityGoalText || ""; const f = ['patient-name','patient-goal','diet-date','prof-name','header-prof-name-input','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber']; f.forEach(x => { if(document.getElementById(x) && da.inputs[x]!==undefined) document.getElementById(x).value = da.inputs[x]; }); if(da.selects) { document.getElementById('calc-formula').value = da.selects['calc-formula'] || 'mifflin'; document.getElementById('calc-activity').value = da.selects['calc-activity'] || '1.55'; const r = document.querySelector(`input[name="calc-sex"][value="${da.selects['calc-sex']}"]`); if(r) r.checked = true; } if(da.images) { const s = (i, p, src) => { if(src) { document.getElementById(i).src=src; document.getElementById(i).classList.remove('hidden'); document.getElementById(p).classList.add('hidden'); } else { document.getElementById(i).classList.add('hidden'); document.getElementById(p).classList.remove('hidden'); } }; s('logo-img-main', 'logo-placeholder', da.images.mainLogo); s('logo-img-footer', 'logo-placeholder-footer', da.images.footerLogo); } const tb = document.querySelector('#history-table tbody'); tb.innerHTML = ''; if(da.history && da.history.length > 0) { da.history.forEach((r) => { const tr = document.createElement('tr'); r.forEach(c => { const td = document.createElement('td'); td.className = "measure-cell"; td.contentEditable = "true"; td.innerText = c; td.onblur = function() { triggerAutoSave(); updateChartData(); }; tr.appendChild(td); }); const ta = document.createElement('td'); ta.className = "p-1 text-center no-print col-history-action nutritionist-only"; ta.innerHTML = '<button onclick="deleteHistoryRow(this)" class="text-slate-300 hover:text-red-500 p-1 transition"><i class="fa-solid fa-trash-can"></i></button>'; tr.appendChild(ta); tb.appendChild(tr); }); } else { for(let i=0; i<5; i++) addHistoryRow(); } if(da.goalsText) document.getElementById('goals-area').innerText = da.goalsText; setTheme(currentTheme); renderMealSelect(); renderDiet(); renderCustomGoals(); renderActivities(); calculateEnergy(); updateDateDisplay(); toggleBodyFatInput(); updateChartData(); updateInitials(); updateSignatureDisplay(); localStorage.setItem('diet_last_patient_id', id); closePatientModal(); showToast("Carregado!"); return true; } catch (e) { return false; } }
+        function loadPatient(id) { const d = localStorage.getItem('diet_data_' + id); if (!d) return false; try { const da = JSON.parse(d); currentPatientId = id; dietMeals = (!da.meals || da.meals.length === 0) ? JSON.parse(JSON.stringify(defaultMeals)) : da.meals; currentTheme = da.theme || 'emerald'; customGoals = da.customGoals || []; physicalActivities = da.physicalActivities || JSON.parse(JSON.stringify(defaultActivities)); activityGoalText = da.activityGoalText || ""; const f = ['patient-name','patient-goal','diet-date','prof-name','header-prof-name-input','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber']; f.forEach(x => { if(document.getElementById(x) && da.inputs[x]!==undefined) document.getElementById(x).value = da.inputs[x]; }); if(da.selects) { document.getElementById('calc-formula').value = da.selects['calc-formula'] || 'mifflin'; document.getElementById('calc-activity').value = da.selects['calc-activity'] || '1.55'; const r = document.querySelector(`input[name="calc-sex"][value="${da.selects['calc-sex']}"]`); if(r) r.checked = true; } if(da.images) { const s = (i, p, src) => { if(src) { document.getElementById(i).src=src; document.getElementById(i).classList.remove('hidden'); document.getElementById(p).classList.add('hidden'); } else { document.getElementById(i).classList.add('hidden'); document.getElementById(p).classList.remove('hidden'); } }; s('logo-img-main', 'logo-placeholder', da.images.mainLogo); s('logo-img-footer', 'logo-placeholder-footer', da.images.footerLogo); } const tb = document.querySelector('#history-table tbody'); tb.innerHTML = ''; if(da.history && da.history.length > 0) { da.history.forEach((r) => { const tr = document.createElement('tr'); r.forEach(c => { const td = document.createElement('td'); td.className = "measure-cell"; td.contentEditable = "true"; td.innerText = c; td.onblur = function() { triggerAutoSave(); updateChartData(); }; tr.appendChild(td); }); const ta = document.createElement('td'); ta.className = "p-1 text-center no-print col-history-action nutritionist-only"; ta.innerHTML = '<button onclick="deleteHistoryRow(this)" class="text-slate-300 hover:text-red-500 p-1 transition"><i class="fa-solid fa-trash-can"></i></button>'; tr.appendChild(ta); tb.appendChild(tr); }); } else { for(let i=0; i<5; i++) addHistoryRow(); } if(da.goalsText) document.getElementById('goals-area').innerText = da.goalsText; setTheme(currentTheme); renderMealSelect(); renderDiet(); renderCustomGoals(); renderActivities(); calculateEnergy(); updateDateDisplay(); toggleBodyFatInput(); updateChartData(); updateInitials(); localStorage.setItem('diet_last_patient_id', id); closePatientModal(); showToast("Carregado!"); return true; } catch (e) { return false; } }
         function triggerAutoSave() { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveCurrentPatientState, 1000); }
         function saveCurrentPatientState() { if (!currentPatientId) return; const inp = {}; ['patient-name','patient-goal','diet-date','prof-name','header-prof-name-input','prof-crn','prof-phone','prof-insta','calc-weight','calc-height','calc-age','calc-bf','target-cal','target-carb-pct','target-prot-pct','target-fat-pct', 'target-fiber'].forEach(f => inp[f] = document.getElementById(f).value); const his = []; document.querySelectorAll('#history-table tbody tr').forEach(r => { const ro = []; r.querySelectorAll('td.measure-cell').forEach(c => ro.push(c.innerText)); his.push(ro); }); const da = { id: currentPatientId, lastModified: Date.now(), theme: currentTheme, inputs: inp, history: his, meals: dietMeals, customGoals: customGoals, physicalActivities: physicalActivities, activityGoalText: activityGoalText, goalsText: document.getElementById('goals-area').innerText, selects: { 'calc-formula': document.getElementById('calc-formula').value, 'calc-activity': document.getElementById('calc-activity').value, 'calc-sex': document.querySelector('input[name="calc-sex"]:checked').value }, images: { mainLogo: document.getElementById('logo-img-main').src.includes('data:') ? document.getElementById('logo-img-main').src : null, footerLogo: document.getElementById('logo-img-footer').src.includes('data:') ? document.getElementById('logo-img-footer').src : null } }; localStorage.setItem('diet_data_' + currentPatientId, JSON.stringify(da)); let l = getPatientsList(); const ix = l.findIndex(p => p.id === currentPatientId); const m = { id: currentPatientId, name: inp['patient-name'] || "Sem Nome", lastModified: Date.now() }; if (ix >= 0) l[ix] = m; else l.push(m); savePatientsList(l); const lb = document.getElementById('current-patient-label'); if(lb) lb.innerText = inp['patient-name'] || "Pacientes"; }
         function toggleBodyFatInput() { const f = document.getElementById('calc-formula').value; if(f==='tinsley_katch'||f==='cunningham') document.getElementById('bf-container').classList.remove('hidden'); else document.getElementById('bf-container').classList.add('hidden'); }
