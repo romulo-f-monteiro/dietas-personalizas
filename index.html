@@ -447,24 +447,29 @@
 
                 <div class="w-full max-w-2xl space-y-2 flex flex-col items-center">
                     
+                    <!-- Campo Paciente Centralizado -->
                     <div id="patient-name-container" class="w-full flex items-center gap-2 justify-center">
                         <span class="text-xl font-semibold text-slate-500 whitespace-nowrap">Paciente:</span>
-                        <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300 w-full text-left" placeholder="Nome do Paciente" value="Paciente Exemplo" onkeyup="triggerAutoSave()">
+                        <input type="text" id="patient-name" class="clean-input text-2xl font-bold text-slate-800 placeholder-slate-300 w-full text-center" placeholder="Nome do Paciente" value="Paciente Exemplo" onkeyup="triggerAutoSave()">
                     </div>
 
-                    <div id="patient-goal-container" class="w-full">
-                        <input type="text" id="patient-goal" class="clean-input text-md font-medium text-slate-600 placeholder-slate-300 w-full" placeholder="Objetivo" value="Objetivo: Hipertrofia" onkeyup="triggerAutoSave()">
+                    <!-- Objetivo Centralizado -->
+                    <div id="patient-goal-container" class="w-full text-center">
+                        <input type="text" id="patient-goal" class="clean-input text-md font-medium text-slate-600 placeholder-slate-300 w-full text-center" placeholder="Objetivo" value="Objetivo: Hipertrofia" onkeyup="triggerAutoSave()">
                     </div>
                     
-                    <div class="relative w-full">
-                        <input type="date" id="diet-date" class="clean-input text-sm text-slate-500 font-medium no-print w-full" onchange="updateDateDisplay(); triggerAutoSave();">
+                    <!-- Data Centralizada -->
+                    <div class="relative w-full text-center">
+                        <input type="date" id="diet-date" class="clean-input text-sm text-slate-500 font-medium no-print w-full text-center" onchange="updateDateDisplay(); triggerAutoSave();">
                         <span id="date-display" class="hidden print-only text-sm text-slate-500 font-medium w-full text-center block"></span>
                     </div>
 
                     <!-- Assinatura Abaixo da Data -->
                     <div class="w-full mt-4 text-center nutri-header-group">
-                        <p class="text-sm font-semibold text-slate-500 mb-0">Nutricionista:</p>
-                        <input type="text" id="header-prof-name-input" class="clean-input signature-font text-4xl text-black placeholder-slate-200 w-full text-center" placeholder="Assine aqui..." onkeyup="triggerAutoSave()">
+                        <!-- Rótulo sem dois pontos -->
+                        <p class="text-sm font-semibold text-slate-500 mb-0">Nutricionista</p>
+                        <!-- Tamanho da fonte reduzido para text-2xl -->
+                        <input type="text" id="header-prof-name-input" class="clean-input signature-font text-2xl text-black placeholder-slate-200 w-full text-center" placeholder="Assine aqui..." onkeyup="triggerAutoSave()">
                     </div>
 
                 </div>
@@ -1027,15 +1032,16 @@
                     const pName = document.getElementById('patient-name');
                     const pNameVal = pName ? pName.value : "Paciente";
                     
-                    // Replace inputs with text for read-only view
-                    if(pName) pName.closest('div').outerHTML = `<h1 class="text-3xl font-black text-slate-800 text-center leading-tight mb-1 break-words">${pName.value}</h1>`;
+                    // Substitui o input do nome por H1 estático centralizado com prefixo "Paciente:"
+                    if(pName) pName.closest('div').outerHTML = `<h1 class="text-3xl font-black text-slate-800 text-center leading-tight mb-1 break-words"><span class="text-xl font-medium text-slate-500 align-middle mr-2">Paciente:</span>${pNameVal}</h1>`;
                     
                     // Header Signature View
                     const pHeaderNameInput = document.getElementById('header-prof-name-input');
                     if(pHeaderNameInput && pHeaderNameInput.value) {
                          // Create the signature div for view mode
                          const sigDiv = document.createElement('div');
-                         sigDiv.className = "signature-font text-4xl text-black text-center mt-2";
+                         // Mantém text-2xl como solicitado
+                         sigDiv.className = "signature-font text-2xl text-black text-center mt-2";
                          sigDiv.innerText = pHeaderNameInput.value;
                          
                          const container = pHeaderNameInput.closest('.nutri-header-group');
@@ -1048,6 +1054,7 @@
                     }
 
                     const pGoal = document.getElementById('patient-goal');
+                    // Garante centralização do objetivo
                     if(pGoal) pGoal.outerHTML = `<p class="text-lg font-medium text-slate-600 text-center mb-2 break-words">${pGoal.value}</p>`;
                     
                     setTheme(currentTheme);
