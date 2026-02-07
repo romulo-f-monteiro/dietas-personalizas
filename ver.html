@@ -4,21 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <meta property="og:title" content="📋 Seu Planejamento Alimentar">
+    <meta property="og:title" content="🍎 Seu Planejamento Alimentar">
+    <meta property="og:description" content="Nutricionista Rômulo Monteiro: Clique para ver sua dieta detalhada.">
     
-    <meta property="og:description" content="Preparei sua dieta com base nos seus objetivos. Toque para acessar.">
-    
-    <meta property="og:image" content="https://romulo-f-monteiro.github.io/plano-alimentar/assets/logo.png">
+    <meta property="og:image" content="https://romulo-f-monteiro.github.io/dietas-personalizas_teste/assets/logo.png">
     
     <meta property="og:type" content="website">
 
-    <title>Acessar Dieta</title>
+    <title>Ver Dieta</title>
 
     <style>
-        /* Design Limpo e Profissional */
         body {
-            background-color: #f0f2f5;
-            font-family: 'Arial', sans-serif;
+            font-family: sans-serif;
+            background-color: #f4f4f9;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -28,55 +26,55 @@
         }
         .cartao {
             background: white;
-            padding: 40px;
-            border-radius: 15px;
+            padding: 30px;
+            border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 350px;
             width: 100%;
         }
-        h1 { color: #333; margin-bottom: 10px; font-size: 22px; }
-        p { color: #666; margin-bottom: 30px; font-size: 16px; }
+        h1 { color: #333; font-size: 20px; margin-top: 0; }
+        p { color: #666; margin-bottom: 25px; }
         
         .botao {
             display: block;
-            background-color: #007bff; /* Azul Profissional */
+            background-color: #2e7d32; /* Verde Nutrição */
             color: white;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 50px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 18px;
-            transition: 0.3s;
+            transition: 0.2s;
         }
-        .botao:hover { background-color: #0056b3; }
+        .botao:hover { background-color: #1b5e20; }
     </style>
 </head>
 <body>
 
     <div class="cartao">
         <h1>Olá!</h1>
-        <p>Seu planejamento já está disponível.</p>
+        <p>Seu planejamento alimentar está pronto.</p>
         
-        <a id="botao-acesso" href="#" class="botao">
-            Abrir Minha Dieta ➔
+        <a id="link-final" href="#" class="botao">
+            Acessar Dieta ➔
         </a>
     </div>
 
     <script>
-        // --- A MÁGICA SIMPLES ---
-        // 1. Pega os dados que estão no link (nome, dieta, etc)
-        const dadosDaDieta = window.location.search;
+        // --- CONFIGURAÇÃO ATUALIZADA ---
+        
+        // 1. Pega os dados da URL (ex: ?nome=Maria...)
+        const parametros = window.location.search;
 
-        // 2. Define onde está o seu site principal (a calculadora)
-        const sitePrincipal = "https://romulo-f-monteiro.github.io/plano-alimentar/";
+        // 2. SEU NOVO SITE (Onde a dieta é calculada)
+        const sitePrincipal = "https://romulo-f-monteiro.github.io/dietas-personalizas_teste/";
 
-        // 3. Monta o link e coloca no botão
-        if (dadosDaDieta) {
-            document.getElementById('botao-acesso').href = sitePrincipal + dadosDaDieta;
+        // 3. Monta o link final
+        if (parametros) {
+            document.getElementById('link-final').href = sitePrincipal + parametros;
         } else {
-            // Se não tiver dados, manda pra home
-            document.getElementById('botao-acesso').href = sitePrincipal;
+            // Se abrir sem dados, vai para a capa do site
+            document.getElementById('link-final').href = sitePrincipal;
         }
     </script>
 
