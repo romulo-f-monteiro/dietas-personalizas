@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta property="og:title" content="📋 Seu Planejamento Alimentar">
+    
+    <meta property="og:description" content="Preparei sua dieta com base nos seus objetivos. Toque para acessar.">
+    
+    <meta property="og:image" content="https://romulo-f-monteiro.github.io/plano-alimentar/assets/logo.png">
+    
+    <meta property="og:type" content="website">
+
+    <title>Acessar Dieta</title>
+
+    <style>
+        /* Design Limpo e Profissional */
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .cartao {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 { color: #333; margin-bottom: 10px; font-size: 22px; }
+        p { color: #666; margin-bottom: 30px; font-size: 16px; }
+        
+        .botao {
+            display: block;
+            background-color: #007bff; /* Azul Profissional */
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+        .botao:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <div class="cartao">
+        <h1>Olá!</h1>
+        <p>Seu planejamento já está disponível.</p>
+        
+        <a id="botao-acesso" href="#" class="botao">
+            Abrir Minha Dieta ➔
+        </a>
+    </div>
+
+    <script>
+        // --- A MÁGICA SIMPLES ---
+        // 1. Pega os dados que estão no link (nome, dieta, etc)
+        const dadosDaDieta = window.location.search;
+
+        // 2. Define onde está o seu site principal (a calculadora)
+        const sitePrincipal = "https://romulo-f-monteiro.github.io/plano-alimentar/";
+
+        // 3. Monta o link e coloca no botão
+        if (dadosDaDieta) {
+            document.getElementById('botao-acesso').href = sitePrincipal + dadosDaDieta;
+        } else {
+            // Se não tiver dados, manda pra home
+            document.getElementById('botao-acesso').href = sitePrincipal;
+        }
+    </script>
+
+</body>
+</html>
