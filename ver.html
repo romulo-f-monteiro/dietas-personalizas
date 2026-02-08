@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carregando Dieta...</title>
+    <title>Carregando...</title>
 
     <meta property="og:title" content="✅ Sua dieta está pronta!">
-    
     <meta property="og:description" content="Clique para ver sua dieta detalhada. Abs, Nutri :)">
     
-    <meta property="og:image" content="https://alice.com.br/blog/wp-content/uploads/2022/08/plano-alimentar-passo-a-passo.jpg">
+    <meta property="og:image" content="https://romulo-f-monteiro.github.io/dietas-personalizas_teste/assets/foto.jpg">
+    
+    <meta property="og:type" content="website">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:type" content="website">
 
     <style>
-        /* Estilo simples apenas para o momento do carregamento */
         body {
             font-family: sans-serif;
             display: flex;
@@ -24,36 +23,23 @@
             height: 100vh;
             margin: 0;
             background-color: #ffffff;
-            color: #666;
-            text-align: center;
-        }
-        .loader {
-            font-size: 18px;
+            color: #888;
         }
     </style>
 </head>
 <body>
 
-    <div class="loader">
-        <p>🔄 Abrindo seu planejamento alimentar...</p>
-    </div>
+    <p>⏳</p>
 
     <script>
         // --- REDIRECIONAMENTO AUTOMÁTICO ---
-        
-        // 1. Pega os dados do paciente da URL
-        const parametros = window.location.search;
+        const params = window.location.search;
+        const sitePrincipal = "https://romulo-f-monteiro.github.io/dietas-personalizas_teste/";
 
-        // 2. Define o site da calculadora (Index)
-        // ATENÇÃO: Aqui mandamos para a raiz (index.html), onde a dieta abre de verdade
-        const siteCalculadora = "https://romulo-f-monteiro.github.io/dietas-personalizas_teste/";
-
-        // 3. Redireciona imediatamente
-        if (parametros) {
-            window.location.replace(siteCalculadora + parametros);
+        if (params) {
+            window.location.replace(sitePrincipal + params);
         } else {
-            // Se não tiver dados, manda pra home
-            window.location.replace(siteCalculadora);
+            window.location.replace(sitePrincipal);
         }
     </script>
 
