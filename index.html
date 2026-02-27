@@ -74,7 +74,7 @@
             
             .meal-table-row {
                 display: grid;
-                grid-template-columns: 1fr auto auto;
+                grid-template-columns: 1fr auto;
                 gap: 8px;
                 padding: 10px;
                 border-bottom: 1px solid #f1f5f9;
@@ -408,7 +408,7 @@
     <!-- Header Principal -->
     <header class="theme-bg text-white shadow-lg no-print transition-colors duration-300">
         <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3 w-full md:w-auto">
+            <div class="hidden md:flex items-center gap-3 w-full md:w-auto">
                 <div class="flex items-center justify-center w-12 h-12 bg-white/20 rounded-lg border-2 border-white/30 backdrop-blur-sm">
                     <span id="header-initials" class="text-xl font-black tracking-tighter">RFM</span>
                 </div>
@@ -417,7 +417,7 @@
                     <p class="text-xs opacity-90">Dietas Personalizadas</p>
                 </div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 flex-wrap justify-center md:justify-end">
                 <button onclick="openTutorialModal()" class="nutritionist-only bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-purple-400">
                     <i class="fa-solid fa-circle-question"></i> Como usar
                 </button>
@@ -430,7 +430,7 @@
                 <button onclick="openShareModal()" class="nutritionist-only bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2 border border-blue-400">
                     <i class="fa-solid fa-share-nodes"></i> Compartilhar Link
                 </button>
-                <button onclick="printDiet()" class="bg-white text-slate-700 hover:bg-slate-100 px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm flex items-center gap-2">
+                <button onclick="printDiet()" class="hidden md:flex bg-white text-slate-700 hover:bg-slate-100 px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm items-center gap-2">
                     <i class="fa-solid fa-print text-slate-600"></i> Imprimir PDF
                 </button>
             </div>
@@ -740,6 +740,13 @@
                 <div class="text-center mt-10 pb-4 border-t border-slate-100 pt-4 break-inside-avoid">
                     <p class="text-[10px] text-slate-500 italic mb-1">Alimentos da tabela UNICAMP. Tabela Brasileira de Composição de Alimentos – TACO (4ª Edição)</p>
                     <p class="text-[10px] text-slate-400 font-medium">Criado por Rômulo F. Monteiro <span class="text-blue-400">@romulof.monteiro</span></p>
+                </div>
+
+                <!-- Botão de Imprimir Dieta (Apenas Mobile) -->
+                <div class="md:hidden mt-4 mb-6 flex justify-center no-print">
+                    <button onclick="printDiet()" class="w-full bg-white text-slate-700 hover:bg-slate-100 px-4 py-3 rounded-xl font-bold transition shadow-md border border-slate-200 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print text-slate-600"></i> Imprimir dieta
+                    </button>
                 </div>
             </div>
         </main>
@@ -1294,8 +1301,10 @@ const url = baseUrl + '?nome=' + safeName + '&d=' + compressed;
                             const i = m.foods.indexOf(f);
                             html+=`<div class="meal-table-row">
                                 <div class="font-medium text-sm leading-tight" style="white-space: normal; word-wrap: break-word;" contenteditable="true" onblur="updateFoodName(${m.id},${i},this.innerText)">${f.name}</div>
-                                <div class="text-sm font-bold text-black whitespace-nowrap inline-flex items-center justify-end w-fit"><input type="number" class="qty-input w-10 bg-transparent text-right text-black font-bold" value="${f.qty}" onchange="updateFoodQty(${m.id},${i},this.value)"> <span class="ml-1 text-black">g</span></div>
-                                <div class="text-xs font-bold text-black whitespace-nowrap text-right">${f.totalCal.toFixed(0)} kcal</div>
+                                <div class="flex flex-col items-end gap-1">
+                                    <div class="text-sm font-bold text-black whitespace-nowrap inline-flex items-center justify-end w-fit"><input type="number" class="qty-input w-10 bg-transparent text-right text-black font-bold" value="${f.qty}" onchange="updateFoodQty(${m.id},${i},this.value)"> <span class="ml-1 text-black">g</span></div>
+                                    <div class="text-xs font-bold text-black whitespace-nowrap text-right">${f.totalCal.toFixed(0)} kcal</div>
+                                </div>
                                 <div class="meal-table-macros hide-macros">
                                     <span class="text-blue-600">C:${f.totalCarb.toFixed(0)}</span>
                                     <span class="text-emerald-600">P:${f.totalProt.toFixed(0)}</span>
