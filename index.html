@@ -1343,7 +1343,7 @@ const url = baseUrl + '?nome=' + safeName + '&d=' + compressed;
                             <span class="text-blue-600">C: ${mc.c.toFixed(0)}g</span>
                             <span class="text-emerald-600">P: ${mc.p.toFixed(0)}g</span>
                             <span class="text-yellow-600">G: ${mc.f.toFixed(0)}g</span>
-                            <span class="text-orange-600">F: ${mc.fib.toFixed(1)}g</span>
+                            <span class="text-orange-600 hidden md:inline">F: ${mc.fib.toFixed(1)}g</span>
                         </div>
                         <div class="px-4 pb-4 pt-2 border-t border-slate-100 relative group/obs"><div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-slate-400 uppercase">Observações</span><button onclick="clearMealObservation(${m.id})" class="no-print opacity-0 group-hover/obs:opacity-100 text-slate-300 hover:text-red-500 nutritionist-only"><i class="fa-solid fa-xmark"></i></button></div><div class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-sm text-slate-600 outline-none" contenteditable="true" onblur="updateMealObservation(${m.id},this.innerText)">${m.observation||''}</div></div>
                         <!-- LINK DE RECEITAS ADICIONADO AQUI -->
